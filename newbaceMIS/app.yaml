@@ -9,8 +9,8 @@ handlers:
   static_dir: template/css
   mime_type: text/css
   
-- url: /template/images
-  static_dir: template/images
+- url: /images
+  static_dir: images
   mime_type: image/png
   
 - url: .*
