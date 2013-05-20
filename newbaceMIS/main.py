@@ -102,8 +102,8 @@ class BaseHandler(webapp2.RequestHandler):
           self.session_store.save_sessions(self.response)
 
 class MainHandler(BaseHandler):
-  def get(self):
-    self.render_template('home.html')
+    def get(self):
+        self.render_template('home.html')
 
 class SignupHandler(BaseHandler):
   def get(self):
@@ -254,10 +254,9 @@ class LoginHandler(BaseHandler):
     except VerifiedError:
         self.auth.unset_session()
         params = {
-                  'username': username,
-                  'verified': True
+                  'username': username
                   }
-        self.render_template('login.html', params)
+        self.render_template('verifyemail.html', params)
         """ask user to verify their email or resend verification got render bug"""
 
   def _serve_page(self, failed=False):
