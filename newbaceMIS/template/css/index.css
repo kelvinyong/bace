@@ -1,0 +1,29 @@
+body {
+  font: 80% Arial, sans-serif;
+}
+
+h1 {
+  color: #266ec6;
+  font-size: 1.6em;
+  margin: 0.2em 0.2em;
+}
+
+h1 a {
+  color: #266ec6;
+  text-decoration: none;
+}
+
+#topnav {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+}
+
+input {
+  display: block;
+}
+
+footer{
+  margin: 1em;
+  text-align: center;	
+}

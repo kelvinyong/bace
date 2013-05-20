@@ -1,0 +1,29 @@
+application: billyacemis
+version: 1
+runtime: python27
+api_version: 1
+threadsafe: yes
+
+handlers:
+- url: /template/css
+  static_dir: template/css
+  mime_type: text/css
+  
+- url: .*
+  script: main.app
+
+- url: /signup
+  script: main.app
+  secure: always
+
+- url: /login
+  script: main.app
+  secure: always
+
+- url: /forgot
+  script: main.app
+  secure: always
+
+libraries:
+- name: webapp2
+  version: latest
