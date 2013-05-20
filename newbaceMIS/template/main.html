@@ -1,62 +1,58 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
-    <meta name="description" content="" />
-<meta name="keywords" content="billy air cond & elect engrg, billy aircond, billy, air conditioning" />
-    <title>{% block title %}Billy ACE Management Information System{% endblock %}</title>
-    <link rel="stylesheet" href="/template/css/index.css" type="text/css" media="screen" title="no title" charset="utf-8">
-    <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=AIzaSyAatrvBOixHV_b6B1ee13soUYBb-7UoFB0"
-      type="text/javascript"></script>
-    <!--<script src="/template/js/jquery.js" type="text/javascript" charset="utf-8"></script>-->
-    <!--<script src="/template/js/geochat.js" type="text/javascript" charset="utf-8"></script>-->
-  </head>
+<!DOCTYPE html>
+<!-- Website template by freewebsitetemplates.com -->
+<html>
+<head>
+  <meta charset="UTF-8">
+	<title>{% block title %}Billy ACE Management Information System{% endblock %}</title>
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+</head>
+<body>
+	<div id="header">
+		<a href="home.html"><img src="images/logo.png" alt="Logo"></a>
+		<br /><br />
+				{% if not user %}
+				<a href="/login">Login</a>|
+				<a href="/forgot">Forgot password</a>
+				{% else %}
+				  Logged in as <span style="background-color: OldLace">{{ user.first_name }}</span> | <a href="/logout">Logout</a>
+				{% endif %}
+				|
+				<a href="/">Home</a>
+				|
+				<a href="/signup">New user</a>
+	</div>
+	<div id="body">
+		<div>
+			<ul id="navigation">
+				<li class="current">
+					<a href="home.html" class="link1">Home</a>
+				</li>
+				<li>
+					<a href="surfbase.html" class="link2">link2</a>
+				</li>
+				<li>
+					<a href="newsblog.html" class="link1">link3</a>
+				</li>
+				<li>
+					<a href="about.html" class="link2">About</a>
+				</li>
+				<li>
+					<a href="contact.html" class="link1">Contact</a>
+				</li>
+			</ul>
+			<div id="home">
+				{% block maincontent %}
 
-  <body>
-  <div class="wrapper">
-<div class="page">
-<div id="header">
-<a href="index.html"><img src="image/LOGO.png" width="500" height="100" alt="TKC_Logo"style="bottom:0" title="Home" /></a>
-
-<div class="right">
-        {% if not user %}
-        <a href="/login">Login</a>|
-        <a href="/forgot">Forgot password</a>
-        {% else %}
-          Logged in as <span style="background-color: OldLace">{{ user.first_name }}</span> | <a href="/logout">Logout</a>
-        {% endif %}
-        |
-        <a href="/">Home</a>
-        |
-        <a href="/signup">New user</a>
-</div>
-</div>
-<div id="main">
-<div id="navigation">
-
-
-</div>
-<div id="content">
-{% block maincontent %}
-
-    {% endblock %}
-
-</div>
-
-
-
-<div id="footer">
-<p>
+				{% endblock %}
+			</div>
+		</div>
+	</div>
+	<div id="footer">
+	<p>
 <a href="index.html">Home</a> | <a href="aboutus.html">About Us</a> | <a href="Programs.html">Programmes</a> | <a href="WhatsNew.html">What's New!</a> | <a href="JoinUs.html">Join Us!</a> | <a href="contactUS.html">Contact Us</a>
 <br /><br />
+EIGHT Infinity &copy; Copyright 2013. All rights reserved.
 </p>
-EIGHT Infinity &copy; 2013 All Rights Reserved.
-
-</div>
-</div>
-
-
-
-  </body>
+	</div>
+</body>
 </html>
