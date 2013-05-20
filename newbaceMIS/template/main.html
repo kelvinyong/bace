@@ -3,6 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <meta name="description" content="" />
+<meta name="keywords" content="billy air cond & elect engrg, billy aircond, billy, air conditioning" />
     <title>{% block title %}Billy ACE Management Information System{% endblock %}</title>
     <link rel="stylesheet" href="/template/css/index.css" type="text/css" media="screen" title="no title" charset="utf-8">
     <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=AIzaSyAatrvBOixHV_b6B1ee13soUYBb-7UoFB0"
@@ -12,7 +14,12 @@
   </head>
 
   <body>
-  	<div id="topnav">
+  <div class="wrapper">
+<div class="page">
+<div id="header">
+<a href="index.html"><img src="image/LOGO.png" width="500" height="100" alt="TKC_Logo"style="bottom:0" title="Home" /></a>
+
+<div class="right">
         {% if not user %}
         <a href="/login">Login</a>|
         <a href="/forgot">Forgot password</a>
@@ -23,20 +30,32 @@
         <a href="/">Home</a>
         |
         <a href="/signup">New user</a>
-   </div>
+</div>
+</div>
+<div id="main">
+<div id="navigation">
 
-  <div class="content">
-    {% block maincontent %}
+
+</div>
+<div id="content">
+{% block maincontent %}
 
     {% endblock %}
-  </div>
 
-  <div>
-    <footer>
-      <hr/>
-      	&copy;2013 EIGHT Infinity
-    </footer>
-  </div>
+</div>
+
+
+
+<div id="footer">
+<p>
+<a href="index.html">Home</a> | <a href="aboutus.html">About Us</a> | <a href="Programs.html">Programmes</a> | <a href="WhatsNew.html">What's New!</a> | <a href="JoinUs.html">Join Us!</a> | <a href="contactUS.html">Contact Us</a>
+<br /><br />
+</p>
+EIGHT Infinity &copy; 2013 All Rights Reserved.
+
+</div>
+</div>
+
 
 
   </body>
