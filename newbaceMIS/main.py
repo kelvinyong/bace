@@ -253,10 +253,7 @@ class LoginHandler(BaseHandler):
       self._serve_page(True)
     except VerifiedError:
         self.auth.unset_session()
-        params = {
-                  'username': username
-                  }
-        self.render_template('verifyemail.html', params)
+        self.redirect(self.uri_for('verifyemail'))
         """ask user to verify their email or resend verification got render bug"""
 
   def _serve_page(self, failed=False):
@@ -298,6 +295,10 @@ class GuestBook(BaseHandler):
         greeting.put()
         self.redirect(self.uri_for('test'))
 
+class VerifyHandler(BaseHandler):
+    def get(self):
+        self.render_template('verifyemail.html')
+
 
 config = {
   'webapp2_extras.auth': {
@@ -320,7 +321,8 @@ app = webapp2.WSGIApplication([
     webapp2.Route('/forgot', ForgotPasswordHandler, name='forgot'),
     webapp2.Route('/authenticated', AuthenticatedHandler, name='authenticated'),
     webapp2.Route('/testdb', dbHandler, name='test'),
-    webapp2.Route('/sign', GuestBook)
+    webapp2.Route('/sign', GuestBook),
+    webapp2.Route('/verifyemail', VerifyHandler, name='verifyemail')
 ], debug=True, config=config)
 
 logging.getLogger().setLevel(logging.DEBUG)
