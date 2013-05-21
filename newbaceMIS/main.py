@@ -276,8 +276,8 @@ class AuthenticatedHandler(BaseHandler):
 
 class dbHandler(BaseHandler):
     def get(self):
-        #greetings = db.GqlQuery("SELECT * FROM User")
-        greetings = Greeting.all()
+        greetings = db.GqlQuery("SELECT * FROM Greeting")
+        #greetings = Greeting.all()
         for greeting in greetings:
             self.response.write('<li> %s date/time %s' % (greeting.content, greeting.date))
         self.response.write('''
