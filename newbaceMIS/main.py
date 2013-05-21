@@ -29,6 +29,21 @@ def user_required(handler):
       return handler(self, *args, **kwargs)
 
   return check_login
+  
+
+def admin_required(handler):
+    """
+        check if 'user' is with admin rights
+    """
+    def check_login(self,*args, **kwargs):
+        if self.auth.get_user_by_session() and self.user.first_name == 'admin3':
+            return handler(self, *args, **kwargs)
+        else:
+            self.redirect(self.uri_for('home'), abort=True)
+            
+    return check_login
+    
+  
 
 class VerifiedError(Exception):
     """Raised when a user has not verified email"""
@@ -288,6 +303,13 @@ class AuthenticatedHandler(BaseHandler):
     @user_required
     def get(self):
         self.render_template('authenticated.html')
+        
+
+class AuthenticatedAdminHandler(BaseHandler):
+    @admin_required
+    def get(self):
+        self.render_template('adminlogin.html')
+        
 
 class dbHandler(BaseHandler):
     def get(self):
@@ -337,7 +359,8 @@ app = webapp2.WSGIApplication([
     webapp2.Route('/authenticated', AuthenticatedHandler, name='authenticated'),
     webapp2.Route('/testdb', dbHandler, name='test'),
     webapp2.Route('/sign', GuestBook),
-    webapp2.Route('/verifyemail', VerifyHandler, name='verifyemail')
+    webapp2.Route('/verifyemail', VerifyHandler, name='verifyemail'),
+    webapp2.Route('/adminlogin', AuthenticatedAdminHandler)
 ], debug=True, config=config)
 
 logging.getLogger().setLevel(logging.DEBUG)
