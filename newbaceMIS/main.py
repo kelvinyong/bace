@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from google.appengine.ext.webapp import template
+from google.appengine.api import mail
 from google.appengine.ext import ndb
 from google.appengine.ext import db
 from models import Greeting
@@ -121,10 +122,15 @@ class SignupHandler(BaseHandler):
       unique_properties,
       email_address=email, first_name=first_name, password_raw=password,
       last_name=last_name, verified=False)
+    
+    if not mail.is_email_valid(email):
+        self.display_message('invalid email entered')
+        return
+    
     if not user_data[0]: #user_data is a tuple
-      self.display_message('Unable to create user for email %s because of \
-        duplicate keys %s' % (user_name, user_data[1]))
-      return
+        self.display_message('Unable to create user for email %s because of \
+            duplicate keys %s' % (user_name, user_data[1]))
+        return
     
     user = user_data[1]
     user_id = user.get_id()
@@ -136,6 +142,15 @@ class SignupHandler(BaseHandler):
 
     msg = 'Send an email to user in order to verify their address. \
           They will be able to do so by visiting <a href="{url}">{url}</a>'
+          
+    message = mail.EmailMessage()
+    message.sender = 'postmaster@billyacemis.appspotmail.com'
+    message.to = email
+    message.body = """
+        testing email
+        %s
+        """ % msg.format(url=verification_url)
+    message.Send()
 
     self.display_message(msg.format(url=verification_url))
 
