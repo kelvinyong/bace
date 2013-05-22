@@ -12,14 +12,14 @@
 		<br /><br />
 				{% if not user %}
 				<a href="/login">Login</a>|
-				<a href="/forgot">Forgot password</a>
+				<a href="/forgot">Forgot password</a>|
+				<a href="/signup">New user</a>				
 				{% else %}
 				  Logged in as <span style="background-color: OldLace">{{ user.first_name }}</span> | <a href="/logout">Logout</a> | <a href="/setting">Settings</a>
 				{% endif %}
 				|
 				<a href="/">Home</a>
-				|
-				<a href="/signup">New user</a>
+				
 	</div>
 	<div id="body">
 		<div>

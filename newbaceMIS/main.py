@@ -303,6 +303,11 @@ class LogoutHandler(BaseHandler):
     def get(self):
         self.auth.unset_session()
         self.redirect(self.uri_for('home'))
+        
+class SettingHandler(BaseHandler):
+    @user_required
+    def get(self):
+        self.render_template('setting.html')
 
 class AuthenticatedHandler(BaseHandler):
     @user_required
@@ -366,7 +371,8 @@ app = webapp2.WSGIApplication([
     webapp2.Route('/testdb', dbHandler, name='test'),
     webapp2.Route('/sign', GuestBook),
     webapp2.Route('/verifyemail', VerifyHandler, name='verifyemail'),
-    webapp2.Route('/adminlogin', AuthenticatedAdminHandler)
+    webapp2.Route('/adminlogin', AuthenticatedAdminHandler),
+    webapp2.Route('/setting', SettingHandler)
 ], debug=True, config=config)
 
 logging.getLogger().setLevel(logging.DEBUG)
