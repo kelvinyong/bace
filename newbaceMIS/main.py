@@ -33,10 +33,12 @@ def user_required(handler):
 
 def admin_required(handler):
     """
-        check if 'user' is with admin rights
+        Decorator that checks if there's a admin associated with the current session.
+        Will redirect to home page if fail
     """
     def check_login(self,*args, **kwargs):
-        if self.auth.get_user_by_session() and self.user.first_name == 'admin3':
+        #if self.auth.get_user_by_session() and self.user.first_name == 'admin3':
+        if self.user.first_name == 'admin3':
             return handler(self, *args, **kwargs)
         else:
             self.redirect(self.uri_for('home'), abort=True)
@@ -46,7 +48,10 @@ def admin_required(handler):
   
 
 class VerifiedError(Exception):
-    """Raised when a user has not verified email"""
+    """
+        custom exception
+        Raised when a user has not verified email
+    """
 
 class BaseHandler(webapp2.RequestHandler):
   @webapp2.cached_property
@@ -306,6 +311,7 @@ class AuthenticatedHandler(BaseHandler):
         
 
 class AuthenticatedAdminHandler(BaseHandler):
+    @user_required
     @admin_required
     def get(self):
         self.render_template('adminlogin.html')
