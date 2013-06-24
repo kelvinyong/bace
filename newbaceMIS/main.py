@@ -5,6 +5,10 @@ from google.appengine.api import mail
 from google.appengine.ext import ndb
 from google.appengine.ext import db
 from models import Greeting
+from models import Customer
+from models import Staff
+from models import TestKey
+import validation
 
 import logging
 import os.path
@@ -38,7 +42,7 @@ def admin_required(handler):
     """
     def check_login(self,*args, **kwargs):
         #if self.auth.get_user_by_session() and self.user.first_name == 'admin3':
-        if self.user.first_name == 'admin3':
+        if self.user.accounType == 'administrator':
             return handler(self, *args, **kwargs)
         else:
             self.redirect(self.uri_for('home'), abort=True)
@@ -131,27 +135,33 @@ class SignupHandler(BaseHandler):
     self.render_template('signup.html')
 
   def post(self):
-    user_name = self.request.get('username')
     email = self.request.get('email')
-    first_name = self.request.get('firstname')
     password = self.request.get('password')
-    last_name = self.request.get('lastname')
-    contact_no = self.request.get('contact')
-
-    unique_properties = ['email_address']
-    user_data = self.user_model.create_user(email, email_address=email, first_name=first_name, password_raw=password,
-      last_name=last_name, contact_Number=contact_no, verified=False)
+    if validation.checkEmail(email):
+        self.display_message('Invalid Email ' + email)
+        return
     
+    customer = Customer()
+    customer.First_Name = self.request.get('firstname')
+    customer.Last_Name = self.request.get('lastname')
+    customer.Contact_No = int(self.request.get('contact'))
+    customer.Address = self.request.get('address')
+    #customer.latest_location # use google map got coordinate?
+    customer.put()
+
+    #unique_properties = ['email_address']
+    acct_data = self.user_model.create_user(email, email_address=email, password_raw=password, first_name=customer.First_Name, accounType = 'customer', verified=False)
+        
     if not mail.is_email_valid(email):
         self.display_message('invalid email entered')
         return
     
-    if not user_data[0]: #user_data is a tuple
+    if not acct_data[0]: #acct_data is a tuple
         self.display_message('Unable to create user for email %s because of \
-            duplicate keys %s' % (user_name, user_data[1]))
+            duplicate keys %s' % (email, acct_data[1]))
         return
     
-    user = user_data[1]
+    user = acct_data[1]
     user_id = user.get_id()
 
     token = self.user_model.create_signup_token(user_id)
@@ -178,11 +188,11 @@ class ForgotPasswordHandler(BaseHandler):
     self._serve_page()
 
   def post(self):
-    username = self.request.get('username')
+    email = self.request.get('email')
 
-    user = self.user_model.get_by_auth_id(username)
+    user = self.user_model.get_by_auth_id(email)
     if not user:
-      logging.info('Could not find any user entry for username %s', username)
+      logging.info('Could not find any user entry for email %s', email)
       self._serve_page(not_found=True)
       return
 
@@ -194,13 +204,22 @@ class ForgotPasswordHandler(BaseHandler):
 
     msg = 'Send an email to user in order to reset their password. \
           They will be able to do so by visiting <a href="{url}">{url}</a>'
+          
+    message = mail.EmailMessage()
+    message.sender = 'postmaster@billyacemis.appspotmail.com'
+    message.to = email
+    message.body = """
+        testing email
+        %s
+        """ % msg.format(url=verification_url)
+    message.Send()
 
     self.display_message(msg.format(url=verification_url))
   
   def _serve_page(self, not_found=False):
-    username = self.request.get('username')
+    email = self.request.get('email')
     params = {
-      'username': username,
+      'email': email,
       'not_found': not_found
     }
     self.render_template('forgot.html', params)
@@ -273,17 +292,17 @@ class LoginHandler(BaseHandler):
     self._serve_page()
 
   def post(self):
-    username = self.request.get('username')
+    email = self.request.get('email')
     password = self.request.get('password')
     try:
-        self.auth.get_user_by_password(username, password, remember=True,
+        self.auth.get_user_by_password(email, password, remember=True,
                                            save_session=True)
         if not self.user.verified:
             raise VerifiedError()
         else:
             self.redirect(self.uri_for('home'))
     except (InvalidAuthIdError, InvalidPasswordError) as e:
-      logging.info('Login failed for user %s because of %s', username, type(e))
+      logging.info('Login failed for user %s because of %s', email, type(e))
       self._serve_page(True)
     except VerifiedError:
         self.auth.unset_session()
@@ -291,9 +310,9 @@ class LoginHandler(BaseHandler):
         """ask user to verify their email or resend verification got render bug"""
 
   def _serve_page(self, failed=False):
-    username = self.request.get('username')
+    email = self.request.get('email')
     params = {
-      'username': username,
+      'email': email,
       'failed': failed
     }
     self.render_template('login.html', params)
@@ -381,7 +400,7 @@ class ScheduleHandler(BaseHandler):
 config = {
   'webapp2_extras.auth': {
     'user_model': 'models.User',
-    'user_attributes': ['first_name']
+    'user_attributes': ['first_name','accounType']
   },
   'webapp2_extras.sessions': {
     'secret_key': 'YOUR_SECRET_KEY'

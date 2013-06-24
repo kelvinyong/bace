@@ -12,7 +12,21 @@ class Greeting(db.Model):
     content = db.StringProperty()
     date = db.DateTimeProperty(auto_now_add=True)
     
+class Customer(db.Model):
+    First_Name = db.StringProperty()
+    Last_Name = db.StringProperty()
+    Contact_No = db.IntegerProperty()
+    Address = db.StringProperty()
+    #latest_location = db.StringProperty()
+    
+class Staff(db.Model):
+    First_Name = db.StringProperty()
+    Last_Name = db.StringProperty()
+    Contact_No = db.IntegerProperty()
+    Address = db.StringProperty()
 
+class TestKey(db.Model):
+    keys = db.StringProperty()
 
 
 class User(webapp2_extras.appengine.auth.models.User):
