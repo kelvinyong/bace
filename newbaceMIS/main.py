@@ -136,12 +136,11 @@ class SignupHandler(BaseHandler):
     first_name = self.request.get('firstname')
     password = self.request.get('password')
     last_name = self.request.get('lastname')
+    contact_no = self.request.get('contact')
 
     unique_properties = ['email_address']
-    user_data = self.user_model.create_user(user_name,
-      unique_properties,
-      email_address=email, first_name=first_name, password_raw=password,
-      last_name=last_name, verified=False)
+    user_data = self.user_model.create_user(email, email_address=email, first_name=first_name, password_raw=password,
+      last_name=last_name, contact_Number=contact_no, verified=False)
     
     if not mail.is_email_valid(email):
         self.display_message('invalid email entered')
@@ -346,6 +345,37 @@ class GuestBook(BaseHandler):
 class VerifyHandler(BaseHandler):
     def get(self):
         self.render_template('verifyemail.html')
+        
+    def post(self):
+        email = self.request.get('email')
+        user = self.user_model.get_by_auth_id(email)
+        user_id = user.get_id()
+    
+        token = self.user_model.create_signup_token(user_id)
+        
+    
+        verification_url = self.uri_for('verification', type='v', user_id=user_id,
+          signup_token=token, _full=True)
+    
+        msg = 'Send an email to user in order to verify their address. \
+              They will be able to do so by visiting <a href="{url}">{url}</a>'
+              
+        message = mail.EmailMessage()
+        message.sender = 'postmaster@billyacemis.appspotmail.com'
+        message.to = email
+        message.body = """
+            testing email
+            %s
+            """ % msg.format(url=verification_url)
+        message.Send()
+    
+        self.display_message(msg.format(url=verification_url))
+
+
+class ScheduleHandler(BaseHandler):
+    @user_required
+    def get(self):
+        self.render_template('schedule.html')
 
 
 config = {
@@ -372,7 +402,8 @@ app = webapp2.WSGIApplication([
     webapp2.Route('/sign', GuestBook),
     webapp2.Route('/verifyemail', VerifyHandler, name='verifyemail'),
     webapp2.Route('/adminlogin', AuthenticatedAdminHandler),
-    webapp2.Route('/setting', SettingHandler)
+    webapp2.Route('/setting', SettingHandler),
+    webapp2.Route('/schedule', ScheduleHandler)
 ], debug=True, config=config)
 
 logging.getLogger().setLevel(logging.DEBUG)

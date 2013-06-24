@@ -11,6 +11,8 @@ from google.appengine.ext import db
 class Greeting(db.Model):
     content = db.StringProperty()
     date = db.DateTimeProperty(auto_now_add=True)
+    
+
 
 
 class User(webapp2_extras.appengine.auth.models.User):

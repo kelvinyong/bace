@@ -5,10 +5,12 @@
   <meta charset="UTF-8">
 	<title>{% block title %}Billy ACE Management Information System{% endblock %}</title>
 	<link rel="stylesheet" type="text/css" href="/template/css/style.css">
+	{% block script %}
+	{% endblock %}
 </head>
 <body>
 	<div id="header">
-		<a href="/"><img src="/images/Logo.png" alt="Logo" width=10% height=10%/></a>
+		<a href="/"><img src="/images/BACE_Logo.png" alt="Logo" width=50% height=50%/></a>
 		<br /><br />
 				{% if not user %}
 				<a href="/login">Login</a>|
@@ -28,7 +30,7 @@
 					<a href="/" class="link1">Home</a>
 				</li>
 				<li>
-					<a href="/surfbase" class="link2">link2</a>
+					<a href="/schedule" class="link2">Book a Schedule</a>
 				</li>
 				<li>
 					<a href="/newsblog" class="link1">link3</a>
