@@ -7,8 +7,6 @@ from google.appengine.ext import db
 from models import Greeting
 from models import Customer
 from models import Staff
-from models import TestKey
-import validation
 
 import logging
 import os.path
@@ -21,18 +19,18 @@ from webapp2_extras.auth import InvalidAuthIdError
 from webapp2_extras.auth import InvalidPasswordError
 
 def user_required(handler):
-  """
-    Decorator that checks if there's a user associated with the current session.
-    Will also fail if there's no session present.
-  """
-  def check_login(self, *args, **kwargs):
-    auth = self.auth
-    if not auth.get_user_by_session():
-      self.redirect(self.uri_for('login'), abort=True)
-    else:
-      return handler(self, *args, **kwargs)
-
-  return check_login
+    """
+        Decorator that checks if there's a user associated with the current session.
+        Will also fail if there's is session present.
+    """
+    def check_login(self, *args, **kwargs):
+        auth = self.auth
+        if not auth.get_user_by_session():
+            self.redirect(self.uri_for('login'), abort=True)
+        else:
+            return handler(self, *args, **kwargs)
+        
+    return check_login
   
 
 def admin_required(handler):
@@ -41,7 +39,6 @@ def admin_required(handler):
         Will redirect to home page if fail
     """
     def check_login(self,*args, **kwargs):
-        #if self.auth.get_user_by_session() and self.user.first_name == 'admin3':
         if self.user.accounType == 'administrator':
             return handler(self, *args, **kwargs)
         else:
@@ -49,7 +46,21 @@ def admin_required(handler):
             
     return check_login
     
-  
+def loggedin(handler):
+    """
+        Decorator that checks if there's a user associated with the current session.
+        Will also fail if there's is session present.
+    """
+    def check_login(self, *args, **kwargs):
+        auth = self.auth
+        if not auth.get_user_by_session():
+            return handler(self, *args, **kwargs)
+        else:
+            self.redirect(self.uri_for('home'), abort=True)
+            
+    return check_login
+
+
 
 class VerifiedError(Exception):
     """
@@ -137,9 +148,6 @@ class SignupHandler(BaseHandler):
   def post(self):
     email = self.request.get('email')
     password = self.request.get('password')
-    if validation.checkEmail(email):
-        self.display_message('Invalid Email ' + email)
-        return
     
     customer = Customer()
     customer.First_Name = self.request.get('firstname')
@@ -288,6 +296,7 @@ class SetPasswordHandler(BaseHandler):
         self.display_message('Password updated')
 
 class LoginHandler(BaseHandler):
+  @loggedin
   def get(self):
     self._serve_page()
 
@@ -362,17 +371,21 @@ class GuestBook(BaseHandler):
         self.redirect(self.uri_for('test'))
 
 class VerifyHandler(BaseHandler):
+    @loggedin
     def get(self):
-        self.render_template('verifyemail.html')
+        self._serve_page()        
         
     def post(self):
         email = self.request.get('email')
         user = self.user_model.get_by_auth_id(email)
+        if not user:
+            logging.info('Not a valid email %s', email)
+            self._serve_page(not_found=True)
+            return
+        
         user_id = user.get_id()
-    
         token = self.user_model.create_signup_token(user_id)
         
-    
         verification_url = self.uri_for('verification', type='v', user_id=user_id,
           signup_token=token, _full=True)
     
@@ -389,6 +402,14 @@ class VerifyHandler(BaseHandler):
         message.Send()
     
         self.display_message(msg.format(url=verification_url))
+        
+    def _serve_page(self, not_found=False):
+        email = self.request.get('email')
+        params = {
+                  'email': email,
+                  'not_found': not_found
+                  }
+        self.render_template('verifyemail.html', params)
 
 
 class ScheduleHandler(BaseHandler):

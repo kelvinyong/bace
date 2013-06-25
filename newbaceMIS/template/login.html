@@ -10,12 +10,6 @@
 
 {% endif %}
 
-{% if verified %}
-
-	<strong>Login failed!</strong> Email not verified
-	
-{% endif %}
-
 <form class="form" action= "/login" method="POST">
 	<label for="email">Email Address:</label>
 	<input type="text" value="{{ email }}" name="email"/>
