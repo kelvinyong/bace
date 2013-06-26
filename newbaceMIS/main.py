@@ -62,8 +62,9 @@ def loggedin(handler):
 
 def getKey(self):
     """
+        return key of data being accessed
     """
-    customerInfo = (db.GqlQuery("SELECT * FROM Customer where First_Name = :fname", fname = self.user.first_name)).get()
+    customerInfo = (db.GqlQuery("SELECT * FROM Customer where First_Name = :fname", fname = self.user.email_address)).get()
     key = customerInfo.key()
     return key
 
@@ -148,24 +149,31 @@ class MainHandler(BaseHandler):
         self.render_template('home.html')
 
 class SignupHandler(BaseHandler):
+  @loggedin
   def get(self):
     self.render_template('signup.html')
 
   def post(self):
     email = self.request.get('email')
     password = self.request.get('password')
+    auth = self.auth
     
-    customer = Customer()
+    if not auth.get_user_by_session():
+        accType = 'customer'
+        customer = Customer()
+    else:
+        accType = self.request.get('accType')
+        customer = Staff()
+    
     customer.Email = email
     customer.First_Name = self.request.get('firstname')
     customer.Last_Name = self.request.get('lastname')
     customer.Contact_No = int(self.request.get('contact'))
     customer.Address = self.request.get('address')
     #customer.latest_location # use google map got coordinate?
-    customer.put()
 
     #unique_properties = ['email_address']
-    acct_data = self.user_model.create_user(email, email_address=email, password_raw=password, first_name=customer.First_Name, accounType = 'customer', verified=False)
+    acct_data = self.user_model.create_user(email, email_address=email, password_raw=password, first_name=customer.First_Name, accounType = accType, verified=False)
         
     if not mail.is_email_valid(email):
         self.display_message('invalid email entered')
@@ -176,6 +184,7 @@ class SignupHandler(BaseHandler):
             duplicate keys %s' % (email, acct_data[1]))
         return
     
+    customer.put()
     user = acct_data[1]
     user_id = user.get_id()
 
@@ -341,6 +350,12 @@ class LogoutHandler(BaseHandler):
 class SettingHandler(BaseHandler):
     @user_required
     def get(self):
+        if self.user.accounType == 'administrator':
+            table = 'Staff'
+        else:
+            table = 'Customer'
+        
+        
         customerInfo = (db.GqlQuery("SELECT * FROM Customer where First_Name = :fname", fname = self.user.first_name)).get()
         params = {
                   'email': customerInfo.Email,
@@ -374,18 +389,30 @@ class AuthenticatedAdminHandler(BaseHandler):
     def get(self):
         self.render_template('adminlogin.html')
         
+class AdminSignupHandler(BaseHandler):
+    @user_required
+    @admin_required
+    def get(self):
+        params = {
+                  'accType': 'administrator'
+                  }
+        self.render_template('signup.html',params)
+        
 
 class dbHandler(BaseHandler):
     def get(self):
         greetings = db.GqlQuery("SELECT * FROM Greeting")
-        #greetings = db.GqlQuery("SELECT * FROM Customer where First_Name = 'KelvinCustomer'")
         #greetings = Greeting.all()
         for greeting in greetings:
-            self.response.write('<li> %s date/time %s' % (greeting.Email, greeting.Last_Name))
+            self.response.write('<li> %s date/time %s' % (greeting.content, greeting.date))
         self.response.write('''
             </ol><hr>
             <form action="/sign" method=post>
             <textarea name=content rows=3 cols=60></textarea>
+            <br><select name=accType>
+              <option value="administrator">administrator</option>
+              <option value="employee">employee</option>
+            </select> 
             <br><input type=submit value="Sign Guestbook">
             </form>
         ''')
@@ -393,7 +420,7 @@ class dbHandler(BaseHandler):
 class GuestBook(BaseHandler):
     def post(self):
         greeting = Greeting()
-        greeting.content = self.request.get('content')
+        greeting.content = self.request.get('accType')
         greeting.put()
         self.redirect(self.uri_for('test'))
 
@@ -448,7 +475,7 @@ class ScheduleHandler(BaseHandler):
 config = {
   'webapp2_extras.auth': {
     'user_model': 'models.User',
-    'user_attributes': ['first_name','accounType']
+    'user_attributes': ['first_name','accounType','email_address']
   },
   'webapp2_extras.sessions': {
     'secret_key': 'YOUR_SECRET_KEY'
@@ -470,7 +497,8 @@ app = webapp2.WSGIApplication([
     webapp2.Route('/verifyemail', VerifyHandler, name='verifyemail'),
     webapp2.Route('/adminlogin', AuthenticatedAdminHandler),
     webapp2.Route('/setting', SettingHandler),
-    webapp2.Route('/schedule', ScheduleHandler)
+    webapp2.Route('/schedule', ScheduleHandler),
+    webapp2.Route('/admin/signup', AdminSignupHandler)
 ], debug=True, config=config)
 
 logging.getLogger().setLevel(logging.DEBUG)

@@ -24,7 +24,14 @@ $(document).ready(function(){
 
 {% block maincontent %}
 
+{% if user %}
+{% if user.accounType == 'administrator' %}
+<h1>Register a new employee</h1>
+{% endif %}
+{% else %}
 <h1>Register a new user</h1>
+{% endif %}
+
 <form action="/signup" method="POST" >
 <label for="email">Email address:</label>
 <input type="text" name="email" />
@@ -38,6 +45,14 @@ $(document).ready(function(){
 <input type="text" name="contact" id="number" />
 <label for="address">Address:</label>
 <input type="text" name="address" />
+
+{% if user.accounType == 'administrator' %}
+<label for="accType">Account Type:</label>
+<select name="accType">
+  <option value="administrator">administrator</option>
+  <option value="employee">employee</option>
+</select> 
+{% endif %}
 <input type="submit" value="Register" />
 </form>
 
