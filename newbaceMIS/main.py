@@ -60,6 +60,12 @@ def loggedin(handler):
             
     return check_login
 
+def getKey(self):
+    """
+    """
+    customerInfo = (db.GqlQuery("SELECT * FROM Customer where First_Name = :fname", fname = self.user.first_name)).get()
+    key = customerInfo.key()
+    return key
 
 
 class VerifiedError(Exception):
@@ -150,6 +156,7 @@ class SignupHandler(BaseHandler):
     password = self.request.get('password')
     
     customer = Customer()
+    customer.Email = email
     customer.First_Name = self.request.get('firstname')
     customer.Last_Name = self.request.get('lastname')
     customer.Contact_No = int(self.request.get('contact'))
@@ -334,7 +341,26 @@ class LogoutHandler(BaseHandler):
 class SettingHandler(BaseHandler):
     @user_required
     def get(self):
-        self.render_template('setting.html')
+        customerInfo = (db.GqlQuery("SELECT * FROM Customer where First_Name = :fname", fname = self.user.first_name)).get()
+        params = {
+                  'email': customerInfo.Email,
+                  'firstname': customerInfo.First_Name,
+                  'lastname': customerInfo.Last_Name,
+                  'contact': customerInfo.Contact_No,
+                  'address': customerInfo.Address
+                  }
+        self.render_template('setting.html', params)
+    
+    def post(self):
+        customer = Customer.get(getKey(self))
+        customer.Email = self.request.get('email')
+        customer.First_Name = self.request.get('firstname')
+        customer.Last_Name = self.request.get('lastname')
+        customer.Contact_No = int(self.request.get('contact'))
+        customer.Address = self.request.get('address')
+        customer.put()
+        self.display_message('Settings updated')
+
 
 class AuthenticatedHandler(BaseHandler):
     @user_required
@@ -352,9 +378,10 @@ class AuthenticatedAdminHandler(BaseHandler):
 class dbHandler(BaseHandler):
     def get(self):
         greetings = db.GqlQuery("SELECT * FROM Greeting")
+        #greetings = db.GqlQuery("SELECT * FROM Customer where First_Name = 'KelvinCustomer'")
         #greetings = Greeting.all()
         for greeting in greetings:
-            self.response.write('<li> %s date/time %s' % (greeting.content, greeting.date))
+            self.response.write('<li> %s date/time %s' % (greeting.Email, greeting.Last_Name))
         self.response.write('''
             </ol><hr>
             <form action="/sign" method=post>
@@ -373,7 +400,7 @@ class GuestBook(BaseHandler):
 class VerifyHandler(BaseHandler):
     @loggedin
     def get(self):
-        self._serve_page()        
+        self._serve_page()       
         
     def post(self):
         email = self.request.get('email')

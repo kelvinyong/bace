@@ -13,6 +13,7 @@ class Greeting(db.Model):
     date = db.DateTimeProperty(auto_now_add=True)
     
 class Customer(db.Model):
+    Email = db.EmailProperty()
     First_Name = db.StringProperty()
     Last_Name = db.StringProperty()
     Contact_No = db.IntegerProperty()
@@ -20,6 +21,7 @@ class Customer(db.Model):
     #latest_location = db.StringProperty()
     
 class Staff(db.Model):
+    Email = db.EmailProperty()
     First_Name = db.StringProperty()
     Last_Name = db.StringProperty()
     Contact_No = db.IntegerProperty()
