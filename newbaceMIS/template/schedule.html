@@ -9,10 +9,14 @@
 <link rel='stylesheet' type='text/css' href='/template/css/calendar.css' />
 <script type='text/javascript' src='/template/javascript/jquery.weekcalendar.js'></script>
 <script type='text/javascript' src='/template/javascript/calendar.js'></script>
+
+
 {% endblock %}
 
 {% block maincontent %}
+<h1>{{ type }}</h1>
 <div id='calendar'></div>
+
 <div id="event_edit_container">
 		<form>
 			<input type="hidden" />
@@ -30,9 +34,12 @@
 					<label for="title">Title: </label><input type="text" name="title" />
 				</li>
 				<li>
-					<label for="body">Body: </label><textarea name="body"></textarea>
+					<label for="body">Description: </label><textarea name="body"></textarea>
 				</li>
 			</ul>
 		</form>
 	</div>
+	<form action="" method="POST">
+	<input type="submit" value="Check Out"/>
+	</form>
 {% endblock %}

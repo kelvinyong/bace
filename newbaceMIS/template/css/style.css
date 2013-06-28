@@ -597,3 +597,7 @@ p a.more {
 	word-spacing:0px;
 	font-weight:bold;
 }
+
+input{
+	display:block;	
+}

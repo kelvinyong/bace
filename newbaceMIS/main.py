@@ -64,8 +64,12 @@ def getKey(self):
     """
         return key of data being accessed
     """
-    customerInfo = (db.GqlQuery("SELECT * FROM Customer where First_Name = :fname", fname = self.user.email_address)).get()
-    key = customerInfo.key()
+    if self.user.accounType == 'administrator' or self.user.accounType == 'employee':
+        info = (db.GqlQuery("SELECT * FROM Staff where Email = :email", email = self.user.email_address)).get()
+    else:
+        info = (db.GqlQuery("SELECT * FROM Customer where Email = :email", email = self.user.email_address)).get()
+        
+    key = info.key()
     return key
 
 
@@ -350,30 +354,32 @@ class LogoutHandler(BaseHandler):
 class SettingHandler(BaseHandler):
     @user_required
     def get(self):
-        if self.user.accounType == 'administrator':
-            table = 'Staff'
+        if self.user.accounType == 'administrator' or self.user.accounType == 'employee':
+            info = (db.GqlQuery("SELECT * FROM Staff where Email = :email", email = self.user.email_address)).get()
         else:
-            table = 'Customer'
+            info = (db.GqlQuery("SELECT * FROM Customer where Email = :email", email = self.user.email_address)).get()
         
-        
-        customerInfo = (db.GqlQuery("SELECT * FROM Customer where First_Name = :fname", fname = self.user.first_name)).get()
         params = {
-                  'email': customerInfo.Email,
-                  'firstname': customerInfo.First_Name,
-                  'lastname': customerInfo.Last_Name,
-                  'contact': customerInfo.Contact_No,
-                  'address': customerInfo.Address
+                  'email': info.Email,
+                  'firstname': info.First_Name,
+                  'lastname': info.Last_Name,
+                  'contact': info.Contact_No,
+                  'address': info.Address
                   }
         self.render_template('setting.html', params)
     
     def post(self):
-        customer = Customer.get(getKey(self))
-        customer.Email = self.request.get('email')
-        customer.First_Name = self.request.get('firstname')
-        customer.Last_Name = self.request.get('lastname')
-        customer.Contact_No = int(self.request.get('contact'))
-        customer.Address = self.request.get('address')
-        customer.put()
+        if self.user.accounType == 'administrator' or self.user.accounType == 'employee':
+            info = Staff.get(getKey(self))
+        else:
+            info = Customer.get(getKey(self))
+            
+        info.Email = self.request.get('email')
+        info.First_Name = self.request.get('firstname')
+        info.Last_Name = self.request.get('lastname')
+        info.Contact_No = int(self.request.get('contact'))
+        info.Address = self.request.get('address')
+        info.put()
         self.display_message('Settings updated')
 
 
@@ -393,10 +399,7 @@ class AdminSignupHandler(BaseHandler):
     @user_required
     @admin_required
     def get(self):
-        params = {
-                  'accType': 'administrator'
-                  }
-        self.render_template('signup.html',params)
+        self.render_template('signup.html')
         
 
 class dbHandler(BaseHandler):
@@ -466,9 +469,19 @@ class VerifyHandler(BaseHandler):
         self.render_template('verifyemail.html', params)
 
 
-class ScheduleHandler(BaseHandler):
+class QueryScheduleHandler(BaseHandler):
     @user_required
     def get(self):
+        self.render_template('booking.html')
+        
+    def post(self):
+        params = {
+                  'type': 'lol'
+                  }
+        self.render_template('schedule.html', params)
+        
+class ScheduleHandler(BaseHandler):
+    def post(self):
         self.render_template('schedule.html')
 
 
@@ -497,7 +510,8 @@ app = webapp2.WSGIApplication([
     webapp2.Route('/verifyemail', VerifyHandler, name='verifyemail'),
     webapp2.Route('/adminlogin', AuthenticatedAdminHandler),
     webapp2.Route('/setting', SettingHandler),
-    webapp2.Route('/schedule', ScheduleHandler),
+    webapp2.Route('/schedule/booking', QueryScheduleHandler),
+    webapp2.Route('/', ScheduleHandler),
     webapp2.Route('/admin/signup', AdminSignupHandler)
 ], debug=True, config=config)
 
