@@ -18,7 +18,7 @@ class Customer(db.Model):
     Last_Name = db.StringProperty()
     Contact_No = db.IntegerProperty()
     Address = db.StringProperty()
-    #latest_location = db.StringProperty()
+    postalCode = db.IntegerProperty()
     
 class Staff(db.Model):
     Email = db.EmailProperty()
@@ -27,8 +27,17 @@ class Staff(db.Model):
     Contact_No = db.IntegerProperty()
     Address = db.StringProperty()
 
-class TestKey(db.Model):
-    keys = db.StringProperty()
+class Job(db.Model):
+    Email = db.EmailProperty()
+    StartDate = db.DateTimeProperty()
+    EndDate = db.DateTimeProperty()
+    Service_Type = db.StringProperty()
+    Description = db.StringProperty()
+    
+class Quotation(db.Model):
+    Email = db.EmailProperty()
+    Title = db.StringProperty()
+    Description = db.TextProperty()
 
 
 class User(webapp2_extras.appengine.auth.models.User):

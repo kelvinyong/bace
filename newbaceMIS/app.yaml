@@ -15,7 +15,7 @@ handlers:
   
 - url: /images
   static_dir: images
-  mime_type: image/png
+  mime_type: image/jpg
   
 - url: .*
   script: main.app

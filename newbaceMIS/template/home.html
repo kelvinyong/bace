@@ -1,7 +1,39 @@
 {% extends "main.html" %}
 
-{% block maincontent %}
-<h1>Welcome</h1>
+{% block script %}
+<script type="text/javascript">
+$(document).ready(function(){
+		$("#navfirst").addClass("active");
+})
+</script>
 
-this will determine the main home page
+{% endblock %}
+
+{% block maincontent %}
+
+	<div class="article">
+		<h2><span><strong>Billy Billy Air-Conditioning &amp; Electrical Engineering</strong></span></h2>
+        <div class="clr"><img src="images/image.jpg" width="613" height="256" alt="we offer very affordable and reliable professional service for both residential and industrial customers" /></div>
+        <p>With the years of experience, we offer very affordable and reliable professional service for both residential and industrial customers.</p>
+       	<p>Started since April 2006 and has over 6 years of experience in the air-conditioning servicing industry cross Singapore...</p>
+        <p class="spec"><a href="/about" class="rm fl">Read more...</a></p>
+        <div class="clr"></div>
+    </div>
+    <div class="article">
+        <h2><strong>Our Operating Hours</strong></h2>
+		<div class="clr"><img src="/images/cert.jpg" width="613" height="193" alt="call us now +65 9456 0875" /></div>
+        <br />
+        <p>
+        	<strong>OPERATING HOURS</strong><br />
+        	MONDAY to SATURDAY & PUBLIC HOLIDAYS<br />
+        	9 A.M - 6 P.M
+        <p><a href ="/schedulebooking">Book NOW!</a></p>
+        </p>
+        <p>      
+      		<strong>EXCLUDING</strong><br />
+            SUNDAY
+        </p>
+        <p><small><a href = "#">Back to top</a></small></p>
+      </div>
+      
 {% endblock %}

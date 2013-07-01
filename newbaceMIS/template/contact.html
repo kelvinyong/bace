@@ -1,0 +1,66 @@
+{% extends "main.html" %}
+
+{% block script %}
+<script type="text/javascript">
+$(document).ready(function(){
+		$("#navsixth").addClass("active");
+})
+</script>
+
+{% endblock %}
+
+{% block maincontent %}
+
+<div class="article">
+	<h2><span><strong>Contact</strong></span></h2>
+	<div class="clr"></div>
+	<div class="clr"><img src="images/cert.jpg" width="613" height="193" alt="call us now +65 9456 0875" /></div>
+	<p>Please email, SMS or call us for air-conditioner installation enquires. Our staff will get back to you as soon as possible. </p>
+	<p>Thank you for your support!</p>
+</div>
+<div class="article">
+	<h2><span><strong>E-mail</strong></span></h2>
+	<div class="clr"></div>
+	<form action="#" method="post" id="sendemail">
+		<ol>
+            <li>
+              <label for="name">Name (required)</label>
+              <input id="name" name="name" class="text" />
+            </li>
+            <li>
+              <label for="email">Email Address (required)</label>
+              <input id="email" name="email" class="text" />
+            </li>
+            <li>
+              <label for="mobile">Mobile Number (required)</label>
+              <input id="mobile" name="mobile" class="text" />
+            </li>
+            <li>
+              <label for="request">Your Request</label>
+              <textarea id="request" name="request" rows="8" cols="50"></textarea>
+            </li>
+            <li>
+              <input type="image" name="imageField" id="imageField" src="images/submit.gif" class="send" />
+              <div class="clr"></div>
+            </li>
+		</ol>
+	</form>
+</div>
+<div class="article">
+	<h2><strong>SMS &amp; Call</strong></h2>
+	<div class="clr"></div>
+	<p>Mr. Phillip Chong</p>
+	<p>Mobile: +65 9456 0875<br />
+	</p>
+</div>
+<div class="article">
+	<h2><span><strong>Location</strong></span></h2>
+	<div class="clr"></div>
+	<p>Our office is located at:</p>
+	<p>Block 35 Circuit Road, #01-444<br />Singapore 370035</p>
+	<p><img src="images/map.jpg" width="446" height="431" alt="map" /></p>
+	<p><img src="images/bus.png" width="27" height="27" alt="bus" /><strong>by Bus</strong>:</p>
+	<p>40, 61, 63, 63M, 65, 66, 135, 154, 155, 158</p>
+</div>
+
+{% endblock %}

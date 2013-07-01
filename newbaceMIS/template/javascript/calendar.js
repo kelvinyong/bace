@@ -1,6 +1,11 @@
 $(document).ready(function() {
 
-
+	$('#bookingForm').submit(function(event){
+		$.post("/json", booking);
+		return true;
+     //event.preventDefault();
+	});//KELVIN
+	
    var $calendar = $('#calendar');
    var id = 10;
 
@@ -10,18 +15,26 @@ $(document).ready(function() {
       overlapEventsSeparate: false,
       firstDayOfWeek : 1,
       businessHours :{start: 9, end: 18, limitDisplay: true },
-      daysToShow : 6,
+      daysToShow : 7,
       height : function($calendar) {
          return $(window).height() - $("h1").outerHeight() - 1;
       },
       eventRender : function(calEvent, $event) {
-         if (calEvent.end.getTime() < new Date().getTime()) {
+    	  if(user_var.email == calEvent.email){//KELVIN
+        	 $event.css("backgroundColor", "#FFFF00");
+             $event.find(".wc-time").css({
+                "backgroundColor" : "#999",
+                "border" : "1px solid #888"
+             });
+         }
+    	  if (calEvent.end.getTime() < new Date().getTime() || calEvent.readOnly) {//KELVIN
             $event.css("backgroundColor", "#aaa");
             $event.find(".wc-time").css({
                "backgroundColor" : "#999",
                "border" : "1px solid #888"
             });
          }
+         
       },
       draggable : function(calEvent, $event) {
          return calEvent.readOnly != true;
@@ -57,6 +70,9 @@ $(document).ready(function() {
 
                   $calendar.weekCalendar("removeUnsavedEvents");
                   $calendar.weekCalendar("updateEvent", calEvent);
+                  
+                  saveBooking(calEvent);//KELVIN
+                  
                   $dialogContent.dialog("close");
                },
                cancel : function() {
@@ -144,48 +160,10 @@ $(document).ready(function() {
       var year = new Date().getFullYear();
       var month = new Date().getMonth();
       var day = new Date().getDate();
-
+      //KELVIN
+      lol();
       return {
-         events : [
-            {
-               "id":1,
-               "start": new Date(year, month, day, 12),
-               "end": new Date(year, month, day, 13),
-               "title":"Lunch with Mike"
-            },
-            {
-               "id":2,
-               "start": new Date(year, month, day, 14),
-               "end": new Date(year, month, day, 15),
-               "title":"Dev Meeting"
-            },
-            {
-               "id":3,
-               "start": new Date(year, month, day + 1, 17),
-               "end": new Date(year, month, day + 1, 18),
-               "title":"Hair cut"
-            },
-            {
-               "id":4,
-               "start": new Date(year, month, day - 1, 9),
-               "end": new Date(year, month, day - 1, 10),
-               "title":"Team breakfast"
-            },
-            {
-               "id":5,
-               "start": new Date(year, month, day + 1, 14),
-               "end": new Date(year, month, day + 1, 15),
-               "title":"Product showcase"
-            },
-            {
-               "id":6,
-               "start": new Date(year, month, day, 10),
-               "end": new Date(year, month, day, 11),
-               "title":"I'm read-only",
-               readOnly : true
-            }
-
-         ]
+         events : allEvent
       };
    }
 

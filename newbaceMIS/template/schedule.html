@@ -8,15 +8,63 @@
 <link rel='stylesheet' type='text/css' href='/template/css/jquery.weekcalendar.css' />
 <link rel='stylesheet' type='text/css' href='/template/css/calendar.css' />
 <script type='text/javascript' src='/template/javascript/jquery.weekcalendar.js'></script>
-<script type='text/javascript' src='/template/javascript/calendar.js'></script>
 
+
+<script type="text/javascript">
+var allEvent=[];
+var booking;
+function lol(){
+console.log(allEvent);
+}
+
+user_var = {
+	'accounType' : "{{ user.accounType }}",
+	'email' : "{{ user.email_address }}"
+};
+
+function saveBooking(slot){
+//when save is clicked in dialog button
+	booking = {
+		'content': slot.body,
+		'day': slot.start.getDate(),
+		'month': slot.start.getMonth()+1,
+		'year': slot.start.getFullYear(),
+		'start': slot.start.getHours(),
+		'end': slot.end.getHours()
+	}
+	console.log(booking);
+	$.post("/cacheBooking", booking);
+}
+
+
+$.getJSON('/json', function(data){
+	for(var i=0; i<data.schedule.length; i++){
+		//console.log(data.schedule[i]);
+		event = {};
+		event['id'] = i+1;
+		event['start'] = new Date(data.schedule[i].date.year,data.schedule[i].date.month-1,data.schedule[i].date.day, data.schedule[i].hour.start);
+		event['end'] = new Date(data.schedule[i].date.year,data.schedule[i].date.month-1,data.schedule[i].date.day, data.schedule[i].hour.end);
+		event['title'] = data.schedule[i].content;
+		event['readOnly'] = data.schedule[i].readonly;
+		event['email'] = data.schedule[i].email;
+		event['type'] = data.schedule[i].type; 
+		allEvent.push(event);
+	}
+
+	var scriptE = document.createElement("script");
+    scriptE.src = "/template/javascript/calendar.js";
+    var headElement = document.getElementsByTagName("head").item(0);
+    headElement.appendChild(scriptE);
+	
+});
+
+</script>
 
 {% endblock %}
 
 {% block maincontent %}
-<h1>{{ type }}</h1>
+<h1>booking</h1>
 <div id='calendar'></div>
-
 <div id="event_edit_container">
 		<form>
 			<input type="hidden" />
@@ -39,7 +87,7 @@
 			</ul>
 		</form>
 	</div>
-	<form action="" method="POST">
-	<input type="submit" value="Check Out"/>
+	<form action="/scheduleconfirmation" id="bookingForm" method="POST">
+	<input type="submit" value="Check Out" />
 	</form>
 {% endblock %}

@@ -4,9 +4,9 @@ from google.appengine.ext.webapp import template
 from google.appengine.api import mail
 from google.appengine.ext import ndb
 from google.appengine.ext import db
-from models import Greeting
-from models import Customer
-from models import Staff
+from datetime import datetime, date, time
+import models
+import json
 
 import logging
 import os.path
@@ -17,6 +17,10 @@ from webapp2_extras import sessions
 
 from webapp2_extras.auth import InvalidAuthIdError
 from webapp2_extras.auth import InvalidPasswordError
+
+
+# A list storing the booking cache.
+booking_cache = []
 
 def user_required(handler):
     """
@@ -164,10 +168,10 @@ class SignupHandler(BaseHandler):
     
     if not auth.get_user_by_session():
         accType = 'customer'
-        customer = Customer()
+        customer = models.Customer()
     else:
         accType = self.request.get('accType')
-        customer = Staff()
+        customer = models.Staff()
     
     customer.Email = email
     customer.First_Name = self.request.get('firstname')
@@ -344,11 +348,13 @@ class LoginHandler(BaseHandler):
       'email': email,
       'failed': failed
     }
-    self.render_template('login.html', params)
+    self.render_template('home.html', params)
 
 class LogoutHandler(BaseHandler):
     def get(self):
+        global booking_cache
         self.auth.unset_session()
+        booking_cache = []
         self.redirect(self.uri_for('home'))
         
 class SettingHandler(BaseHandler):
@@ -370,9 +376,9 @@ class SettingHandler(BaseHandler):
     
     def post(self):
         if self.user.accounType == 'administrator' or self.user.accounType == 'employee':
-            info = Staff.get(getKey(self))
+            info = models.Staff.get(getKey(self))
         else:
-            info = Customer.get(getKey(self))
+            info = models.Customer.get(getKey(self))
             
         info.Email = self.request.get('email')
         info.First_Name = self.request.get('firstname')
@@ -387,14 +393,7 @@ class AuthenticatedHandler(BaseHandler):
     @user_required
     def get(self):
         self.render_template('authenticated.html')
-        
 
-class AuthenticatedAdminHandler(BaseHandler):
-    @user_required
-    @admin_required
-    def get(self):
-        self.render_template('adminlogin.html')
-        
 class AdminSignupHandler(BaseHandler):
     @user_required
     @admin_required
@@ -412,18 +411,14 @@ class dbHandler(BaseHandler):
             </ol><hr>
             <form action="/sign" method=post>
             <textarea name=content rows=3 cols=60></textarea>
-            <br><select name=accType>
-              <option value="administrator">administrator</option>
-              <option value="employee">employee</option>
-            </select> 
             <br><input type=submit value="Sign Guestbook">
             </form>
         ''')
         
 class GuestBook(BaseHandler):
     def post(self):
-        greeting = Greeting()
-        greeting.content = self.request.get('accType')
+        greeting = models.Greeting()
+        greeting.content = self.request.get('content')
         greeting.put()
         self.redirect(self.uri_for('test'))
 
@@ -475,15 +470,117 @@ class QueryScheduleHandler(BaseHandler):
         self.render_template('booking.html')
         
     def post(self):
-        params = {
-                  'type': 'lol'
-                  }
-        self.render_template('schedule.html', params)
+        global booking_cache
+        #.. send information to database first to calculate recommendation
+        #create one cache for recommendation
+        schedule={}
+        schedule['type'] = 'recommendation'
+        schedule['content'] = 'Appointment Recommendation'
+        date={}
+        date['day'] = 3
+        date['month'] = 7
+        date['year'] = 2013
+        schedule['date'] = date
+        hour={}
+        hour['start'] = 15
+        hour['end'] = 16
+        schedule['hour'] = hour
+        
+        booking_cache.append(schedule)
+            
+        self.render_template('schedule.html')
         
 class ScheduleHandler(BaseHandler):
     def post(self):
-        self.render_template('schedule.html')
+        #save info toconfirm booking
+        #params={}
+        #data = json.loads(data)
+        #params['info'] = self.request.get('id');
+        
+        self.display_message('Saved Booking')
 
+
+class jsonHandler(BaseHandler):
+    def get(self):
+        jobs = db.GqlQuery("SELECT * FROM Job")
+        #need to set a where clause for job i.e. no point showing 
+        params = {}
+        params['schedule'] = []
+        for job in jobs:
+            schedule={}
+            schedule['type'] = 'query'
+            if(self.user.email_address == job.Email):
+                schedule['email'] = job.Email
+            schedule['content'] = job.Description
+            date={}
+            date['day'] = job.StartDate.day
+            date['month'] = job.StartDate.month
+            date['year'] = job.StartDate.year
+            schedule['date'] = date
+            hour={}
+            hour['start'] = job.StartDate.hour
+            hour['end'] = job.EndDate.hour
+            schedule['hour'] = hour
+            #schedule['readonly'] = False
+            if(job.StartDate < datetime.now() or self.user.email_address != job.Email):
+                schedule['readonly'] = True
+            params['schedule'].append(schedule)
+            
+        params['schedule'] += booking_cache
+            
+        self.response.out.write(json.JSONEncoder().encode(params));
+        
+    def post(self):
+        #save booking into database
+        d = date(int(self.request.get('year')), int(self.request.get('month')), int(self.request.get('day')))
+        st = time(int(self.request.get('start')))
+        et = time(int(self.request.get('end')))
+        datetime.combine(d, st)
+        
+        job = models.Job()
+        job.Email = self.user.email_address
+        job.Description = self.request.get('content')
+        job.StartDate = datetime.combine(d, st)
+        job.EndDate = datetime.combine(d, et)
+        job.put()
+        
+        
+class cacheHandler(BaseHandler):
+    def post(self):
+        global booking_cache
+        
+        schedule={}
+        schedule['type'] = 'appointment'
+        schedule['content'] = self.request.get('content')
+        date={}
+        date['day'] = int(self.request.get('day'))
+        date['month'] = int(self.request.get('month'))
+        date['year'] = int(self.request.get('year'))
+        schedule['date'] = date
+        hour={}
+        hour['start'] = int(self.request.get('start'))
+        hour['end'] = int(self.request.get('end'))
+        schedule['hour'] = hour
+        schedule['readonly'] = False
+        
+        booking_cache.append(schedule)
+
+
+class contactHandler(BaseHandler):
+    def get(self):
+        self.render_template('contact.html')
+        
+class galleryHandler(BaseHandler):
+    def get(self):
+        self.render_template('gallery.html')
+        
+class aboutHandler(BaseHandler):
+    def get(self):
+        self.render_template('about.html')
+        
+class servicesHandler(BaseHandler):
+    def get(self):
+        self.render_template('services.html')
 
 config = {
   'webapp2_extras.auth': {
@@ -508,11 +605,16 @@ app = webapp2.WSGIApplication([
     webapp2.Route('/testdb', dbHandler, name='test'),
     webapp2.Route('/sign', GuestBook),
     webapp2.Route('/verifyemail', VerifyHandler, name='verifyemail'),
-    webapp2.Route('/adminlogin', AuthenticatedAdminHandler),
     webapp2.Route('/setting', SettingHandler),
-    webapp2.Route('/schedule/booking', QueryScheduleHandler),
-    webapp2.Route('/', ScheduleHandler),
-    webapp2.Route('/admin/signup', AdminSignupHandler)
+    webapp2.Route('/schedulebooking', QueryScheduleHandler),
+    webapp2.Route('/scheduleconfirmation', ScheduleHandler),
+    webapp2.Route('/empsignup', AdminSignupHandler),
+    webapp2.Route('/json', jsonHandler),
+    webapp2.Route('/cacheBooking', cacheHandler),
+    webapp2.Route('/contact', contactHandler),
+    webapp2.Route('/gallery', galleryHandler),
+    webapp2.Route('/about', aboutHandler),
+    webapp2.Route('/services', servicesHandler)
 ], debug=True, config=config)
 
 logging.getLogger().setLevel(logging.DEBUG)

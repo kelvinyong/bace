@@ -1,0 +1,36 @@
+{% extends "main.html" %}
+
+{% block script %}
+<script type="text/javascript">
+
+$(document).ready(function(){
+		$("#navthird").addClass("active");
+})
+</script>
+
+{% endblock %}
+{% block maincontent %}
+
+
+<div class="article" id = "gallery">
+    <h2><span><strong>Image Gallery</strong></span></h2>
+    <p><img src="images/20130103_195022.jpg" width="440" height="320" alt="Service 1" /></p>
+</div>
+<div class="article">
+	<p><img src="images/20130103_195215.jpg" width="440" height="320" alt="Service 1" /></p>
+	<p><small><a href = "#gallery">Back to top</a></small></p>
+</div>
+<div class="article">
+    <p><img src="images/20130103_195222.jpg" width="440" height="320" alt="Service 1" /></p>
+	<p><small><a href = "#gallery">Back to top</a></small></p>
+</div>
+<div class="article">
+    <p><img src="images/Mit_Cat_1.jpg" width="440" height="682" alt="Service 1" /></p>
+	<p><small><a href = "#gallery">Back to top</a></small></p>
+</div>
+<div class="article">
+	<p><img src="images/Mit_Cat_2.jpg" width="440" height="682" alt="Service 1" /></p>
+	<p><small><a href = "#gallery">Back to top</a></small></p>
+</div>
+    
+{% endblock %}
