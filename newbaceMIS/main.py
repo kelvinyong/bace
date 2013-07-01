@@ -526,7 +526,7 @@ class jsonHandler(BaseHandler):
                 schedule['readonly'] = True
             params['schedule'].append(schedule)
             
-        params['schedule'] += booking_cache
+        params['schedule'] += booking_cache#loop booking_cache than check email than set readonly to true so unauthorize ppl cannot click
             
         self.response.out.write(json.JSONEncoder().encode(params));
         
@@ -551,6 +551,7 @@ class cacheHandler(BaseHandler):
         
         schedule={}
         schedule['type'] = 'appointment'
+        schedule['email'] = self.user.email_address
         schedule['content'] = self.request.get('content')
         date={}
         date['day'] = int(self.request.get('day'))
