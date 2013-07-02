@@ -21,6 +21,7 @@ from webapp2_extras.auth import InvalidPasswordError
 
 # A list storing the booking cache.
 booking_cache = []
+day = 3
 
 def user_required(handler):
     """
@@ -353,8 +354,10 @@ class LoginHandler(BaseHandler):
 class LogoutHandler(BaseHandler):
     def get(self):
         global booking_cache
+        global day
         self.auth.unset_session()
         booking_cache = []
+        day=3
         self.redirect(self.uri_for('home'))
         
 class SettingHandler(BaseHandler):
@@ -471,13 +474,15 @@ class QueryScheduleHandler(BaseHandler):
         
     def post(self):
         global booking_cache
+        global day
         #.. send information to database first to calculate recommendation
         #create one cache for recommendation
         schedule={}
         schedule['type'] = 'recommendation'
         schedule['content'] = 'Appointment Recommendation'
+        schedule['email'] = self.user.email_address
         date={}
-        date['day'] = 3
+        date['day'] = day
         date['month'] = 7
         date['year'] = 2013
         schedule['date'] = date
@@ -485,9 +490,10 @@ class QueryScheduleHandler(BaseHandler):
         hour['start'] = 15
         hour['end'] = 16
         schedule['hour'] = hour
+        schedule['readonly'] = False
         
         booking_cache.append(schedule)
-            
+        day +=1
         self.render_template('schedule.html')
         
 class ScheduleHandler(BaseHandler):
@@ -502,6 +508,8 @@ class ScheduleHandler(BaseHandler):
 
 class jsonHandler(BaseHandler):
     def get(self):
+        global booking_cache
+        
         jobs = db.GqlQuery("SELECT * FROM Job")
         #need to set a where clause for job i.e. no point showing 
         params = {}
@@ -526,6 +534,12 @@ class jsonHandler(BaseHandler):
                 schedule['readonly'] = True
             params['schedule'].append(schedule)
             
+        for cache in booking_cache:
+            if(self.user.email_address != cache['email']):
+                cache['email'] = None
+                cache['readonly'] = True
+        
+        
         params['schedule'] += booking_cache#loop booking_cache than check email than set readonly to true so unauthorize ppl cannot click
             
         self.response.out.write(json.JSONEncoder().encode(params));
@@ -564,7 +578,9 @@ class cacheHandler(BaseHandler):
         schedule['hour'] = hour
         schedule['readonly'] = False
         
+        #check for existing same date in cache before appending
         booking_cache.append(schedule)
+        self.response.out.write('hello')
 
 
 class contactHandler(BaseHandler):

@@ -45,6 +45,7 @@
       today : function() {
          this._clearCalendar();
          this._loadCalEvents(new Date());
+         getUpdates();//KELVIN
       },
 
       /*
@@ -53,8 +54,11 @@
       prevWeek : function() {
          //minus more than 1 day to be sure we're in previous week - account for daylight savings or other anomolies
          var newDate = new Date(this.element.data("startDate").getTime() - (MILLIS_IN_WEEK / 6));
-         this._clearCalendar();
-         this._loadCalEvents(newDate);
+         if(!(newDate.getFullYear() < (new Date).getFullYear())){//KELVIN
+        	 this._clearCalendar();
+        	 this._loadCalEvents(newDate);
+         }
+         getUpdates();
       },
 
       /*
@@ -63,8 +67,11 @@
       nextWeek : function() {
          //add 8 days to be sure of being in prev week - allows for daylight savings or other anomolies
          var newDate = new Date(this.element.data("startDate").getTime() + MILLIS_IN_WEEK + (MILLIS_IN_WEEK / 7));
-         this._clearCalendar();
-         this._loadCalEvents(newDate);
+         if(!(newDate.getFullYear() > (new Date).getFullYear())){//KELVIN
+        	 this._clearCalendar();
+        	 this._loadCalEvents(newDate);
+         }
+         getUpdates();
       },
 
       /*

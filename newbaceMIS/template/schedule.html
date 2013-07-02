@@ -9,7 +9,6 @@
 <link rel='stylesheet' type='text/css' href='/template/css/calendar.css' />
 <script type='text/javascript' src='/template/javascript/jquery.weekcalendar.js'></script>
 
-
 <script type="text/javascript">
 var allEvent=[];
 var booking;
@@ -23,8 +22,28 @@ user_var = {
 	'email' : "{{ user.email_address }}"
 };
 
+function getUpdates(){
+	allEvent=[];
+	$.getJSON('/json', function(data){
+		for(var i=0; i<data.schedule.length; i++){
+			//console.log(data.schedule[i]);
+			event = {};
+			event['id'] = i+1;
+			event['start'] = new Date(data.schedule[i].date.year,data.schedule[i].date.month-1,data.schedule[i].date.day, data.schedule[i].hour.start);
+			event['end'] = new Date(data.schedule[i].date.year,data.schedule[i].date.month-1,data.schedule[i].date.day, data.schedule[i].hour.end);
+			event['title'] = data.schedule[i].content;
+			event['readOnly'] = data.schedule[i].readonly;
+			event['email'] = data.schedule[i].email;
+			event['type'] = data.schedule[i].type; 
+			allEvent.push(event);
+		}
+	});
+	
+	$("#calendar").hide().fadeIn('slow');
+}
+
 function saveBooking(slot){
-//when save is clicked in dialog button
+//save as cache when save is clicked in dialog button 
 	booking = {
 		'content': slot.body,
 		'day': slot.start.getDate(),
@@ -34,7 +53,9 @@ function saveBooking(slot){
 		'end': slot.end.getHours()
 	}
 	console.log(booking);
-	$.post("/cacheBooking", booking);
+	$.post("/cacheBooking", booking,function(data){
+		console.log(data);
+	});
 }
 
 

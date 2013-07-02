@@ -1,6 +1,7 @@
 $(document).ready(function() {
 
 	$('#bookingForm').submit(function(event){
+		//save booking to database
 		$.post("/json", booking);
 		return true;
      //event.preventDefault();
@@ -15,7 +16,7 @@ $(document).ready(function() {
       overlapEventsSeparate: false,
       firstDayOfWeek : 1,
       businessHours :{start: 9, end: 18, limitDisplay: true },
-      daysToShow : 7,
+      daysToShow : 6,
       height : function($calendar) {
          return $(window).height() - $("h1").outerHeight() - 1;
       },
@@ -27,7 +28,7 @@ $(document).ready(function() {
                 "border" : "1px solid #888"
              });
          }
-    	  if (calEvent.end.getTime() < new Date().getTime() || calEvent.readOnly) {//KELVIN
+    	  if (calEvent.start.getTime() < new Date().getTime() || calEvent.readOnly) {//KELVIN
             $event.css("backgroundColor", "#aaa");
             $event.find(".wc-time").css({
                "backgroundColor" : "#999",
