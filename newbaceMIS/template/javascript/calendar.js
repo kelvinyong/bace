@@ -28,7 +28,7 @@ $(document).ready(function() {
                 "border" : "1px solid #888"
              });
          }
-    	  if (calEvent.start.getTime() < new Date().getTime() || calEvent.readOnly) {//KELVIN
+    	  if ((calEvent.start < new Date()) || calEvent.readOnly) {//KELVIN
             $event.css("backgroundColor", "#aaa");
             $event.find(".wc-time").css({
                "backgroundColor" : "#999",
@@ -160,11 +160,51 @@ $(document).ready(function() {
    function getEventData() {
       var year = new Date().getFullYear();
       var month = new Date().getMonth();
-      var day = new Date().getDate();
+      var date = new Date().getDate();
+      var hour = new Date().getHours();
+      var unavailableList = []
+      var id=1;
+      var now = false;
       //KELVIN
-      lol();
+      
+      for(var m=4;m <= month; m++){
+    	  var days = new Date(year,m+1,0).getDate();
+    	  for(var d=1;d <= days; d++){
+    		  for(var t=9;t <18; t++){
+    			  if((m == month && d == date && t == hour+1) || (m == month && d == date && t == 17)){
+    				  now = true;
+	    			  break;
+	    		  }
+    			  //console.log(d+':'+date+':'+m+':'+month+':'+hour);
+	    		  id += allEvent.length;
+	        	  unavailableEvent ={};
+	        	  unavailableEvent['id'] = id;
+	        	  unavailableEvent['start'] = new Date(year,m,d,t);
+	        	  unavailableEvent['end'] = new Date(year,m,d,t+1);
+	        	  unavailableEvent['title'] = 'unavailable'
+	        	  unavailableEvent['readOnly'] = true
+	        	  unavailableEvent['type'] = 'unavailable';
+	        	  
+	        	  var exist = false;
+	        	  for(var i =0; i<allEvent.length;i++){
+	        		  if((allEvent[i]['start'].getDate() == unavailableEvent['start'].getDate()) && 
+	        				  (allEvent[i]['start'].getFullYear() == unavailableEvent['start'].getFullYear()) &&
+	        				  	(allEvent[i]['start'].getMonth() == unavailableEvent['start'].getMonth()) && 
+	        				  		(allEvent[i]['start'].getHours() == unavailableEvent['start'].getHours())){
+	        			  exist = true;
+	        		  }
+	        	  }
+	        	  if(!exist)unavailableList.push(unavailableEvent);
+	        	  
+        	  }
+    		  if(now) break;
+          }
+    	  if(now) break;
+      }
+      
+      //lol();
       return {
-         events : allEvent
+         events : allEvent.concat(unavailableList)
       };
    }
 

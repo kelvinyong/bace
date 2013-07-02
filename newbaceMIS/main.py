@@ -477,6 +477,9 @@ class QueryScheduleHandler(BaseHandler):
         global day
         #.. send information to database first to calculate recommendation
         #create one cache for recommendation
+        #auth = self.auth
+        #if not auth.get_user_by_session():
+            
         schedule={}
         schedule['type'] = 'recommendation'
         schedule['content'] = 'Appointment Recommendation'
@@ -535,8 +538,11 @@ class jsonHandler(BaseHandler):
             params['schedule'].append(schedule)
             
         for cache in booking_cache:
-            if(self.user.email_address != cache['email']):
-                cache['email'] = None
+            if(self.user.email_address == cache['email']):
+                #cache['email'] = None
+                cache['content'] = self.user.email_address + cache['email']
+                cache['readonly'] = False
+            else:
                 cache['readonly'] = True
         
         
@@ -578,9 +584,18 @@ class cacheHandler(BaseHandler):
         schedule['hour'] = hour
         schedule['readonly'] = False
         
-        #check for existing same date in cache before appending
+        #check for existing same date and in cache before appending
+        
+        for temp in booking_cache:
+            if((temp['date'] == schedule['date']) and temp['hour'] == schedule['hour']):
+                msg = 'someone has just reserved please try again'
+            else:
+                msg = 'ok'
+              
+        
+        
         booking_cache.append(schedule)
-        self.response.out.write('hello')
+        self.response.out.write(msg)
 
 
 class contactHandler(BaseHandler):

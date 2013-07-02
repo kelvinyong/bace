@@ -26,7 +26,7 @@ function getUpdates(){
 	allEvent=[];
 	$.getJSON('/json', function(data){
 		for(var i=0; i<data.schedule.length; i++){
-			//console.log(data.schedule[i]);
+			console.log(data.schedule[i]);
 			event = {};
 			event['id'] = i+1;
 			event['start'] = new Date(data.schedule[i].date.year,data.schedule[i].date.month-1,data.schedule[i].date.day, data.schedule[i].hour.start);
@@ -39,7 +39,7 @@ function getUpdates(){
 		}
 	});
 	
-	$("#calendar").hide().fadeIn('slow');
+	$("#calendar").hide().fadeIn(1000);
 }
 
 function saveBooking(slot){
