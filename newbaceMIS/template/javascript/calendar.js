@@ -29,6 +29,7 @@ $(document).ready(function() {
              });
          }
     	  if ((calEvent.start < new Date()) || calEvent.readOnly) {//KELVIN
+    		  console.log(calEvent.start);
             $event.css("backgroundColor", "#aaa");
             $event.find(".wc-time").css({
                "backgroundColor" : "#999",
@@ -204,7 +205,7 @@ $(document).ready(function() {
     	  if(now) break;
       }
       
-      //lol();
+      lol();
       return {
          events : allEvent.concat(unavailableList)
       };

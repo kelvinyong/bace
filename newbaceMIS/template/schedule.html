@@ -57,8 +57,7 @@ function saveBooking(slot){
 	$.post("/cacheBooking", booking,function(data){
 		alert(data.msg);
 		if(data.exist){
-			location.reload(true);
-			//$("#calendar").weekCalendar("removeEvent", data.id);
+			getUpdates();
 		}
 	}, "json");
 }
