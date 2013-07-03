@@ -18,7 +18,7 @@ $(document).ready(function() {
       businessHours :{start: 9, end: 18, limitDisplay: true },
       daysToShow : 6,
       height : function($calendar) {
-         return $(window).height() - $("h1").outerHeight() - 1;
+         return $(window).height() - $("h1").outerHeight() - 50;
       },
       eventRender : function(calEvent, $event) {
     	  if(user_var.email == calEvent.email){//KELVIN
@@ -38,7 +38,7 @@ $(document).ready(function() {
          
       },
       draggable : function(calEvent, $event) {
-         return calEvent.readOnly != true;
+         return false;
       },
       resizable : function(calEvent, $event) {
          return calEvent.readOnly != true;
@@ -158,9 +158,11 @@ $(document).ready(function() {
    }
 
    function getEventData() {
-      var year = new Date().getFullYear();
-      var month = new Date().getMonth();
-      var date = new Date().getDate();
+	  var date = new Date();
+      date.setDate(date.getDate()+6);
+      var year = date.getFullYear();
+      var month = date.getMonth();
+      
       var hour = new Date().getHours();
       var unavailableList = []
       var id=1;
@@ -171,7 +173,7 @@ $(document).ready(function() {
     	  var days = new Date(year,m+1,0).getDate();
     	  for(var d=1;d <= days; d++){
     		  for(var t=9;t <18; t++){
-    			  if((m == month && d == date && t == hour+1) || (m == month && d == date && t == 17)){
+    			  if(m == month && d == date.getDate()){
     				  now = true;
 	    			  break;
 	    		  }

@@ -88,7 +88,7 @@
       removeEvent : function(eventId) {
 
          var self = this;
-
+         
          self.element.find(".wc-cal-event").each(function() {
             if ($(this).data("calEvent").id === eventId) {
                $(this).remove();
@@ -265,9 +265,8 @@
 
          $calendarContainer = $("<div class=\"wc-container\">").appendTo(self.element);
 
-         if (options.buttons) {
+         if (options.buttons) {//KELVIN
             calendarNavHtml = "<div class=\"wc-nav\">\
-                    <button class=\"wc-today\">" + options.buttonText.today + "</button>\
                     <button class=\"wc-prev\">" + options.buttonText.lastWeek + "</button>\
                     <button class=\"wc-next\">" + options.buttonText.nextWeek + "</button>\
                     </div>";
@@ -439,7 +438,10 @@
          var date, weekStartDate, endDate, $weekDayColumns;
          var self = this;
          var options = this.options;
+         //KELVIN
+         var today = new Date();
          date = dateWithinWeek || options.date;
+         if((date.getDate() == today.getDate())&& (date.getMonth() == today.getMonth())) date.setTime(date.getTime() + MILLIS_IN_WEEK + (MILLIS_IN_WEEK / 7));
          weekStartDate = self._dateFirstDayOfWeek(date);
          weekEndDate = self._dateLastMilliOfWeek(date);
 

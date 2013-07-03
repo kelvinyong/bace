@@ -21,7 +21,7 @@ from webapp2_extras.auth import InvalidPasswordError
 
 # A list storing the booking cache.
 booking_cache = []
-day = 3
+day = 15
 
 def user_required(handler):
     """
@@ -357,7 +357,7 @@ class LogoutHandler(BaseHandler):
         global day
         self.auth.unset_session()
         booking_cache = []
-        day=3
+        day=15
         self.redirect(self.uri_for('home'))
         
 class SettingHandler(BaseHandler):
@@ -477,9 +477,6 @@ class QueryScheduleHandler(BaseHandler):
         global day
         #.. send information to database first to calculate recommendation
         #create one cache for recommendation
-        #auth = self.auth
-        #if not auth.get_user_by_session():
-            
         schedule={}
         schedule['type'] = 'recommendation'
         schedule['content'] = 'Appointment Recommendation'
@@ -539,15 +536,17 @@ class jsonHandler(BaseHandler):
             
         for cache in booking_cache:
             if(self.user.email_address == cache['email']):
-                #cache['email'] = None
-                cache['content'] = self.user.email_address + cache['email']
                 cache['readonly'] = False
+                params['schedule'].append(cache)
             else:
                 cache['readonly'] = True
+                temp = cache['email']
+                cache['email'] = None
+                params['schedule'].append(cache)
+                cache['email'] = temp
         
+        #params['schedule'] += booking_cache#loop booking_cache than check email than set readonly to true so unauthorize ppl cannot click
         
-        params['schedule'] += booking_cache#loop booking_cache than check email than set readonly to true so unauthorize ppl cannot click
-            
         self.response.out.write(json.JSONEncoder().encode(params));
         
     def post(self):
@@ -568,6 +567,8 @@ class jsonHandler(BaseHandler):
 class cacheHandler(BaseHandler):
     def post(self):
         global booking_cache
+        data={}
+        data['id'] = self.request.get('id')
         
         schedule={}
         schedule['type'] = 'appointment'
@@ -585,17 +586,22 @@ class cacheHandler(BaseHandler):
         schedule['readonly'] = False
         
         #check for existing same date and in cache before appending
-        
+        exist = False;
         for temp in booking_cache:
             if((temp['date'] == schedule['date']) and temp['hour'] == schedule['hour']):
-                msg = 'someone has just reserved please try again'
+                data['msg'] = 'Someone has just reserved. Please try again'
+                data['exist'] = True;
+                exist = True;
+                break;
             else:
-                msg = 'ok'
-              
-        
-        
-        booking_cache.append(schedule)
-        self.response.out.write(msg)
+                data['msg'] = 'Reservation is being made'
+                data['exist'] = False;
+                
+        if not exist:
+            booking_cache.append(schedule)
+                
+             
+        self.response.out.write(json.JSONEncoder().encode(data))
 
 
 class contactHandler(BaseHandler):
