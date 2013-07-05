@@ -24,7 +24,8 @@ $(document).ready(function(){
 <h1>{{ user.first_name }}'s Personal Settings</h1>
 <form action="/setting" method="POST" >
 <ol>
-<label for="email">You are currently login using this email address:</label>
+	<li>
+	<label for="email">You are currently login using this email address:</label>
     <input type="text" name="email" class="text" value = "{{ email }}" readonly />
     </li>
     <li>
