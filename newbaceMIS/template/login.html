@@ -2,23 +2,31 @@
 
 {% block maincontent %}
 
-<h1>Login</h1>
+<h2><strong>Login failed!</strong></h2>
 
 {% if failed %}
 
-    <strong>Login failed!</strong> Check your Login ID/password and try again.
+Please check your Login ID or password and try again.
 
 {% endif %}
 
 <form class="form" action= "/login" method="POST">
-	<label for="email">Email Address:</label>
-	<input type="text" value="{{ email }}" name="email" autofocus/>
-	<label for="password">Password</label>
-	<input type="password" name="password"/>
-	<button type="submit" class="btn">Login</button>
+<ol>
+    <li>
+        <label for="email">Email Address:</label>
+        <input type="text" value="{{ email }}" name="email" autofocus/>
+        </li>
+        <li>
+        <label for="password">Password</label>
+        <input type="password" name="password"/>
+        </li>
+        <li>
+        <button type="submit" class="btn">Login</button>
+        </li>
+        <li>
+        <a href="/forgot">Forgot password</a>
+        </li>
+</ol>
 </form>
-
-<a href="/forgot">Forgot password</a>
-i think have a arrow pointing <---- to sign in better since will have 2 of this sign in field
 
 {% endblock %}
