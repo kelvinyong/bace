@@ -349,7 +349,7 @@ class LoginHandler(BaseHandler):
       'email': email,
       'failed': failed
     }
-    self.render_template('home.html', params)
+    self.render_template('login.html', params)
 
 class LogoutHandler(BaseHandler):
     def get(self):
@@ -529,7 +529,7 @@ class jsonHandler(BaseHandler):
             hour['start'] = job.StartDate.hour
             hour['end'] = job.EndDate.hour
             schedule['hour'] = hour
-            #schedule['readonly'] = False
+            schedule['readonly'] = False
             if(job.StartDate < datetime.now() or self.user.email_address != job.Email):
                 schedule['readonly'] = True
             params['schedule'].append(schedule)
@@ -584,6 +584,11 @@ class cacheHandler(BaseHandler):
         hour['end'] = int(self.request.get('end'))
         schedule['hour'] = hour
         schedule['readonly'] = False
+        
+        #check cache for existing email address
+        #one customer can only have one active booking
+        
+        
         
         #check for existing same date and in cache before appending
         exist = False;

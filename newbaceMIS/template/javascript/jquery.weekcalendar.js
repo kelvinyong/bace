@@ -44,7 +44,7 @@
        */
       today : function() {
          this._clearCalendar();
-         this._loadCalEvents(new Date());
+         this._loadCalEvents(this.element.data("startDate"));
          getUpdates();//KELVIN
       },
 
@@ -54,7 +54,8 @@
       prevWeek : function() {
          //minus more than 1 day to be sure we're in previous week - account for daylight savings or other anomolies
          var newDate = new Date(this.element.data("startDate").getTime() - (MILLIS_IN_WEEK / 6));
-         if(!(newDate.getFullYear() < (new Date).getFullYear())){//KELVIN
+         var now = new Date();
+         if(!(newDate < now.setMonth(now.getMonth()+3))){//KELVIN
         	 this._clearCalendar();
         	 this._loadCalEvents(newDate);
          }
@@ -67,7 +68,8 @@
       nextWeek : function() {
          //add 8 days to be sure of being in prev week - allows for daylight savings or other anomolies
          var newDate = new Date(this.element.data("startDate").getTime() + MILLIS_IN_WEEK + (MILLIS_IN_WEEK / 7));
-         if(!(newDate.getFullYear() > (new Date).getFullYear())){//KELVIN
+         var now = new Date();
+         if(!(newDate > now.setMonth(now.getMonth()+3))){//KELVIN
         	 this._clearCalendar();
         	 this._loadCalEvents(newDate);
          }
@@ -267,6 +269,7 @@
 
          if (options.buttons) {//KELVIN
             calendarNavHtml = "<div class=\"wc-nav\">\
+            		<button class=\"wc-today\">" + options.buttonText.today + "</button>\
                     <button class=\"wc-prev\">" + options.buttonText.lastWeek + "</button>\
                     <button class=\"wc-next\">" + options.buttonText.nextWeek + "</button>\
                     </div>";
@@ -1303,7 +1306,7 @@
          timeslotsPerHour : 1,
          buttons : true,
          buttonText : {
-            today : "today",
+            today : "refresh",
             lastWeek : "&nbsp;&lt;&nbsp;",
             nextWeek : "&nbsp;&gt;&nbsp;"
          },

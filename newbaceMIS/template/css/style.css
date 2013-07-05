@@ -311,6 +311,7 @@ ol li input.text {
 }
 ol li textarea {
 	width:480px;
+	max-width: 480px; 
 	border:1px solid #c0c0c0;
 	margin:2px 0;
 	padding:2px;

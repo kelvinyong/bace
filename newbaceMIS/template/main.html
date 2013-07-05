@@ -57,11 +57,19 @@
         		<div class="clr"></div>
         		<ul class="ex_menu">
 					<form class="form" action= "/login" method="POST">
-						<label for="email">Email Address:</label>
-						<input type="text" name="email" autofocus/>
-						<label for="password">Password</label>
-						<input type="password" name="password"/>
-						<button type="submit" class="btn">Login</button>
+						<ol>
+							<li>
+								<label for="email">Email Address:</label>
+								<input type="text" name="email" autofocus />
+							</li>
+							<li>
+								<label for="password">Password:</label>
+								<input type="password" name="password" />
+							</li>
+							<li>
+								<button type="submit" class="btn">Login</button>
+							</li>
+						</ol>
 					</form>
 				
 					<small><a href = "/signup">Register</a> | <a href="/forgot">Forgot password</a></small><br />
@@ -78,6 +86,7 @@
         			<li><a href="/setting">Settings</a></li>
 				{% if user.accounType == 'administrator' %}
 					<li><a href="/empsignup">New Employee</a></li>
+					<li><a href="/">Add a job</a></li>
 					<li>{{ user.accounType }} Rights</li>
 				{% endif %}
 				</ul>
@@ -96,7 +105,7 @@
         		</ul>
       		</div>
       		<div class="gadget">
-        		<h2 class="star"><span>Sponsers</span></h2>
+        		<h2 class="star"><span>Partners</span></h2>
         		<div class="clr"></div>
         		<ul class="sb_menu">
           			<li><img src="images/logo/Mitsubishi.jpg" width="95" height="40" alt="Mitsubishi logo" /></li>

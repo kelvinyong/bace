@@ -1,5 +1,6 @@
 $(document).ready(function() {
-
+	var booking;
+	var created = false;
 	$('#bookingForm').submit(function(event){
 		//save booking to database
 		$.post("/json", booking);
@@ -18,23 +19,17 @@ $(document).ready(function() {
       businessHours :{start: 9, end: 18, limitDisplay: true },
       daysToShow : 6,
       height : function($calendar) {
-         return $(window).height() - $("h1").outerHeight() - 50;
+         return $(window).height() - $(".sidebar").outerHeight()/9 - 1;
       },
       eventRender : function(calEvent, $event) {
-    	  if(user_var.email == calEvent.email){//KELVIN
-        	 $event.css("backgroundColor", "#FFFF00");
-             $event.find(".wc-time").css({
-                "backgroundColor" : "#999",
-                "border" : "1px solid #888"
-             });
-         }
-    	  if ((calEvent.start < new Date()) || calEvent.readOnly) {//KELVIN
-    		  console.log(calEvent.start);
+    	  if ((calEvent.start < new Date()) || calEvent.readOnly) {//KELVIN timing issue?
             $event.css("backgroundColor", "#aaa");
             $event.find(".wc-time").css({
                "backgroundColor" : "#999",
                "border" : "1px solid #888"
             });
+         }else if(user_var.email == calEvent.email){//KELVIN!!!
+        	 $event.css("backgroundColor", "#FFFF00");
          }
          
       },
@@ -47,8 +42,23 @@ $(document).ready(function() {
       eventNew : function(calEvent, $event) {
          var $dialogContent = $("#event_edit_container");
          resetForm($dialogContent);
-         var startField = $dialogContent.find("select[name='start']").val(calEvent.start);
-         var endField = $dialogContent.find("select[name='end']").val(calEvent.end);
+         var displaystartTime;
+		 var displayendTime;
+		 
+		 if(calEvent.start.getHours()>12){
+			displaystartTime = calEvent.start.getHours()-12 + ":00 pm";
+		 }else {
+			displaystartTime = calEvent.start.getHours() + ":00 am";
+		 }
+		 
+		 if(calEvent.end.getHours()>12){
+			displayendTime = calEvent.end.getHours()-12 + ":00 pm";
+		 }else {
+			displayendTime = calEvent.end.getHours() + ":00 am";
+		 }
+		 
+         var startField = $dialogContent.find("input[name='start']").val(displaystartTime);
+         var endField = $dialogContent.find("input[name='end']").val(displayendTime);
          var titleField = $dialogContent.find("input[name='title']");
          var bodyField = $dialogContent.find("textarea[name='body']");
 
@@ -65,15 +75,35 @@ $(document).ready(function() {
                save : function() {
                   calEvent.id = id;
                   id++;
-                  calEvent.start = new Date(startField.val());
-                  calEvent.end = new Date(endField.val());
+                  calEvent.start = new Date(calEvent.start);
+                  calEvent.end = new Date(calEvent.end);
                   calEvent.title = titleField.val();
                   calEvent.body = bodyField.val();
 
                   $calendar.weekCalendar("removeUnsavedEvents");
                   $calendar.weekCalendar("updateEvent", calEvent);
                   
-                  saveBooking(calEvent);//KELVIN
+                  //KELVIN
+                  if(created)$calendar.weekCalendar("removeEvent", calEvent.id -1);//KELVIN
+                  
+                  booking = {
+                			'id':calEvent.id,
+                			'content': calEvent.body,
+                			'day': calEvent.start.getDate(),
+                			'month': calEvent.start.getMonth()+1,
+                			'year': calEvent.start.getFullYear(),
+                			'start': calEvent.start.getHours(),
+                			'end': calEvent.end.getHours()
+                		}
+                		console.log(booking);
+                		$.post("/cacheBooking", booking,function(data){
+                			alert(data.msg);
+                			created=true;
+                			if(data.exist){
+                				getUpdates();
+                				$calendar.weekCalendar("removeEvent", calEvent.id);
+                			}
+                		}, "json");
                   
                   $dialogContent.dialog("close");
                },
@@ -84,7 +114,6 @@ $(document).ready(function() {
          }).show();
 
          $dialogContent.find(".date_holder").text($calendar.weekCalendar("formatDate", calEvent.start));
-         setupStartAndEndTimeFields(startField, endField, calEvent, $calendar.weekCalendar("getTimeslotTimes", calEvent.start));
 
       },
       eventDrop : function(calEvent, $event) {
@@ -99,15 +128,30 @@ $(document).ready(function() {
 
          var $dialogContent = $("#event_edit_container");
          resetForm($dialogContent);
-         var startField = $dialogContent.find("select[name='start']").val(calEvent.start);
-         var endField = $dialogContent.find("select[name='end']").val(calEvent.end);
+         var displaystartTime;
+		 var displayendTime;
+		 
+		 if(calEvent.start.getHours()>12){
+			displaystartTime = calEvent.start.getHours()-12 + ":00 pm";
+		 }else {
+			displaystartTime = calEvent.start.getHours() + ":00 am";
+		 }
+		 
+		 if(calEvent.end.getHours()>12){
+			displayendTime = calEvent.end.getHours()-12 + ":00 pm";
+		 }else {
+			displayendTime = calEvent.end.getHours() + ":00 am";
+		 }
+		 
+         var startField = $dialogContent.find("input[name='start']").val(displaystartTime);
+         var endField = $dialogContent.find("input[name='end']").val(displayendTime);
          var titleField = $dialogContent.find("input[name='title']").val(calEvent.title);
          var bodyField = $dialogContent.find("textarea[name='body']");
          bodyField.val(calEvent.body);
 
          $dialogContent.dialog({
             modal: true,
-            title: "Edit - " + calEvent.title,
+            title: calEvent.title,
             close: function() {
                $dialogContent.dialog("destroy");
                $dialogContent.hide();
@@ -116,8 +160,8 @@ $(document).ready(function() {
             buttons: {
                save : function() {
 
-                  calEvent.start = new Date(startField.val());
-                  calEvent.end = new Date(endField.val());
+                  calEvent.start = new Date(calEvent.start);
+                  calEvent.end = new Date(calEvent.end);
                   calEvent.title = titleField.val();
                   calEvent.body = bodyField.val();
 
@@ -134,10 +178,7 @@ $(document).ready(function() {
             }
          }).show();
 
-         var startField = $dialogContent.find("select[name='start']").val(calEvent.start);
-         var endField = $dialogContent.find("select[name='end']").val(calEvent.end);
          $dialogContent.find(".date_holder").text($calendar.weekCalendar("formatDate", calEvent.start));
-         setupStartAndEndTimeFields(startField, endField, calEvent, $calendar.weekCalendar("getTimeslotTimes", calEvent.start));
          $(window).resize().resize(); //fixes a bug in modal overlay size ??
 
       },
@@ -194,6 +235,8 @@ $(document).ready(function() {
 	        				  (allEvent[i]['start'].getFullYear() == unavailableEvent['start'].getFullYear()) &&
 	        				  	(allEvent[i]['start'].getMonth() == unavailableEvent['start'].getMonth()) && 
 	        				  		(allEvent[i]['start'].getHours() == unavailableEvent['start'].getHours())){
+	        			  t += (allEvent[i]['end'].getHours()-allEvent[i]['start'].getHours())-1;
+	        			  //check for end date as well to cater for 2 hour slot
 	        			  exist = true;
 	        		  }
 	        	  }
@@ -215,7 +258,7 @@ $(document).ready(function() {
    /*
     * Sets up the start and end time fields in the calendar event
     * form for editing based on the calendar event being edited
-    */
+    *///KELVIN maybe delete this function
    function setupStartAndEndTimeFields($startTimeField, $endTimeField, calEvent, timeslotTimes) {
 
       for (var i = 0; i < timeslotTimes.length; i++) {
@@ -264,25 +307,6 @@ $(document).ready(function() {
          $endTimeField.find("option:eq(1)").attr("selected", "selected");
       }
 
-   });
-
-
-   var $about = $("#about");
-
-   $("#about_button").click(function() {
-      $about.dialog({
-         title: "About BACE Scheduling System",
-         width: 600,
-         close: function() {
-            $about.dialog("destroy");
-            $about.hide();
-         },
-         buttons: {
-            close : function() {
-               $about.dialog("close");
-            }
-         }
-      }).show();
    });
 
 
