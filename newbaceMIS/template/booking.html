@@ -33,28 +33,6 @@ $(document).ready(function(){
 <form action="/schedulebooking" method="POST" >
 <ol>
 	<li>
-
-		<label for="serviceType">Service Type:</label>
-		<select name="serviceType">
-		  <option value="Basic Servicing">Basic Servicing</option>
-		  <option value="Chemical Wash">Chemical Wash</option>
-		  <option value="Top Up Gas">Top Up Gas</option>
-		  <option value="Checking &amp; Troubleshooting">Checking &amp; Troubleshooting</option>
-        </select>
-    </li>
-    <li>
-        <label for="quantity">Quantity:</label>
-        <select name="quantity">
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="3">4</option>
-          <option value="3">5</option>
-          <option value="3">6</option>
-          <option value="3">7</option>
-          <option value="3">8</option>
-          <option value="3">8&lt;</option>
-          
 		<label for="serviceType">Basic Servicing :</label>
         <select name="basicservicingquantity">
           <option value="0" selected>0</option>
@@ -96,7 +74,6 @@ $(document).ready(function(){
         <select name="checktroubleshoot">
           <option value="no" selected>No</option>
           <option value="yes">Yes</option>
-
         </select>
      </li>
      <li>
@@ -121,7 +98,6 @@ $(document).ready(function(){
 </ol>
 </form>
 
-asd
 {% endblock %}
 
 
