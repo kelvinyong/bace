@@ -25,31 +25,30 @@ $(document).ready(function(){
 <form action="/setting" method="POST" >
 <ol>
 	<li>
-    <label for="email">Email cannot be Changed:</label>
-    <input type="text" name="email" value = "{{ email }}" readonly />
+	<p>You are currently login using this email address: {{ email }}</p>
     </li>
     <li>
     <label for="password">Password:</label>
-    <input type="password" name="password" />
+    <input type="password" name="password" class="text"/>
     </li>
     <li>
     <label for="firstname">First Name:</label>
-    <input type="text" name="firstname" value = "{{ firstname }}"/>
+    <input type="text" name="firstname" value = "{{ firstname }}" class="text"/>
     </li>
     <li>
     <label for="lastname">Last Name:</label>
-    <input type="text" name="lastname" value = "{{ lastname }}"/>
+    <input type="text" name="lastname" value = "{{ lastname }}" class="text"/>
     </li>
     <li>
     <label for="contact">Contact Number:</label>
-    <input type="text" name="contact" id="number" value = "{{ contact }}"/>
+    <input type="text" name="contact" id="number" value = "{{ contact }}" class="text"/>
     </li>
     <li>
     <label for="address">Address:</label>
-    <input type="text" name="address" value = "{{ address }}"/>
+    <input type="text" name="address" value = "{{ address }}" class="text"/>
     </li>
     <li>
-    <input type="submit" value="Submit Changes" />
+    <input type="submit" value="Submit Changes" class="text"/>
     </li>
 </ol>
 </form>
