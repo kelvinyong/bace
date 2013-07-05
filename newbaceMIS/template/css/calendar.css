@@ -11,8 +11,9 @@ p {
 	font-size: 1em;	
 }
 
-#event_edit_container, #about {
+#event_edit_container, {
 	display: none;
+	list-style:none;
 }
 
 .wc-header td {

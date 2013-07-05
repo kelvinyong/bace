@@ -37,84 +37,93 @@ $(document).ready(function() {
          return false;
       },
       resizable : function(calEvent, $event) {
-         return calEvent.readOnly != true;
+         return false;
       },
       eventNew : function(calEvent, $event) {
-         var $dialogContent = $("#event_edit_container");
-         resetForm($dialogContent);
-         var displaystartTime;
-		 var displayendTime;
+    	 if(booking_quota < 2 || created){
+    		 var $dialogContent = $("#event_edit_container");
+	         resetForm($dialogContent);
+	         var displaystartTime;
+			 var displayendTime;
 		 
-		 if(calEvent.start.getHours()>12){
-			displaystartTime = calEvent.start.getHours()-12 + ":00 pm";
-		 }else {
-			displaystartTime = calEvent.start.getHours() + ":00 am";
-		 }
+			 if(calEvent.start.getHours()>12){
+				displaystartTime = calEvent.start.getHours()-12 + ":00 pm";
+			 }else {
+				displaystartTime = calEvent.start.getHours() + ":00 am";
+			 }
+			 
+			 if(calEvent.end.getHours()>12){
+				displayendTime = calEvent.end.getHours()-12 + ":00 pm";
+			 }else {
+				displayendTime = calEvent.end.getHours() + ":00 am";
+			 }
 		 
-		 if(calEvent.end.getHours()>12){
-			displayendTime = calEvent.end.getHours()-12 + ":00 pm";
-		 }else {
-			displayendTime = calEvent.end.getHours() + ":00 am";
-		 }
-		 
-         var startField = $dialogContent.find("input[name='start']").val(displaystartTime);
-         var endField = $dialogContent.find("input[name='end']").val(displayendTime);
-         var titleField = $dialogContent.find("input[name='title']");
-         var bodyField = $dialogContent.find("textarea[name='body']");
+	         var startField = $dialogContent.find("input[name='start']").val(displaystartTime);
+	         var endField = $dialogContent.find("input[name='end']").val(displayendTime);
+	         var titleField = $dialogContent.find("input[name='title']");
+	         var bodyField = $dialogContent.find("textarea[name='body']");
 
 
-         $dialogContent.dialog({
-            modal: true,
-            title: "New Calendar Event",
-            close: function() {
-               $dialogContent.dialog("destroy");
-               $dialogContent.hide();
-               $('#calendar').weekCalendar("removeUnsavedEvents");
-            },
-            buttons: {
-               save : function() {
-                  calEvent.id = id;
-                  id++;
-                  calEvent.start = new Date(calEvent.start);
-                  calEvent.end = new Date(calEvent.end);
-                  calEvent.title = titleField.val();
-                  calEvent.body = bodyField.val();
-
-                  $calendar.weekCalendar("removeUnsavedEvents");
-                  $calendar.weekCalendar("updateEvent", calEvent);
-                  
-                  //KELVIN
-                  if(created)$calendar.weekCalendar("removeEvent", calEvent.id -1);//KELVIN
-                  
-                  booking = {
-                			'id':calEvent.id,
-                			'content': calEvent.body,
-                			'day': calEvent.start.getDate(),
-                			'month': calEvent.start.getMonth()+1,
-                			'year': calEvent.start.getFullYear(),
-                			'start': calEvent.start.getHours(),
-                			'end': calEvent.end.getHours()
-                		}
-                		console.log(booking);
-                		$.post("/cacheBooking", booking,function(data){
-                			alert(data.msg);
-                			created=true;
-                			if(data.exist){
-                				getUpdates();
-                				$calendar.weekCalendar("removeEvent", calEvent.id);
-                			}
-                		}, "json");
-                  
-                  $dialogContent.dialog("close");
-               },
-               cancel : function() {
-                  $dialogContent.dialog("close");
-               }
-            }
-         }).show();
-
-         $dialogContent.find(".date_holder").text($calendar.weekCalendar("formatDate", calEvent.start));
-
+	         $dialogContent.dialog({
+	            modal: true,
+	            title: "New Appointment",
+	            close: function() {
+	               $dialogContent.dialog("destroy");
+	               $dialogContent.hide();
+	               $('#calendar').weekCalendar("removeUnsavedEvents");
+	            },
+	            buttons: {
+	               save : function() {
+	                  calEvent.id = id;
+	                  id++;
+	                  calEvent.start = new Date(calEvent.start);
+	                  calEvent.end = new Date(calEvent.end);
+	                  calEvent.title = titleField.val();
+	                  calEvent.body = bodyField.val();
+	
+	                  $calendar.weekCalendar("removeUnsavedEvents");
+	                  $calendar.weekCalendar("updateEvent", calEvent);
+	                  
+	                  //KELVIN
+	                  if(created){
+	                	  $calendar.weekCalendar("removeEvent", calEvent.id -1);
+	                	  $.post("/removeCacheBooking",booking);
+	                	  console.log(booking);
+	                  }
+	                  
+	                  booking = {
+	                			'id':calEvent.id,
+	                			'content': calEvent.body,
+	                			'day': calEvent.start.getDate(),
+	                			'month': calEvent.start.getMonth()+1,
+	                			'year': calEvent.start.getFullYear(),
+	                			'start': calEvent.start.getHours(),
+	                			'end': calEvent.end.getHours(),
+	                			'email': user_var.email,
+	                			'type': 'appointment'
+	                		}
+	                		$.post("/cacheBooking", booking,function(data){
+	                			alert(data.msg);
+	                			created=true;
+	                			booking_quota++;
+	                			if(data.exist){
+	                				getUpdates();
+	                				$calendar.weekCalendar("removeEvent", calEvent.id);
+	                			}
+	                		}, "json");
+	                  
+	                  $dialogContent.dialog("close");
+	               },
+	               cancel : function() {
+	                  $dialogContent.dialog("close");
+	               }
+	            }
+	         }).show();
+	    	  
+	         $dialogContent.find(".date_holder").text($calendar.weekCalendar("formatDate", calEvent.start));
+    	  }else{
+    		  	$calendar.weekCalendar("removeUnsavedEvents");
+    		  }
       },
       eventDrop : function(calEvent, $event) {
       },
@@ -151,7 +160,7 @@ $(document).ready(function() {
 
          $dialogContent.dialog({
             modal: true,
-            title: calEvent.title,
+            title: "View Appointment",
             close: function() {
                $dialogContent.dialog("destroy");
                $dialogContent.hide();

@@ -571,7 +571,7 @@ class cacheHandler(BaseHandler):
         data['id'] = self.request.get('id')
         
         schedule={}
-        schedule['type'] = 'appointment'
+        schedule['type'] = self.request.get('type')
         schedule['email'] = self.user.email_address
         schedule['content'] = self.request.get('content')
         date={}
@@ -584,10 +584,6 @@ class cacheHandler(BaseHandler):
         hour['end'] = int(self.request.get('end'))
         schedule['hour'] = hour
         schedule['readonly'] = False
-        
-        #check cache for existing email address
-        #one customer can only have one active booking
-        
         
         
         #check for existing same date and in cache before appending
@@ -607,6 +603,20 @@ class cacheHandler(BaseHandler):
                 
              
         self.response.out.write(json.JSONEncoder().encode(data))
+        
+
+class cacheRemoveHandler(BaseHandler):
+    def post(self):
+        global booking_cache
+        data={}
+        data['email'] = self.request.get('email')
+        data['type'] = self.request.get('type')
+        
+        for temp in booking_cache:
+            if((temp['email'] == data['email']) and temp['type'] == data['type']):
+                booking_cache.remove(temp)
+                break;
+        
 
 
 class contactHandler(BaseHandler):
@@ -654,6 +664,7 @@ app = webapp2.WSGIApplication([
     webapp2.Route('/empsignup', AdminSignupHandler),
     webapp2.Route('/json', jsonHandler),
     webapp2.Route('/cacheBooking', cacheHandler),
+    webapp2.Route('/removeCacheBooking', cacheRemoveHandler),
     webapp2.Route('/contact', contactHandler),
     webapp2.Route('/gallery', galleryHandler),
     webapp2.Route('/about', aboutHandler),
