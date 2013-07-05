@@ -12,6 +12,7 @@
 <script type="text/javascript">
 var allEvent=[];
 var booking;
+var booking_quota = 0;
 
 function lol(){
 console.log(allEvent);
@@ -40,6 +41,7 @@ function getUpdates(){
 	});
 	
 	$("#calendar").hide().fadeIn(1300);
+	console.log(booking_quota);
 }
 
 function saveBooking(slot){//delete later on
@@ -73,7 +75,12 @@ $.getJSON('/json', function(data){
 		event['title'] = data.schedule[i].content;
 		event['readOnly'] = data.schedule[i].readonly;
 		event['email'] = data.schedule[i].email;
-		event['type'] = data.schedule[i].type; 
+		event['type'] = data.schedule[i].type;
+		
+		if(!event['readOnly']){
+		booking_quota++;
+		}
+		
 		allEvent.push(event);
 	}
 

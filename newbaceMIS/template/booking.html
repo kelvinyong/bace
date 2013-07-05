@@ -31,25 +31,50 @@ $(document).ready(function(){
 <h1>Type of Service</h1>
 
 <form action="/schedulebooking" method="POST" >
-<label for="serviceType">Service Type:</label>
-<select name="serviceType">
-  <option value="Cleaning">Cleaning</option>
-  <option value="Chemical Washing">Chemical Washing</option>
-  <option value="Others">Others</option>
-</select>
-<label for="quantity">Quantity etc:</label>
-<select name="quantity">
-  <option value="1">1</option>
-  <option value="2">2</option>
-  <option value="3">3</option>
-</select>
-read only..
-<label for="address">want to confirm Address?:</label>
-<input type="text" name="address" />
-<label for="address">Postal Code:</label>
-<input type="text" name="postal" id="number"/>
-<input type="submit" value="Proceed" />
+<ol>
+	<li>
+		<label for="serviceType">Service Type:</label>
+		<select name="serviceType">
+		  <option value="Basic Servicing">Basic Servicing</option>
+		  <option value="Chemical Wash">Chemical Wash</option>
+		  <option value="Top Up Gas">Top Up Gas</option>
+		  <option value="Checking &amp; Troubleshooting">Checking &amp; Troubleshooting</option>
+        </select>
+    </li>
+    <li>
+        <label for="quantity">Quantity:</label>
+        <select name="quantity">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="3">4</option>
+          <option value="3">5</option>
+          <option value="3">6</option>
+          <option value="3">7</option>
+          <option value="3">8</option>
+          <option value="3">8&lt;</option>
+        </select>
+     </li>
+     <li>
+    	<label for="mobile">Mobile Number:</label>
+        <input type="text" name="mobile" class="number"/>
+    </li>
+     <li>
+        <label for="address">Address:</label>
+        <input type="text" name="address" class="text"/>
+     </li>
+     <li>
+        <label for="address">Postal Code:</label>
+        <input type="text" name="postal" id="number"/>
+    </li>
+    <li>
+		<label for="request">Your Request</label>
+        <textarea id="request" name="request" rows="8" cols="50"></textarea>
+    </li>
+    <li>
+        <input type="submit" value="Proceed" />
+    </li>
+</ol>
 </form>
 
-information to determine a booking to be made
 {% endblock %}
