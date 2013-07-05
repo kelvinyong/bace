@@ -40,7 +40,7 @@ $(document).ready(function() {
          return false;
       },
       eventNew : function(calEvent, $event) {
-    	 if(booking_quota < 2 || created){
+    	 if((booking_quota < 2 || created)|| user_var.accounType == 'administrator'){
     		 var $dialogContent = $("#event_edit_container");
 	         resetForm($dialogContent);
 	         var displaystartTime;
@@ -85,10 +85,10 @@ $(document).ready(function() {
 	                  $calendar.weekCalendar("updateEvent", calEvent);
 	                  
 	                  //KELVIN
-	                  if(created){
+	                  if(created && (user_var.accounType != 'administrator')){
 	                	  $calendar.weekCalendar("removeEvent", calEvent.id -1);
 	                	  $.post("/removeCacheBooking",booking);
-	                	  console.log(booking);
+	                	  //remove recommended slot
 	                  }
 	                  
 	                  booking = {
@@ -105,6 +105,7 @@ $(document).ready(function() {
 	                		$.post("/cacheBooking", booking,function(data){
 	                			alert(data.msg);
 	                			created=true;
+	                			console.log(data);
 	                			booking_quota++;
 	                			if(data.exist){
 	                				getUpdates();
@@ -219,42 +220,43 @@ $(document).ready(function() {
       var id=1;
       var now = false;
       //KELVIN
-      
-      for(var m=4;m <= month; m++){
-    	  var days = new Date(year,m+1,0).getDate();
-    	  for(var d=1;d <= days; d++){
-    		  for(var t=9;t <18; t++){
-    			  if(m == month && d == date.getDate()){
-    				  now = true;
-	    			  break;
-	    		  }
-    			  //console.log(d+':'+date+':'+m+':'+month+':'+hour);
-	    		  id += allEvent.length;
-	        	  unavailableEvent ={};
-	        	  unavailableEvent['id'] = id;
-	        	  unavailableEvent['start'] = new Date(year,m,d,t);
-	        	  unavailableEvent['end'] = new Date(year,m,d,t+1);
-	        	  unavailableEvent['title'] = 'unavailable'
-	        	  unavailableEvent['readOnly'] = true
-	        	  unavailableEvent['type'] = 'unavailable';
-	        	  
-	        	  var exist = false;
-	        	  for(var i =0; i<allEvent.length;i++){
-	        		  if((allEvent[i]['start'].getDate() == unavailableEvent['start'].getDate()) && 
-	        				  (allEvent[i]['start'].getFullYear() == unavailableEvent['start'].getFullYear()) &&
-	        				  	(allEvent[i]['start'].getMonth() == unavailableEvent['start'].getMonth()) && 
-	        				  		(allEvent[i]['start'].getHours() == unavailableEvent['start'].getHours())){
-	        			  t += (allEvent[i]['end'].getHours()-allEvent[i]['start'].getHours())-1;
-	        			  //check for end date as well to cater for 2 hour slot
-	        			  exist = true;
-	        		  }
+      if(user_var.accounType != 'administrator'){
+	      for(var m=4;m <= month; m++){
+	    	  var days = new Date(year,m+1,0).getDate();
+	    	  for(var d=1;d <= days; d++){
+	    		  for(var t=9;t <18; t++){
+	    			  if(m == month && d == date.getDate()){
+	    				  now = true;
+		    			  break;
+		    		  }
+	    			  //console.log(d+':'+date+':'+m+':'+month+':'+hour);
+		    		  id += allEvent.length;
+		        	  unavailableEvent ={};
+		        	  unavailableEvent['id'] = id;
+		        	  unavailableEvent['start'] = new Date(year,m,d,t);
+		        	  unavailableEvent['end'] = new Date(year,m,d,t+1);
+		        	  unavailableEvent['title'] = 'unavailable'
+		        	  unavailableEvent['readOnly'] = true
+		        	  unavailableEvent['type'] = 'unavailable';
+		        	  
+		        	  var exist = false;
+		        	  for(var i =0; i<allEvent.length;i++){
+		        		  if((allEvent[i]['start'].getDate() == unavailableEvent['start'].getDate()) && 
+		        				  (allEvent[i]['start'].getFullYear() == unavailableEvent['start'].getFullYear()) &&
+		        				  	(allEvent[i]['start'].getMonth() == unavailableEvent['start'].getMonth()) && 
+		        				  		(allEvent[i]['start'].getHours() == unavailableEvent['start'].getHours())){
+		        			  t += (allEvent[i]['end'].getHours()-allEvent[i]['start'].getHours())-1;
+		        			  //check for end date as well to cater for 2 hour slot
+		        			  exist = true;
+		        		  }
+		        	  }
+		        	  if(!exist)unavailableList.push(unavailableEvent);
+		        	  
 	        	  }
-	        	  if(!exist)unavailableList.push(unavailableEvent);
-	        	  
-        	  }
-    		  if(now) break;
-          }
-    	  if(now) break;
+	    		  if(now) break;
+	          }
+	    	  if(now) break;
+	      }
       }
       
       lol();

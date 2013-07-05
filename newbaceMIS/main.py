@@ -623,6 +623,10 @@ class contactHandler(BaseHandler):
     def get(self):
         self.render_template('contact.html')
         
+class AdminScheduleHandler(BaseHandler):
+    def get(self):
+        self.render_template('schedule.html')
+        
 class galleryHandler(BaseHandler):
     def get(self):
         self.render_template('gallery.html')
@@ -660,6 +664,7 @@ app = webapp2.WSGIApplication([
     webapp2.Route('/verifyemail', VerifyHandler, name='verifyemail'),
     webapp2.Route('/setting', SettingHandler),
     webapp2.Route('/schedulebooking', QueryScheduleHandler),
+    webapp2.Route('/empschedule', AdminScheduleHandler),
     webapp2.Route('/scheduleconfirmation', ScheduleHandler),
     webapp2.Route('/empsignup', AdminSignupHandler),
     webapp2.Route('/json', jsonHandler),
