@@ -24,8 +24,8 @@ $(document).ready(function(){
 <h1>{{ user.first_name }}'s Personal Settings</h1>
 <form action="/setting" method="POST" >
 <ol>
-	<li>
-	<p>You are currently login using this email address: <span name="email">{{ email }}</span></p>
+<label for="email">You are currently login using this email address:</label>
+    <input type="text" name="email" class="text" value = "{{ email }}" readonly />
     </li>
     <li>
     <label for="password">Password:</label>
@@ -47,6 +47,7 @@ $(document).ready(function(){
     <label for="address">Address:</label>
     <input type="text" name="address" value = "{{ address }}" class="text"/>
     </li>
+    <li>
     <label for="postcode">Postcode:</label>
     <input type="text" name="postcode" id="number" value = "{{ postcode }}" class="text"/>
     </li>
