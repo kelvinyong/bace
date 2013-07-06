@@ -84,12 +84,14 @@
         			<li>Logged in as <span style="background-color: OldLace">{{ user.first_name }}</span></li>
         			<li><a href="/logout">Logout</a></li>
         			<li><a href="/setting">Settings</a></li>
+        		{% if user.accounType == 'customer' %}	
         			<li><a href="/">Booking History</a></li>
+        		{% endif %}
 				{% if user.accounType == 'administrator' %}
 					<li><a href="/empsignup">New Employee</a></li>
 					<li><a href="/">Add a job</a></li>
 					<li><a href="/empschedule">Schedule</a></li>
-					<li><a href="/">Weekly Schedule</a></li>
+					<li><a href="/empweeklyschedule">Weekly Schedule</a></li>
 					<li><a href="/">Inventory</a></li>
 					<li>{{ user.accounType }} Rights</li>
 				{% endif %}

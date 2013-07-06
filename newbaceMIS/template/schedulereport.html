@@ -1,0 +1,109 @@
+{% extends "main.html" %}
+
+{% block title %}Schedule Booking{% endblock %}
+
+{% block script %}
+
+<script type="text/javascript">
+var start, end;
+$(document).ready(function(){
+	$("#prev").click(function(){
+		info={
+			'task': 'prev',
+			'sday': start.getDate(),
+			'smonth': start.getMonth(),
+			'syear': start.getFullYear(),
+			'eday': end.getDate(),
+			'emonth': end.getMonth(),
+			'eyear': end.getFullYear()
+		};
+		$.post("/jsonempweeklyschedule",info,function(data){
+			displayResult(data);
+		},"json");
+	});
+	
+	$("#next").click(function(){
+		info={
+			'task': 'next',
+			'sday': start.getDate(),
+			'smonth': start.getMonth(),
+			'syear': start.getFullYear(),
+			'eday': end.getDate(),
+			'emonth': end.getMonth(),
+			'eyear': end.getFullYear()
+		};
+		$.post("/jsonempweeklyschedule",info,function(data){
+			displayResult(data);
+		},"json");
+	});
+});
+
+
+
+$.getJSON('/jsonempweeklyschedule', function(data){
+	displayResult(data);
+});
+
+function displayResult(data){
+	start = new Date(data.jobfrom.year,data.jobfrom.month,data.jobfrom.day);
+	end = new Date(data.jobto.year,data.jobto.month,data.jobto.day);
+	
+	var startdate, enddate;
+	var html = '<form>';
+	for(var i=0; i<data.report.length; i++){
+		html += '<ol>';
+		html += '<li>Email:'+data.report[i].email+'</li>';
+		html += '<li>Description:'+data.report[i].description+'</li>';
+		
+		startdate = new Date(data.report[i].date.year,data.report[i].date.month-1,data.report[i].date.day, data.report[i].hour.start);
+		html += '<li>Start Date:'+ startdate +'</li>';
+		
+		enddate = new Date(data.report[i].date.year,data.report[i].date.month-1,data.report[i].date.day, data.report[i].hour.end);
+		html += '<li>End Date:'+ enddate +'</li>';
+		html += '<li>Service Type:'+data.report[i].servicetype+'</li>';
+		html += '<li>Postal Code:'+'</li>';
+		html += '</ol><br />';
+	}
+	html += '</form>';
+	
+	startdisplay = start.getFullYear() + "-" + start.getMonth() + "-" + start.getDate();
+	enddisplay = end.getFullYear() + "-" + end.getMonth() + "-" + end.getDate();
+
+	document.getElementById("dateregion").innerHTML = "Between" + startdisplay + " and " + enddisplay;
+	document.getElementById("weeklySchedule").innerHTML = html;
+}
+
+
+</script>
+
+{% endblock %}
+
+{% block maincontent %}
+<h1> Upcoming Appointments </h1>
+<div class="clr"></div>
+<input type="button" id="prev" value="&nbsp;&lt;&nbsp;previous"></input><input type="button" id="next" value="&nbsp;&gt;&nbsp;next"></input>
+<h2 id="dateregion"></h2>
+<div class="clr"></div>
+<div id="weeklySchedule">
+	<form>
+		<ol id="listSchedule">
+			<li>
+				<label for="email">Email:</label><span id="semail"></span>
+    		</li>
+    		<li>
+    			<label for="description">Description:</label>
+    		</li>
+    		<li>
+    			<label for="startdate">Start Date:</label>
+    		</li>
+    		<li>
+   			 	<label for="enddate">End Date:</label>
+    		</li>
+    		<li>
+   			 	<label for="servicetype">Service Type:</label>
+    		</li>
+		</ol>
+	</form>
+</div>
+
+{% endblock %}

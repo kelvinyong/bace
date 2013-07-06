@@ -4,7 +4,7 @@ from google.appengine.ext.webapp import template
 from google.appengine.api import mail
 from google.appengine.ext import ndb
 from google.appengine.ext import db
-from datetime import datetime, date, time
+from datetime import datetime, date, time, timedelta
 import models
 import json
 
@@ -179,6 +179,7 @@ class SignupHandler(BaseHandler):
     customer.Last_Name = self.request.get('lastname')
     customer.Contact_No = int(self.request.get('contact'))
     customer.Address = self.request.get('address')
+    customer.postalCode = int(self.request.get('postalcode'))
     #customer.latest_location # use google map got coordinate?
 
     #unique_properties = ['email_address']
@@ -373,7 +374,8 @@ class SettingHandler(BaseHandler):
                   'firstname': info.First_Name,
                   'lastname': info.Last_Name,
                   'contact': info.Contact_No,
-                  'address': info.Address
+                  'address': info.Address,
+                  'postalcode': info.postalCode
                   }
         self.render_template('setting.html', params)
     
@@ -388,6 +390,7 @@ class SettingHandler(BaseHandler):
         info.Last_Name = self.request.get('lastname')
         info.Contact_No = int(self.request.get('contact'))
         info.Address = self.request.get('address')
+        info.postalCode = int(self.request.get('postalcode'))
         info.put()
         self.display_message('Settings updated')
 
@@ -554,13 +557,15 @@ class jsonHandler(BaseHandler):
         d = date(int(self.request.get('year')), int(self.request.get('month')), int(self.request.get('day')))
         st = time(int(self.request.get('start')))
         et = time(int(self.request.get('end')))
-        datetime.combine(d, st)
+        #datetime.combine(d, st)
         
         job = models.Job()
         job.Email = self.user.email_address
         job.Description = self.request.get('content')
         job.StartDate = datetime.combine(d, st)
         job.EndDate = datetime.combine(d, et)
+        #job.Service_Type = self.request.get('servicetype')
+        #job.postalCode = self.request.get('postalcode')
         job.put()
         
         
@@ -600,7 +605,8 @@ class cacheHandler(BaseHandler):
                 
         if not exist:
             booking_cache.append(schedule)
-                
+        if len(booking_cache) == 0:
+            data['msg'] = 'Reservation is being made'
              
         self.response.out.write(json.JSONEncoder().encode(data))
         
@@ -623,9 +629,169 @@ class contactHandler(BaseHandler):
     def get(self):
         self.render_template('contact.html')
         
+class storeHandler(BaseHandler):
+    def get(self):
+        self.render_template('addstore.html')
+        
+class quotationHandler(BaseHandler):
+    def post(self):
+        quotation = models.Quotation()
+        quotation.Email = self.request.get('email')
+        quotation.Request = self.request.get('request')
+        quotation.ServiceType = self.request.get('type')
+        quotation.Name = self.request.get('name')
+        quotation.Contact_No = int(self.request.get('contact'))
+        quotation.put()
+        
+        message = mail.AdminEmailMessage()
+        message.sender = quotation.Email
+        message.body = """
+            testing quotation
+            """
+        message.Send()
+        
+        self.display_message('Your enquiry has been sent. We will reply within 48 hours')
+        
 class AdminScheduleHandler(BaseHandler):
     def get(self):
         self.render_template('schedule.html')
+        
+class weeklySchedulejsonHandler(BaseHandler):
+    @user_required
+    @admin_required
+    def get(self):
+        jobs = db.GqlQuery("SELECT * FROM Job WHERE StartDate >= :startdate AND StartDate <= :enddate")
+        params = {}
+        params['report'] = []
+        #jobs = db.GqlQuery("SELECT * FROM Job WHERE StartDate >= :startdate", startdate = datetime.now())
+        start = datetime.combine(datetime(datetime.now().year,datetime.now().month,datetime.now().day),time(8))
+        end = (start + timedelta(days=7))
+        jobs.bind(startdate = start, enddate = end)
+        
+        jobfrom={}
+        jobfrom['day'] = start.day
+        jobfrom['month'] = start.month
+        jobfrom['year'] = start.year
+        params['jobfrom'] = jobfrom
+            
+        jobto={}
+        jobto['day'] = end.day
+        jobto['month'] = end.month
+        jobto['year'] = end.year
+        params['jobto'] = jobto
+        
+        
+        for job in jobs:
+            report={}
+            report['description'] = job.Description
+            report['email'] = job.Email
+            date={}
+            date['day'] = job.StartDate.day
+            date['month'] = job.StartDate.month
+            date['year'] = job.StartDate.year
+            report['date'] = date
+            hour={}
+            hour['start'] = job.StartDate.hour
+            hour['end'] = job.EndDate.hour
+            report['hour'] = hour
+            report['servicetype'] = job.Service_Type
+            report['postalcode'] = job.postalCode
+            params['report'].append(report)
+        
+        self.response.out.write(json.JSONEncoder().encode(params))
+        
+    def post(self):
+        jobs = db.GqlQuery("SELECT * FROM Job WHERE StartDate >= :startdate AND StartDate <= :enddate")
+        params = {}
+        params['report'] = []
+        querydate={
+              'startday': int(self.request.get('sday')),
+              'startmonth': int(self.request.get('smonth')),
+              'startyear': int(self.request.get('syear')),
+              'endday': int(self.request.get('eday')),
+              'endmonth': int(self.request.get('emonth')),
+              'endyear': int(self.request.get('eyear')),
+              }
+        today = datetime.combine(datetime(datetime.now().year,datetime.now().month,datetime.now().day),time(8))
+        start = datetime.combine(datetime(querydate['startyear'],querydate['startmonth'],querydate['startday']),time(8))
+        end = datetime.combine(datetime(querydate['endyear'],querydate['endmonth'],querydate['endday']),time(8))
+        
+        if(self.request.get('task') == 'prev'):
+            if(today <= start):
+                newstart = (start + timedelta(days=-7))
+                jobs.bind(startdate = newstart, enddate = start)
+                
+                jobfrom={}
+                jobfrom['day'] = newstart.day
+                jobfrom['month'] = newstart.month
+                jobfrom['year'] = newstart.year
+                params['jobfrom'] = jobfrom
+            
+                jobto={}
+                jobto['day'] = start.day
+                jobto['month'] = start.month
+                jobto['year'] = start.year
+                params['jobto'] = jobto
+                
+                for job in jobs:
+                    report={}
+                    report['description'] = job.Description
+                    report['email'] = job.Email
+                    date={}
+                    date['day'] = job.StartDate.day
+                    date['month'] = job.StartDate.month
+                    date['year'] = job.StartDate.year
+                    report['date'] = date
+                    hour={}
+                    hour['start'] = job.StartDate.hour
+                    hour['end'] = job.EndDate.hour
+                    report['hour'] = hour
+                    report['servicetype'] = job.Service_Type
+                    report['postalcode'] = job.postalCode
+                    params['report'].append(report)
+                    
+                self.response.out.write(json.JSONEncoder().encode(params))
+                
+        elif(self.request.get('task') == 'next'):
+            if(today + timedelta(days=30)>end):
+                newend = (end + timedelta(days=7))
+                jobs.bind(startdate = end, enddate = newend)
+                
+                jobfrom={}
+                jobfrom['day'] = end.day
+                jobfrom['month'] = end.month
+                jobfrom['year'] = end.year
+                params['jobfrom'] = jobfrom
+            
+                jobto={}
+                jobto['day'] = newend.day
+                jobto['month'] = newend.month
+                jobto['year'] = newend.year
+                params['jobto'] = jobto
+                
+                for job in jobs:
+                    report={}
+                    report['description'] = job.Description
+                    report['email'] = job.Email
+                    date={}
+                    date['day'] = job.StartDate.day
+                    date['month'] = job.StartDate.month
+                    date['year'] = job.StartDate.year
+                    report['date'] = date
+                    hour={}
+                    hour['start'] = job.StartDate.hour
+                    hour['end'] = job.EndDate.hour
+                    report['hour'] = hour
+                    report['servicetype'] = job.Service_Type
+                    report['postalcode'] = job.postalCode
+                    params['report'].append(report)
+        
+                self.response.out.write(json.JSONEncoder().encode(params))
+        
+        
+class weeklyScheduleHandler(BaseHandler):
+    def get(self):
+        self.render_template('schedulereport.html')
         
 class galleryHandler(BaseHandler):
     def get(self):
@@ -666,6 +832,8 @@ app = webapp2.WSGIApplication([
     webapp2.Route('/schedulebooking', QueryScheduleHandler),
     webapp2.Route('/empschedule', AdminScheduleHandler),
     webapp2.Route('/scheduleconfirmation', ScheduleHandler),
+    webapp2.Route('/jsonempweeklyschedule', weeklySchedulejsonHandler),
+    webapp2.Route('/empweeklyschedule',weeklyScheduleHandler),
     webapp2.Route('/empsignup', AdminSignupHandler),
     webapp2.Route('/json', jsonHandler),
     webapp2.Route('/cacheBooking', cacheHandler),
@@ -673,7 +841,9 @@ app = webapp2.WSGIApplication([
     webapp2.Route('/contact', contactHandler),
     webapp2.Route('/gallery', galleryHandler),
     webapp2.Route('/about', aboutHandler),
-    webapp2.Route('/services', servicesHandler)
+    webapp2.Route('/services', servicesHandler),
+    webapp2.Route('/store', storeHandler),
+    webapp2.Route('/quotation', quotationHandler)
 ], debug=True, config=config)
 
 logging.getLogger().setLevel(logging.DEBUG)

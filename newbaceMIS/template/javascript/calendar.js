@@ -1,5 +1,4 @@
 $(document).ready(function() {
-	var booking;
 	var created = false;
 	$('#bookingForm').submit(function(event){
 		//save booking to database
@@ -102,10 +101,10 @@ $(document).ready(function() {
 	                			'email': user_var.email,
 	                			'type': 'appointment'
 	                		}
+	                  console.log(booking);
 	                		$.post("/cacheBooking", booking,function(data){
 	                			alert(data.msg);
 	                			created=true;
-	                			console.log(data);
 	                			booking_quota++;
 	                			if(data.exist){
 	                				getUpdates();
@@ -158,8 +157,28 @@ $(document).ready(function() {
          var titleField = $dialogContent.find("input[name='title']").val(calEvent.title);
          var bodyField = $dialogContent.find("textarea[name='body']");
          bodyField.val(calEvent.body);
-
-         $dialogContent.dialog({
+         
+         if(user_var.accounType == 'administrator'){
+        	 $dialogContent.dialog({
+                 modal: true,
+                 title: "View Appointment",
+                 close: function() {
+                    $dialogContent.dialog("destroy");
+                    $dialogContent.hide();
+                    $('#calendar').weekCalendar("removeUnsavedEvents");
+                 },
+                 buttons: {
+                    "delete" : function() {
+                       $calendar.weekCalendar("removeEvent", calEvent.id);
+                       $dialogContent.dialog("close");
+                    },
+                    cancel : function() {
+                       $dialogContent.dialog("close");
+                    }
+                 }
+              }).show();
+         }else{
+        	 $dialogContent.dialog({
             modal: true,
             title: "View Appointment",
             close: function() {
@@ -168,25 +187,14 @@ $(document).ready(function() {
                $('#calendar').weekCalendar("removeUnsavedEvents");
             },
             buttons: {
-               save : function() {
-
-                  calEvent.start = new Date(calEvent.start);
-                  calEvent.end = new Date(calEvent.end);
-                  calEvent.title = titleField.val();
-                  calEvent.body = bodyField.val();
-
-                  $calendar.weekCalendar("updateEvent", calEvent);
-                  $dialogContent.dialog("close");
-               },
-               "delete" : function() {
-                  $calendar.weekCalendar("removeEvent", calEvent.id);
-                  $dialogContent.dialog("close");
-               },
                cancel : function() {
                   $dialogContent.dialog("close");
                }
             }
          }).show();
+         }
+
+         
 
          $dialogContent.find(".date_holder").text($calendar.weekCalendar("formatDate", calEvent.start));
          $(window).resize().resize(); //fixes a bug in modal overlay size ??

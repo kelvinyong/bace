@@ -93,7 +93,17 @@ function getSchedule(){
     scriptE.src = "/template/javascript/calendar.js";
     var headElement = document.getElementsByTagName("head").item(0);
     headElement.appendChild(scriptE);
-
+	
+	if(user_var.accounType == 'administrator'){
+		x = document.getElementsByTagName("input");
+		for(i=0;i<x.length;i++){
+			x[i].removeAttribute("readonly");
+			}
+		x = document.getElementsByTagName("textarea");
+		for(i=0;i<x.length;i++){
+			x[i].removeAttribute("readonly");
+			}
+	}
 }
 </script>
 
@@ -115,16 +125,30 @@ function getSchedule(){
 				<li>
 					<label for="end">End Time: </label><input type="text" name="end" readonly/>
 				</li>
+				{% if user.accounType == 'administrator' %}
 				<li>
-					<label for="title">Title: </label><input type="text" name="title" readonly/>
+					<label for="postalcode">Postal Code: </label><input type="text" name="postalcode"/>
 				</li>
 				<li>
-					<label for="body">Description: </label><textarea name="body" style="width:250px;" readonly></textarea>
+					<label for="email">Email Address: </label><input type="text" name="email"/>
+				</li>
+				{% endif %}
+				<li>
+					<label for="title">Service(s) Type: </label><input type="text" name="title" readonly/>
+				</li>
+				<li>
+					<label for="body">Request: </label><textarea name="body" style="width:250px;" readonly></textarea>
 				</li>
 			</ol>
 		</form>
 	</div>
+	{% if user.accounType == 'administrator' %}
+	<form action="/empschedule" id="bookingForm" method="POST">
+	<input type="submit" value="Add all schedule" />
+	</form>
+	{% else %}
 	<form action="/scheduleconfirmation" id="bookingForm" method="POST">
 	<input type="submit" value="Check Out" />
 	</form>
+	{% endif %}
 {% endblock %}

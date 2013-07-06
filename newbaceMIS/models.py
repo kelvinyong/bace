@@ -26,6 +26,7 @@ class Staff(db.Model):
     Last_Name = db.StringProperty()
     Contact_No = db.IntegerProperty()
     Address = db.StringProperty()
+    postalCode = db.IntegerProperty()
 
 class Job(db.Model):
     Email = db.EmailProperty()
@@ -33,11 +34,22 @@ class Job(db.Model):
     EndDate = db.DateTimeProperty()
     Service_Type = db.StringProperty()
     Description = db.StringProperty()
+    postalCode = db.IntegerProperty()
     
 class Quotation(db.Model):
+    ServiceType = db.StringProperty()
+    Name = db.StringProperty()
     Email = db.EmailProperty()
-    Title = db.StringProperty()
-    Description = db.TextProperty()
+    Contact_No = db.IntegerProperty()
+    Request = db.TextProperty()
+    
+    
+class Inventory(db.Model):
+    Name = db.StringProperty()
+    Description = db.StringProperty()
+    Price = db.FloatProperty()
+    Quantity = db.IntegerProperty()
+    Store = db.StringProperty()
 
 
 class User(webapp2_extras.appengine.auth.models.User):

@@ -57,7 +57,7 @@ $(document).ready(function(){
             </li>
             <li>
               <label for="password">Password</label>
-              <input type="text" name="password" class="text" required="required"/>
+              <input type="text" name="password" class="text"/>
             </li>
             <li>
               <label for="firstname">First Name</label>
@@ -76,8 +76,8 @@ $(document).ready(function(){
               <input type="text" name="address" class="text" required="required"/>
             </li>
             <li>
-              <label for="postcode">Postcode</label>
-              <input type="text" name="postcode" class="text" id="number" required="required"/>
+              <label for="postalcode">PostalCode</label>
+              <input type="text" name="postalcode" class="text" id="number" required="required"/>
             </li>
             <li>
             {% if user.accounType == 'administrator' %}
