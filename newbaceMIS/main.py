@@ -473,8 +473,23 @@ class VerifyHandler(BaseHandler):
 class QueryScheduleHandler(BaseHandler):
     @user_required
     def get(self):
-        self.render_template('booking.html')
+        customer = (db.GqlQuery("SELECT * FROM Customer where Email = :email", email = self.user.email_address)).get()
+        params = {
+                  'email': customer.Email,
+                  'address': customer.Address,
+                  'postalcode': customer.postalCode
+                  }
+        self.render_template('booking.html', params)
         
+    def post(self):
+        params = {
+                  'postalcode': self.request.get('postalcode'),
+                  'description': self.request.get('description'),
+                  'servicetype': self.request.get('servicetype')
+                  }
+        self.render_template('schedule.html',params)
+        
+class recommendScheduleHandler(BaseHandler):
     def post(self):
         global booking_cache
         global day
@@ -482,7 +497,9 @@ class QueryScheduleHandler(BaseHandler):
         #create one cache for recommendation
         schedule={}
         schedule['type'] = 'recommendation'
-        schedule['content'] = 'Appointment Recommendation'
+        schedule['servicetype'] = 'R>'+self.request.get('servicetype')
+        schedule['description'] = self.request.get('description')
+        schedule['postalcode'] = self.request.get('postalcode')
         schedule['email'] = self.user.email_address
         date={}
         date['day'] = day
@@ -497,7 +514,8 @@ class QueryScheduleHandler(BaseHandler):
         
         booking_cache.append(schedule)
         day +=1
-        self.render_template('schedule.html')
+        
+        
         
 class ScheduleHandler(BaseHandler):
     def post(self):
@@ -520,9 +538,11 @@ class jsonHandler(BaseHandler):
         for job in jobs:
             schedule={}
             schedule['type'] = 'query'
-            if(self.user.email_address == job.Email):
+            if(self.user.email_address == job.Email or self.user.accounType == 'administrator'):
                 schedule['email'] = job.Email
-            schedule['content'] = job.Description
+            schedule['description'] = job.Description
+            schedule['postalcode'] = job.postalCode
+            schedule['servicetype'] = job.Service_Type
             date={}
             date['day'] = job.StartDate.day
             date['month'] = job.StartDate.month
@@ -533,12 +553,12 @@ class jsonHandler(BaseHandler):
             hour['end'] = job.EndDate.hour
             schedule['hour'] = hour
             schedule['readonly'] = False
-            if(job.StartDate < datetime.now() or self.user.email_address != job.Email):
+            if((job.StartDate < datetime.now() or self.user.email_address != job.Email) and self.user.accounType != 'administrator'):
                 schedule['readonly'] = True
             params['schedule'].append(schedule)
             
         for cache in booking_cache:
-            if(self.user.email_address == cache['email']):
+            if(self.user.email_address == cache['email'] or self.user.accounType == 'administrator'):
                 cache['readonly'] = False
                 params['schedule'].append(cache)
             else:
@@ -561,24 +581,25 @@ class jsonHandler(BaseHandler):
         
         job = models.Job()
         job.Email = self.user.email_address
-        job.Description = self.request.get('content')
+        job.Description = self.request.get('description')
         job.StartDate = datetime.combine(d, st)
         job.EndDate = datetime.combine(d, et)
-        #job.Service_Type = self.request.get('servicetype')
-        #job.postalCode = self.request.get('postalcode')
+        job.Service_Type = self.request.get('servicetype')
+        job.postalCode = int(self.request.get('postalcode'))
         job.put()
         
         
 class cacheHandler(BaseHandler):
     def post(self):
         global booking_cache
+        
+        #not all data is saved, only essentials for checking
         data={}
         data['id'] = self.request.get('id')
         
         schedule={}
         schedule['type'] = self.request.get('type')
         schedule['email'] = self.user.email_address
-        schedule['content'] = self.request.get('content')
         date={}
         date['day'] = int(self.request.get('day'))
         date['month'] = int(self.request.get('month'))
@@ -596,17 +617,19 @@ class cacheHandler(BaseHandler):
         for temp in booking_cache:
             if((temp['date'] == schedule['date']) and temp['hour'] == schedule['hour']):
                 data['msg'] = 'Someone has just reserved. Please try again'
-                data['exist'] = True;
-                exist = True;
+                data['exist'] = True
+                exist = True
                 break;
             else:
                 data['msg'] = 'Reservation is being made'
-                data['exist'] = False;
+                data['exist'] = False
                 
-        if not exist:
-            booking_cache.append(schedule)
         if len(booking_cache) == 0:
             data['msg'] = 'Reservation is being made'
+            data['exist'] = False
+        if not exist:
+            booking_cache.append(schedule)
+        
              
         self.response.out.write(json.JSONEncoder().encode(data))
         
@@ -628,10 +651,6 @@ class cacheRemoveHandler(BaseHandler):
 class contactHandler(BaseHandler):
     def get(self):
         self.render_template('contact.html')
-        
-class storeHandler(BaseHandler):
-    def get(self):
-        self.render_template('addstore.html')
         
 class quotationHandler(BaseHandler):
     def post(self):
@@ -657,8 +676,6 @@ class AdminScheduleHandler(BaseHandler):
         self.render_template('schedule.html')
         
 class weeklySchedulejsonHandler(BaseHandler):
-    @user_required
-    @admin_required
     def get(self):
         jobs = db.GqlQuery("SELECT * FROM Job WHERE StartDate >= :startdate AND StartDate <= :enddate")
         params = {}
@@ -790,8 +807,151 @@ class weeklySchedulejsonHandler(BaseHandler):
         
         
 class weeklyScheduleHandler(BaseHandler):
+    @user_required
+    @admin_required
     def get(self):
         self.render_template('schedulereport.html')
+        
+class historyHandler(BaseHandler):
+    @user_required
+    def get(self):
+        self.render_template('history.html')
+        
+class historyjsonHandler(BaseHandler):
+    def get(self):
+        jobs = db.GqlQuery("SELECT * FROM Job WHERE Email = :email", email = self.user.email_address)
+        params = {}
+        params['history'] = []
+        params['current'] = []
+        
+        for job in jobs:
+            info={}
+            info['description'] = job.Description
+            info['email'] = job.Email
+            date={}
+            date['day'] = job.StartDate.day
+            date['month'] = job.StartDate.month
+            date['year'] = job.StartDate.year
+            info['date'] = date
+            hour={}
+            hour['start'] = job.StartDate.hour
+            hour['end'] = job.EndDate.hour
+            info['hour'] = hour
+            info['servicetype'] = job.Service_Type
+            info['postalcode'] = job.postalCode
+            if(job.StartDate<datetime.now()):
+                params['history'].append(info)
+            else:
+                params['current'].append(info)
+        
+        self.response.out.write(json.JSONEncoder().encode(params))
+        
+class inventoryManagementHandler(BaseHandler):
+    @user_required
+    @admin_required
+    def get(self):
+        self.post()
+        
+    def post(self):
+    
+        processType = self.request.get('process')
+        delete = self.request.get('delete')
+        
+        if delete=='Yes':
+            iKey = self.request.get('warehouseKey')
+            currentKey = ndb.Key(urlsafe=iKey)
+            warehouse = currentKey.get()
+            warehouse.delete()
+        
+        if processType=='Add_Warehouse':
+            #self.response.write('WAREHOUSE ADDED')
+            warehouse = models.Warehouse(parent=models.warehouse_key('mainUser'))
+            warehouse.Name = self.request.get('warehouseName')
+            warehouse.Location = self.request.get('warehouseLocation')
+            warehouse.put()
+        
+        elif processType=='Add_Item':
+            #self.response.write('ITEM ADDED')
+            item = models.Item(parent=models.item_key('warehouse01'))
+            item.Type = self.request.get('itemType')
+            item.Name = self.request.get('itemName')
+            item.Description = self.request.get('itemDesc')
+            item.Price = self.request.get('itemPrice')
+            item.Quantity = self.request.get('itemQty')
+            item.Store = self.request.get('itemStorage')
+            item.put()
+        
+        items_query = models.Item.query(ancestor=models.item_key('warehouse01')).order(models.Item.Type)
+        #items_query = Item.query(models.Item.Type=='Basic Air Con')
+        #items_query = Item.query().order(models.Item.Type, models.Item.Store)
+        items = items_query.fetch(60)
+        itemKeys = items_query.fetch(60, keys_only=True)
+        
+        keyList = []
+        for i in itemKeys:
+            keyList.append(i.urlsafe())
+        
+        #linking key and object together
+        mainItemList = zip(items, keyList)
+        
+        warehouses_query = models.Warehouse.query(ancestor=models.warehouse_key('mainUser')).order(models.Warehouse.Name)
+        warehouses = warehouses_query.fetch(60)
+        warehousesKeys = warehouses_query.fetch(60, keys_only=True)
+        
+        warehousesList = []
+        for i in warehousesKeys:
+            warehousesList.append(i.urlsafe())
+        
+        mainWarehousesList = zip(warehouses, warehousesList)
+        
+        
+        params = {
+                  'process': self.request.get('process'),
+                  'items': items,
+                  'itemKeys': itemKeys,
+                  'mainItemList': mainItemList,
+                  'warehouses': warehouses,
+                  'warehousesKeys': warehousesKeys,
+                  'mainWarehousesList': mainWarehousesList
+                  }
+        self.render_template('inventory.html',params)
+
+
+class editItemHandler(BaseHandler):
+    def post(self):
+    
+        update = self.request.get('update')
+        
+        if update=='Yes':
+            iKey = self.request.get('itemKey')
+            currentKey = ndb.Key(urlsafe=iKey)
+            item = currentKey.get()
+            item.Type = self.request.get('itemType')
+            item.Name = self.request.get('itemName')
+            item.Description = self.request.get('itemDesc')
+            item.Price = self.request.get('itemPrice')
+            item.Quantity = self.request.get('itemQty')
+            item.Store = self.request.get('itemStorage')
+            item.put()
+
+            self.display_message('<h1>Edit Item</h1> <br />Item successfully updated\
+            <br /><a href="/inventoryManagement"><input type="button" value="Back" ></a>')
+        
+    
+        iKey = self.request.get('itemKey')
+        currentKey = ndb.Key(urlsafe=iKey)
+        currentItem = currentKey.get()
+        
+        warehouses_query = models.Warehouse.query(ancestor=models.warehouse_key('mainUser')).order(models.Warehouse.Name)
+        warehouses = warehouses_query.fetch(60)
+        
+        params = {
+                  'item': currentItem,
+                  'itemKey': iKey,
+                  'warehouses': warehouses
+                  }
+        self.render_template('editItem.html',params)
+        
         
 class galleryHandler(BaseHandler):
     def get(self):
@@ -830,6 +990,7 @@ app = webapp2.WSGIApplication([
     webapp2.Route('/verifyemail', VerifyHandler, name='verifyemail'),
     webapp2.Route('/setting', SettingHandler),
     webapp2.Route('/schedulebooking', QueryScheduleHandler),
+    webapp2.Route('/jsonrecommend', recommendScheduleHandler),
     webapp2.Route('/empschedule', AdminScheduleHandler),
     webapp2.Route('/scheduleconfirmation', ScheduleHandler),
     webapp2.Route('/jsonempweeklyschedule', weeklySchedulejsonHandler),
@@ -842,8 +1003,11 @@ app = webapp2.WSGIApplication([
     webapp2.Route('/gallery', galleryHandler),
     webapp2.Route('/about', aboutHandler),
     webapp2.Route('/services', servicesHandler),
-    webapp2.Route('/store', storeHandler),
-    webapp2.Route('/quotation', quotationHandler)
+    webapp2.Route('/quotation', quotationHandler),
+    webapp2.Route('/bookinghistory', historyHandler),
+    webapp2.Route('/jsonbookinghistory', historyjsonHandler),
+    webapp2.Route('/inventoryManagement', inventoryManagementHandler),
+    webapp2.Route('/editItem', editItemHandler),
 ], debug=True, config=config)
 
 logging.getLogger().setLevel(logging.DEBUG)

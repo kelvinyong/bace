@@ -43,13 +43,25 @@ class Quotation(db.Model):
     Contact_No = db.IntegerProperty()
     Request = db.TextProperty()
     
-    
-class Inventory(db.Model):
-    Name = db.StringProperty()
-    Description = db.StringProperty()
-    Price = db.FloatProperty()
-    Quantity = db.IntegerProperty()
-    Store = db.StringProperty()
+def item_key(itemStorage):
+    """Constructs a Datastore key for an item entity with itemStorage."""
+    return ndb.Key('Item', itemStorage)
+
+class Item(ndb.Model):
+    Type = ndb.StringProperty()
+    Name = ndb.StringProperty()
+    Description = ndb.StringProperty()
+    Price = ndb.StringProperty()
+    Quantity = ndb.StringProperty()
+    Store = ndb.StringProperty()
+
+def warehouse_key(whouse):
+    """Constructs a Datastore key for an item entity with itemStorage."""
+    return ndb.Key('Warehouse', whouse)
+
+class Warehouse(ndb.Model):
+    Name = ndb.StringProperty()
+    Location = ndb.StringProperty()
 
 
 class User(webapp2_extras.appengine.auth.models.User):

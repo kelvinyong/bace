@@ -53,7 +53,7 @@
        */
       prevWeek : function() {
          //minus more than 1 day to be sure we're in previous week - account for daylight savings or other anomolies
-         var newDate = new Date(this.element.data("startDate").getTime() - (MILLIS_IN_WEEK / 7));
+         var newDate = new Date(this.element.data("startDate").getTime() - (MILLIS_IN_WEEK / 6));
          var now = new Date();
          if(!(newDate < now.setMonth(now.getMonth()-3))){//KELVIN
         	 this._clearCalendar();
@@ -938,7 +938,7 @@
          var self = this;
          var options = this.options;
          $calEvent.find(".wc-time").html(self._formatDate(calEvent.start, options.timeFormat) + options.timeSeparator + self._formatDate(calEvent.end, options.timeFormat));
-         $calEvent.find(".wc-title").html(calEvent.title);
+         $calEvent.find(".wc-title").html(calEvent.servicetype);//KELVIN
          $calEvent.data("calEvent", calEvent);
       },
 

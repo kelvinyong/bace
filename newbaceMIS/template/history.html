@@ -1,0 +1,61 @@
+{% extends "main.html" %}
+
+{% block title %}Booking History{% endblock %}
+
+{% block script %}
+
+<script type="text/javascript">
+
+$.getJSON("/jsonbookinghistory",function(data){
+	displayResult(data);
+});
+
+
+function displayResult(data){
+	var startdate, enddate;
+	var html = '<form>';
+	for(var i=0; i<data.history.length; i++){
+		html += '<ol>';
+		html += '<li>Email:'+data.history[i].email+'</li>';
+		html += '<li>Description:'+data.history[i].description+'</li>';
+		startdate = new Date(data.history[i].date.year,data.history[i].date.month-1,data.history[i].date.day, data.history[i].hour.start);
+		html += '<li>Start Date:'+ startdate +'</li>';
+		enddate = new Date(data.history[i].date.year,data.history[i].date.month-1,data.history[i].date.day, data.history[i].hour.end);
+		html += '<li>End Date:'+ enddate +'</li>';
+		html += '<li>Service Type:'+data.history[i].servicetype+'</li>';
+		html += '<li>Postal Code:'+data.history[i].postalcode+'</li>';
+		html += '</ol><br />';
+	}
+	html += '</form>';
+	document.getElementById("bookinghistory").innerHTML = html;
+	
+	html = '<form>';
+	for(var i=0; i<data.current.length; i++){
+		html += '<ol>';
+		html += '<li>Email:'+data.current[i].email+'</li>';
+		html += '<li>Description:'+data.current[i].description+'</li>';
+		startdate = new Date(data.current[i].date.year,data.current[i].date.month-1,data.current[i].date.day, data.current[i].hour.start);
+		html += '<li>Start Date:'+ startdate +'</li>';
+		enddate = new Date(data.current[i].date.year,data.current[i].date.month-1,data.current[i].date.day, data.current[i].hour.end);
+		html += '<li>End Date:'+ enddate +'</li>';
+		html += '<li>Service Type:'+data.current[i].servicetype+'</li>';
+		html += '<li>Postal Code:'+data.current[i].postalcode+'</li>';
+		html += '</ol><br />';
+	}
+	html += '</form>';
+	document.getElementById("bookingcurrent").innerHTML = html;
+}
+
+</script>
+
+{% endblock %}
+
+{% block maincontent %}
+<h1> Booking History </h1>
+<div class="clr"></div>
+<div id="bookinghistory"></div>
+<h1> Current Booking </h1>
+<div class="clr"></div>
+<div id="bookingcurrent"></div>
+
+{% endblock %}

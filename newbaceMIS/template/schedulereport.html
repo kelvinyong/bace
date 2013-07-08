@@ -61,7 +61,7 @@ function displayResult(data){
 		enddate = new Date(data.report[i].date.year,data.report[i].date.month-1,data.report[i].date.day, data.report[i].hour.end);
 		html += '<li>End Date:'+ enddate +'</li>';
 		html += '<li>Service Type:'+data.report[i].servicetype+'</li>';
-		html += '<li>Postal Code:'+'</li>';
+		html += '<li>Postal Code:'+data.report[i].postalcode+'</li>';
 		html += '</ol><br />';
 	}
 	html += '</form>';

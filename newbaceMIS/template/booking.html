@@ -4,6 +4,12 @@
 
 {% block script %}
 <script type="text/javascript">
+
+user_var = {
+	'email' : "{{ email }}",
+	'postalcode': "{{ postalcode }}"
+};
+
 $(document).ready(function(){
 		$('#number').keypress(function(e) {
     		var a = [];
@@ -18,6 +24,27 @@ $(document).ready(function(){
 
 		$("#navfifth").addClass("active");
 		$("#navsfifth").addClass("active");
+		
+		
+		$('#recommend').submit(function(event){
+			var servicetype = '';
+			bs = document.getElementById("basicservicingquantity").value;
+			if(bs>1)servicetype += 'Basic Servicing; ';
+			cw = document.getElementById("chemicalwashquantity").value;
+			if(cw>1)servicetype += 'Chemical Washing; ';
+			if(document.getElementById("topupgas").checked) servicetype += 'Gas; ';
+			if(document.getElementById("checktroubleshoot").checked) servicetype += 'Checking. ';
+			
+			document.getElementById('service').value = servicetype;
+			user_var['servicetype'] = servicetype;
+			user_var['description'] = document.getElementById("request").value;
+			console.log("ok");
+			event.preventDefault();
+			$.post("/jsonrecommend", user_var).done(function() {
+				$('#recommend').unbind('submit').submit();
+			});
+
+	});
 
 })
 
@@ -30,11 +57,11 @@ $(document).ready(function(){
 
 <h1>Type of Service</h1>
 
-<form action="/schedulebooking" method="POST" >
+<form id="recommend" method="POST" >
 <ol>
 	<li>
 		<label for="serviceType">Basic Servicing :</label>
-        <select name="basicservicingquantity">
+        <select id="basicservicingquantity">
           <option value="0" selected>0</option>
           <option value="1">1</option>
           <option value="2">2</option>
@@ -49,7 +76,7 @@ $(document).ready(function(){
      </li>
     <li>
 		<label for="serviceType">Chemical Wash:</label>
-        <select name="chemicalwashquantity">
+        <select id="chemicalwashquantity">
           <option value="0" selected>0</option>
           <option value="1">1</option>
           <option value="2">2</option>
@@ -64,33 +91,24 @@ $(document).ready(function(){
      </li>
      <li>
 		<label for="serviceType">Top Up Gas:</label>
-        <select name="topupgas">
-          <option value="no" selected>No</option>
-          <option value="yes">Yes</option>
-        </select>
+		<input type="checkbox" id="topupgas">Yes<input type="checkbox">No
      </li>
      <li>
 		<label for="serviceType">Check &amp; Troubleshooting:</label>
-        <select name="checktroubleshoot">
-          <option value="no" selected>No</option>
-          <option value="yes">Yes</option>
-        </select>
+		<input type="checkbox" id="checktroubleshoot">Yes<input type="checkbox">No
      </li>
      <li>
-    	<label for="mobile">Mobile Number:</label>
-        <input type="text" name="mobile" class="number"/>
-    </li>
-     <li>
         <label for="address">Address:</label>
-        <input type="text" name="address" class="text"/>
+        <input type="text" name="address" class="text" value = "{{ address }}" readonly/>
      </li>
      <li>
         <label for="address">Postal Code:</label>
-        <input type="text" name="postal" id="number"/>
+        <input type="text" name="postalcode" id="number" value = "{{ postalcode }}" readonly/>
     </li>
     <li>
-		<label for="request">Request</label>
-        <textarea id="request" name="request" rows="8" cols="50"></textarea>
+		<label for="description">Request</label>
+        <textarea id="request" name="description" rows="8" cols="50"></textarea>
+        <input type="hidden" name="servicetype" id="service" />
     </li>
     <li>
         <input type="submit" value="Proceed" />

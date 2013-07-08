@@ -12,6 +12,7 @@
 
 <script type="text/javascript">
 var allEvent=[];
+var adminBooking=[];
 var booking;
 var booking_quota = 0;
 
@@ -21,7 +22,10 @@ console.log(allEvent);
 
 user_var = {
 	'accounType' : "{{ user.accounType }}",
-	'email' : "{{ user.email_address }}"
+	'email' : "{{ user.email_address }}",
+	'postalcode' : "{{ postalcode }}",
+	'description': "{{ description }}",
+	'servicetype': "{{ servicetype }}"
 };
 
 function getUpdates(){
@@ -29,18 +33,20 @@ function getUpdates(){
 	$.getJSON('/json', function(data){
 		for(var i=0; i<data.schedule.length; i++){
 			//console.log(data.schedule[i]);
-			event = {};
-			event['id'] = i+1;
-			event['start'] = new Date(data.schedule[i].date.year,data.schedule[i].date.month-1,data.schedule[i].date.day, data.schedule[i].hour.start);
-			event['end'] = new Date(data.schedule[i].date.year,data.schedule[i].date.month-1,data.schedule[i].date.day, data.schedule[i].hour.end);
-			event['title'] = data.schedule[i].content;
-			event['readOnly'] = data.schedule[i].readonly;
-			event['email'] = data.schedule[i].email;
-			event['type'] = data.schedule[i].type; 
+			event={
+				'id': i+1,
+				'start': new Date(data.schedule[i].date.year,data.schedule[i].date.month-1,data.schedule[i].date.day, data.schedule[i].hour.start),
+				'end': new Date(data.schedule[i].date.year,data.schedule[i].date.month-1,data.schedule[i].date.day, data.schedule[i].hour.end),
+				'servicetype': data.schedule[i].servicetype,
+				'description': data.schedule[i].description,
+				'postalcode': data.schedule[i].postalcode,
+				'readOnly': data.schedule[i].readonly,
+				'email': data.schedule[i].email,
+				'type': data.schedule[i].type
+			};
 			allEvent.push(event);
 		}
 	});
-	getSchedule();
 	$("#calendar").hide().fadeIn(1300);
 }
 
@@ -48,7 +54,7 @@ function saveBooking(slot){//delete later on
 //save as cache when save is clicked in dialog button 
 	booking = {
 		'id':slot.id,
-		'content': slot.body,
+		'description': slot.body,
 		'day': slot.start.getDate(),
 		'month': slot.start.getMonth()+1,
 		'year': slot.start.getFullYear(),
@@ -68,33 +74,31 @@ function saveBooking(slot){//delete later on
 $.getJSON('/json', function(data){
 	for(var i=0; i<data.schedule.length; i++){
 		//console.log(data.schedule[i]);
-		event = {};
-		event['id'] = i+1;
-		event['start'] = new Date(data.schedule[i].date.year,data.schedule[i].date.month-1,data.schedule[i].date.day, data.schedule[i].hour.start);
-		event['end'] = new Date(data.schedule[i].date.year,data.schedule[i].date.month-1,data.schedule[i].date.day, data.schedule[i].hour.end);
-		event['title'] = data.schedule[i].content;
-		event['readOnly'] = data.schedule[i].readonly;
-		event['email'] = data.schedule[i].email;
-		event['type'] = data.schedule[i].type;
-		
+		event={
+			'id': i+1,
+			'start': new Date(data.schedule[i].date.year,data.schedule[i].date.month-1,data.schedule[i].date.day, data.schedule[i].hour.start),
+			'end': new Date(data.schedule[i].date.year,data.schedule[i].date.month-1,data.schedule[i].date.day, data.schedule[i].hour.end),
+			'servicetype': data.schedule[i].servicetype,
+			'description': data.schedule[i].description,
+			'postalcode': data.schedule[i].postalcode,
+			'readOnly': data.schedule[i].readonly,
+			'email': data.schedule[i].email,
+			'type': data.schedule[i].type
+			};
+				
 		if(!event['readOnly']){
 		booking_quota++;
 		}
 		
 		allEvent.push(event);
 	}
-
-	getSchedule();
 	
-});
-
-function getSchedule(){
 	var scriptE = document.createElement("script");
     scriptE.src = "/template/javascript/calendar.js";
     var headElement = document.getElementsByTagName("head").item(0);
     headElement.appendChild(scriptE);
-	
-	if(user_var.accounType == 'administrator'){
+    
+    if(user_var.accounType == 'administrator'){
 		x = document.getElementsByTagName("input");
 		for(i=0;i<x.length;i++){
 			x[i].removeAttribute("readonly");
@@ -104,7 +108,8 @@ function getSchedule(){
 			x[i].removeAttribute("readonly");
 			}
 	}
-}
+});
+
 </script>
 
 {% endblock %}
@@ -134,7 +139,7 @@ function getSchedule(){
 				</li>
 				{% endif %}
 				<li>
-					<label for="title">Service(s) Type: </label><input type="text" name="title" readonly/>
+					<label for="servicetype">Service(s) Type: </label><input type="text" name="servicetype" readonly/>
 				</li>
 				<li>
 					<label for="body">Request: </label><textarea name="body" style="width:250px;" readonly></textarea>
@@ -142,6 +147,7 @@ function getSchedule(){
 			</ol>
 		</form>
 	</div>
+	<div>
 	{% if user.accounType == 'administrator' %}
 	<form action="/empschedule" id="bookingForm" method="POST">
 	<input type="submit" value="Add all schedule" />
@@ -151,4 +157,5 @@ function getSchedule(){
 	<input type="submit" value="Check Out" />
 	</form>
 	{% endif %}
+	</div>
 {% endblock %}

@@ -3,12 +3,11 @@ $(document).ready(function() {
 	$('#bookingForm').submit(function(event){
 		//save booking to database
 		$.post("/json", booking);
-		return true;
      //event.preventDefault();
 	});//KELVIN
 	
    var $calendar = $('#calendar');
-   var id = 10;
+   var id = allEvent.length+1;
 
    $calendar.weekCalendar({
       timeslotsPerHour : 1,
@@ -59,9 +58,11 @@ $(document).ready(function() {
 		 
 	         var startField = $dialogContent.find("input[name='start']").val(displaystartTime);
 	         var endField = $dialogContent.find("input[name='end']").val(displayendTime);
-	         var titleField = $dialogContent.find("input[name='title']");
-	         var bodyField = $dialogContent.find("textarea[name='body']");
-
+	         var servicetypeField = $dialogContent.find("input[name='servicetype']").val(user_var.servicetype);
+	         var bodyField = $dialogContent.find("textarea[name='body']").val(user_var.description);
+	         var emailField = $dialogContent.find("input[name='email']").val(user_var.email);//KELVIN
+        	 var pcField = $dialogContent.find("input[name='postalcode']").val(user_var.postalcode);
+        	 
 
 	         $dialogContent.dialog({
 	            modal: true,
@@ -77,11 +78,13 @@ $(document).ready(function() {
 	                  id++;
 	                  calEvent.start = new Date(calEvent.start);
 	                  calEvent.end = new Date(calEvent.end);
-	                  calEvent.title = titleField.val();
-	                  calEvent.body = bodyField.val();
+	                  calEvent.servicetype = servicetypeField.val();
+	                  calEvent.description = bodyField.val();
+	                  calEvent.postalcode = pcField.val();
+                      calEvent.email = emailField.val();
 	
 	                  $calendar.weekCalendar("removeUnsavedEvents");
-	                  $calendar.weekCalendar("updateEvent", calEvent);
+	                  
 	                  
 	                  //KELVIN
 	                  if(created && (user_var.accounType != 'administrator')){
@@ -91,14 +94,16 @@ $(document).ready(function() {
 	                  }
 	                  
 	                  booking = {
-	                			'id':calEvent.id,
-	                			'content': calEvent.body,
+	                			'id': calEvent.id,
 	                			'day': calEvent.start.getDate(),
 	                			'month': calEvent.start.getMonth()+1,
 	                			'year': calEvent.start.getFullYear(),
 	                			'start': calEvent.start.getHours(),
 	                			'end': calEvent.end.getHours(),
-	                			'email': user_var.email,
+	                			'servicetype': calEvent.servicetype,
+	                			'email': calEvent.email,
+	                			'postalcode': user_var.postalcode,
+	                			'description': calEvent.description,
 	                			'type': 'appointment'
 	                		}
 	                  console.log(booking);
@@ -109,7 +114,7 @@ $(document).ready(function() {
 	                			if(data.exist){
 	                				getUpdates();
 	                				$calendar.weekCalendar("removeEvent", calEvent.id);
-	                			}
+	                			}else $calendar.weekCalendar("updateEvent", calEvent);
 	                		}, "json");
 	                  
 	                  $dialogContent.dialog("close");
@@ -154,11 +159,12 @@ $(document).ready(function() {
 		 
          var startField = $dialogContent.find("input[name='start']").val(displaystartTime);
          var endField = $dialogContent.find("input[name='end']").val(displayendTime);
-         var titleField = $dialogContent.find("input[name='title']").val(calEvent.title);
-         var bodyField = $dialogContent.find("textarea[name='body']");
-         bodyField.val(calEvent.body);
+         var servicetypeField = $dialogContent.find("input[name='servicetype']").val(calEvent.servicetype);
+         var bodyField = $dialogContent.find("textarea[name='body']").val(calEvent.description);
          
          if(user_var.accounType == 'administrator'){
+        	 var emailField = $dialogContent.find("input[name='email']").val(calEvent.email);//KELVIN
+        	 var pcField = $dialogContent.find("input[name='postalcode']").val(calEvent.postalcode);
         	 $dialogContent.dialog({
                  modal: true,
                  title: "View Appointment",
@@ -168,6 +174,32 @@ $(document).ready(function() {
                     $('#calendar').weekCalendar("removeUnsavedEvents");
                  },
                  buttons: {
+                	 save : function() {
+                		 calEvent.start = startField;
+                         calEvent.end = endField;
+                         calEvent.servicetype = servicetypeField.val();
+                         calEvent.description = bodyField.val();
+                         calEvent.postalcode = pcField.val();
+                         calEvent.email = emailField.val();
+                         
+                         
+                         booking = {
+ 	                			'id': calEvent.id,
+ 	                			'day': calEvent.start.getDate(),
+ 	                			'month': calEvent.start.getMonth()+1,
+ 	                			'year': calEvent.start.getFullYear(),
+ 	                			'start': calEvent.start.getHours(),
+ 	                			'end': calEvent.end.getHours(),
+ 	                			'servicetype': calEvent.servicetype,
+ 	                			'email': calEvent.email,
+ 	                			'postalcode': calEvent.postalcode,
+ 	                			'description': calEvent.description,
+ 	                			'type': 'appointment'
+ 	                		}
+
+                         $calendar.weekCalendar("updateEvent", calEvent);
+                         $dialogContent.dialog("close");
+                	 },
                     "delete" : function() {
                        $calendar.weekCalendar("removeEvent", calEvent.id);
                        $dialogContent.dialog("close");
@@ -243,7 +275,7 @@ $(document).ready(function() {
 		        	  unavailableEvent['id'] = id;
 		        	  unavailableEvent['start'] = new Date(year,m,d,t);
 		        	  unavailableEvent['end'] = new Date(year,m,d,t+1);
-		        	  unavailableEvent['title'] = 'unavailable'
+		        	  unavailableEvent['servicetype'] = 'unavailable'
 		        	  unavailableEvent['readOnly'] = true
 		        	  unavailableEvent['type'] = 'unavailable';
 		        	  
@@ -266,7 +298,6 @@ $(document).ready(function() {
 	    	  if(now) break;
 	      }
       }
-      
       lol();
       return {
          events : allEvent.concat(unavailableList)
