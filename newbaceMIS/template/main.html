@@ -9,7 +9,11 @@
 	<script type="text/javascript" src="/template/javascript/arial.js"></script>
 	<script type="text/javascript" src="/template/javascript/cuf_run.js"></script>
 	
+	
+	
 	{% block script %}
+
+	
 
 	{% endblock %}
 </head>
@@ -26,12 +30,14 @@
         		<li id="navsecond"><a href="/about">About Us</a></li>
         		<li id="navthird"><a href="/gallery">Gallery</a></li>
         		<li id="navfourth"><a href="/services">Services</a></li>
+        		{% if user.accounType != 'administrator' and user.accounType != 'employee' %}	
         		<li id="navfifth"><a href="/schedulebooking">Booking</a></li>
+        		{% endif%}
         		<li id="navsixth"><a href="/contact">Contact Us</a></li>
         	</ul>
 		</div>
 		<div class="clr"></div>
-		<div class="hbg"><img src="images/header_images.jpg" width="670" height="298" alt="banner" class="fr" />
+		<div class="hbg"><img src="/images/header_images.jpg" width="670" height="298" alt="banner" class="fr" />
 			<div class="info fl">
 				<h3>Quality</h3>
 				<h3>performance</h3>
@@ -88,11 +94,11 @@
         			<li><a href="/bookinghistory">Booking History</a></li>
         		{% endif %}
 				{% if user.accounType == 'administrator' %}
-					<li><a href="/empsignup">New Employee</a></li>
+					<li><a href="/admin/signup">New Employee</a></li>
 					<li><a href="/">Add a job</a></li>
-					<li><a href="/empschedule">Schedule</a></li>
-					<li><a href="/empweeklyschedule">Weekly Schedule</a></li>
-					<li><a href="/inventoryManagement">Inventory</a></li>
+					<li><a href="/admin/schedule">Schedule</a></li>
+					<li><a href="/admin/weeklyschedule">Weekly Schedule</a></li>
+					<li><a href="/admin/inventory">Inventory</a></li>
 					<li>{{ user.accounType }} Rights</li>
 				{% endif %}
 				</ul>
@@ -114,16 +120,16 @@
         		<h2 class="star"><span>Partners</span></h2>
         		<div class="clr"></div>
         		<ul class="sb_menu">
-          			<li><img src="images/logo/Mitsubishi.jpg" width="95" height="40" alt="Mitsubishi logo" /></li>
-          			<li><img src="images/logo/DAIKIN.jpg" width="134" height="33" alt="DAIKIN logo" /></li>
-          			<li><img src="images/logo/SANYO.jpg" width="125" height="40" alt="SANYO logo" /></li>
-          			<li><img src="images/logo/Panasonic.jpg" width="131" height="54" alt="Panasonic logo" /></li>
-          			<li><img src="images/logo/Carrier.jpg" width="143" height="53" alt="Carrier logo" /></li>
-          			<li><img src="images/logo/Toshiba.jpg" width="145" height="41" alt="Toshiba logo" /></li>
-          			<li><img src="images/logo/YORK.jpg" width="152" height="48" alt="YORK logo" /></li>
-          			<li><img src="images/logo/LG.jpg" width="113" height="58" alt="LG logo" /></li>
-          			<li><img src="images/logo/Samsung.jpg" width="147" height="54" alt="Samsung logo" /></li>
-          			<li><img src="images/logo/Fujitsu.jpg" width="112" height="57" alt="Fujitsu logo" /></li>
+          			<li><img src="/images/logo/Mitsubishi.jpg" width="95" height="40" alt="Mitsubishi logo" /></li>
+          			<li><img src="/images/logo/DAIKIN.jpg" width="134" height="33" alt="DAIKIN logo" /></li>
+          			<li><img src="/images/logo/SANYO.jpg" width="125" height="40" alt="SANYO logo" /></li>
+          			<li><img src="/images/logo/Panasonic.jpg" width="131" height="54" alt="Panasonic logo" /></li>
+          			<li><img src="/images/logo/Carrier.jpg" width="143" height="53" alt="Carrier logo" /></li>
+          			<li><img src="/images/logo/Toshiba.jpg" width="145" height="41" alt="Toshiba logo" /></li>
+          			<li><img src="/images/logo/YORK.jpg" width="152" height="48" alt="YORK logo" /></li>
+          			<li><img src="/images/logo/LG.jpg" width="113" height="58" alt="LG logo" /></li>
+          			<li><img src="/images/logo/Samsung.jpg" width="147" height="54" alt="Samsung logo" /></li>
+          			<li><img src="/images/logo/Fujitsu.jpg" width="112" height="57" alt="Fujitsu logo" /></li>
         		</ul>
       		</div>
     	</div>
@@ -134,7 +140,7 @@
     <div class="fbg_resize">
       <div class="col c1">
         <h2><span>Image Gallery</span></h2>
-        <a href="/gallery"><img src="images/pic_1.jpg" width="58" height="58" alt="pic1" /></a><a href="/gallery"><img src="images/pic_2.jpg" width="58" height="58" alt="pic2" /></a> <a href="/gallery"><img src="images/pic_3.jpg" width="58" height="58" alt="pic3" /></a> <a href="/gallery"><img src="images/pic_4.jpg" width="58" height="58" alt="pic4" /></a> <a href="/gallery"><img src="images/pic_5.jpg" width="58" height="58" alt="pic5" /></a> <a href="/gallery"><img src="images/pic_6.jpg" width="58" height="58" alt="pic6" /></a> 
+        <a href="/gallery"><img src="/images/pic_1.jpg" width="58" height="58" alt="pic1" /></a><a href="/gallery"><img src="/images/pic_2.jpg" width="58" height="58" alt="pic2" /></a> <a href="/gallery"><img src="/images/pic_3.jpg" width="58" height="58" alt="pic3" /></a> <a href="/gallery"><img src="/images/pic_4.jpg" width="58" height="58" alt="pic4" /></a> <a href="/gallery"><img src="/images/pic_5.jpg" width="58" height="58" alt="pic5" /></a> <a href="/gallery"><img src="/images/pic_6.jpg" width="58" height="58" alt="pic6" /></a> 
         </div>
       <div class="col c2">
         <h2><span>Operating Hours</span></h2>

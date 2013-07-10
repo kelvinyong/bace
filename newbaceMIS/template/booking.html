@@ -38,7 +38,6 @@ $(document).ready(function(){
 			document.getElementById('service').value = servicetype;
 			user_var['servicetype'] = servicetype;
 			user_var['description'] = document.getElementById("request").value;
-			console.log("ok");
 			event.preventDefault();
 			$.post("/jsonrecommend", user_var).done(function() {
 				$('#recommend').unbind('submit').submit();
@@ -91,11 +90,15 @@ $(document).ready(function(){
      </li>
      <li>
 		<label for="serviceType">Top Up Gas:</label>
-		<input type="checkbox" id="topupgas">Yes<input type="checkbox">No
+		<form>
+			<input type="radio" name="topup" id="topupgas">Yes<input type="radio" name="topup" checked="checked">No
+		</form>
      </li>
      <li>
 		<label for="serviceType">Check &amp; Troubleshooting:</label>
-		<input type="checkbox" id="checktroubleshoot">Yes<input type="checkbox">No
+		<form>
+			<input type="radio" id="checktroubleshoot" name="check">Yes<input type="radio" name="check" checked="checked">No
+		</form>
      </li>
      <li>
         <label for="address">Address:</label>

@@ -9,11 +9,11 @@
 <br>
     <form id="editItem" method="post">
     	<table>
-    	<tr><td>Item type:</td><td><input type="text" name="itemType" value="{{ item.Type }}"/></td>
-        <tr><td>Item name:</td><td><input type="text" name="itemName" value="{{ item.Name }}"/></td>
-        <tr><td>Item description:</td><td><input type="text" name="itemDesc" value="{{ item.Description }}"/></td>
-        <tr><td>Item price:</td><td><input type="text" name="itemPrice" value="{{ item.Price }}"/></td>
-        <tr><td>Item quantity:</td><td><input type="text" name="itemQty" value="{{ item.Quantity }}"/></td>
+    	<tr><td>Item type:</td><td><input type="text" name="itemType" value="{{ item.Type }}" required="required"/></td>
+        <tr><td>Item name:</td><td><input type="text" name="itemName" value="{{ item.Name }}" required="required"/></td>
+        <tr><td>Item description:</td><td><input type="text" name="itemDesc" value="{{ item.Description }}" required="required"/></td>
+        <tr><td>Item price:</td><td><input type="text" name="itemPrice" value="{{ item.Price }}" required="required"/></td>
+        <tr><td>Item quantity:</td><td><input type="text" name="itemQty" value="{{ item.Quantity }}" required="required"/></td>
         <tr><td>Item storage:</td>
         <td>
         	<select name="itemStorage">

@@ -12,9 +12,19 @@
 
 <script type="text/javascript">
 var allEvent=[];
+var clickSubmit = false;
 var adminBooking=[];
-var booking;
+var selectedBooking;
 var booking_quota = 0;
+
+window.onbeforeunload = function(e) {
+	if(!clickSubmit){
+		e.preventDefault();
+		$.post("/removeusercache", user_var).done(function() {
+				return 'Leaving this page will clear all unsaved information';
+			});
+	}
+};
 
 function lol(){
 console.log(allEvent);
@@ -46,28 +56,11 @@ function getUpdates(){
 			};
 			allEvent.push(event);
 		}
+	}).done(function(){
+		$("#calendar").hide().fadeIn(1300);
+		return;
 	});
-	$("#calendar").hide().fadeIn(1300);
-}
-
-function saveBooking(slot){//delete later on
-//save as cache when save is clicked in dialog button 
-	booking = {
-		'id':slot.id,
-		'description': slot.body,
-		'day': slot.start.getDate(),
-		'month': slot.start.getMonth()+1,
-		'year': slot.start.getFullYear(),
-		'start': slot.start.getHours(),
-		'end': slot.end.getHours()
-	}
-	console.log(booking);
-	$.post("/cacheBooking", booking,function(data){
-		alert(data.msg);
-		if(data.exist){
-			getUpdates();
-		}
-	}, "json");
+	
 }
 
 
@@ -116,6 +109,8 @@ $.getJSON('/json', function(data){
 
 {% block maincontent %}
 <h1>booking</h1>
+<div class="clr"></div>
+<p>Recommended timeslot is given, please choose another slot if you are not available by clicking on the calendar</p>
 <div id='calendar'></div>
 <div id="event_edit_container">
 		<form>
@@ -125,10 +120,20 @@ $.getJSON('/json', function(data){
 					<span>Date: </span><span class="date_holder"></span> 
 				</li>
 				<li>
-					<label for="start">Start Time: </label><input type="text" name="start" readonly/>
+					<label for="start">Start Time: </label>
+					{% if user.accounType == 'administrator' %}
+					<select name="start"><option value="">Select Start Time</option></select>
+					{% else %}
+					<input type="text" name="start" readonly/>
+					{% endif %}
 				</li>
 				<li>
-					<label for="end">End Time: </label><input type="text" name="end" readonly/>
+					<label for="end">End Time: </label>
+					{% if user.accounType == 'administrator' %}
+					<select name="end"><option value="">Select End Time</option></select>
+					{% else %}
+					<input type="text" name="end" readonly/>
+					{% endif %}
 				</li>
 				{% if user.accounType == 'administrator' %}
 				<li>
@@ -154,8 +159,11 @@ $.getJSON('/json', function(data){
 	</form>
 	{% else %}
 	<form action="/scheduleconfirmation" id="bookingForm" method="POST">
+	<label for="confirmation">Select Preferred booking:</label>
+	<input type="radio" id="rBook" name="check" checked="checked">Recommended<input type="radio" name="check">My Preference
 	<input type="submit" value="Check Out" />
 	</form>
+	<small>*Recommendation will be selected if preference is not created on the calendar*</small>
 	{% endif %}
 	</div>
 {% endblock %}

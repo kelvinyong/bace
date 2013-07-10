@@ -21,7 +21,7 @@ from webapp2_extras.auth import InvalidPasswordError
 
 # A list storing the booking cache.
 booking_cache = []
-day = 15
+day = 16
 
 def user_required(handler):
     """
@@ -288,7 +288,8 @@ class VerificationHandler(BaseHandler):
       if not user.verified:
         user.verified = True
         user.put()
-
+    
+      
       self.display_message('User email address has been verified.')
       return
     elif verification_type == 'p':
@@ -354,11 +355,12 @@ class LoginHandler(BaseHandler):
 
 class LogoutHandler(BaseHandler):
     def get(self):
-        global booking_cache
+        #global booking_cache
         global day
+
+        #booking_cache = []
+        day=16
         self.auth.unset_session()
-        booking_cache = []
-        day=15
         self.redirect(self.uri_for('home'))
         
 class SettingHandler(BaseHandler):
@@ -394,39 +396,11 @@ class SettingHandler(BaseHandler):
         info.put()
         self.display_message('Settings updated')
 
-
-class AuthenticatedHandler(BaseHandler):
-    @user_required
-    def get(self):
-        self.render_template('authenticated.html')
-
 class AdminSignupHandler(BaseHandler):
     @user_required
     @admin_required
     def get(self):
         self.render_template('signup.html')
-        
-
-class dbHandler(BaseHandler):
-    def get(self):
-        greetings = db.GqlQuery("SELECT * FROM Greeting")
-        #greetings = Greeting.all()
-        for greeting in greetings:
-            self.response.write('<li> %s date/time %s' % (greeting.content, greeting.date))
-        self.response.write('''
-            </ol><hr>
-            <form action="/sign" method=post>
-            <textarea name=content rows=3 cols=60></textarea>
-            <br><input type=submit value="Sign Guestbook">
-            </form>
-        ''')
-        
-class GuestBook(BaseHandler):
-    def post(self):
-        greeting = models.Greeting()
-        greeting.content = self.request.get('content')
-        greeting.put()
-        self.redirect(self.uri_for('test'))
 
 class VerifyHandler(BaseHandler):
     @loggedin
@@ -507,7 +481,7 @@ class recommendScheduleHandler(BaseHandler):
         date['year'] = 2013
         schedule['date'] = date
         hour={}
-        hour['start'] = 15
+        hour['start'] = 14
         hour['end'] = 16
         schedule['hour'] = hour
         schedule['readonly'] = False
@@ -599,7 +573,10 @@ class cacheHandler(BaseHandler):
         
         schedule={}
         schedule['type'] = self.request.get('type')
-        schedule['email'] = self.user.email_address
+        schedule['postalcode'] = self.request.get('postalcode')
+        schedule['description'] = self.request.get('description')
+        schedule['servicetype'] = self.request.get('servicetype')
+        schedule['email'] = self.request.get('email')
         date={}
         date['day'] = int(self.request.get('day'))
         date['month'] = int(self.request.get('month'))
@@ -612,22 +589,29 @@ class cacheHandler(BaseHandler):
         schedule['readonly'] = False
         
         
-        #check for existing same date and in cache before appending
+        #check for existing same date and time in cache before appending
         exist = False;
         for temp in booking_cache:
-            if((temp['date'] == schedule['date']) and temp['hour'] == schedule['hour']):
-                data['msg'] = 'Someone has just reserved. Please try again'
-                data['exist'] = True
-                exist = True
-                break;
-            else:
-                data['msg'] = 'Reservation is being made'
-                data['exist'] = False
+            #if((temp['date'] == schedule['date']) and temp['hour'] == schedule['hour']):
+            if(temp['date'] == schedule['date']):
+                for i in range(temp['hour']['end'] - temp['hour']['start']):
+                    data['test'] = 'enter2'
+                    if (schedule['hour']['start'] == (temp['hour']['start'] + i)):
+                        data['msg'] = 'Someone has just reserved. Please try again'
+                        data['exist'] = True
+                        exist = True
+                        break;
+                for i in range(schedule['hour']['end'] - schedule['hour']['start']):
+                    data['test'] = 'enter3'
+                    if(temp['hour']['start'] == (schedule['hour']['start'] + i)):
+                        data['msg'] = 'Someone has just reserved. Please try again'
+                        data['exist'] = True
+                        exist = True
+                        break;
                 
-        if len(booking_cache) == 0:
+        if not exist or len(booking_cache) == 0:
             data['msg'] = 'Reservation is being made'
             data['exist'] = False
-        if not exist:
             booking_cache.append(schedule)
         
              
@@ -637,12 +621,26 @@ class cacheHandler(BaseHandler):
 class cacheRemoveHandler(BaseHandler):
     def post(self):
         global booking_cache
-        data={}
-        data['email'] = self.request.get('email')
-        data['type'] = self.request.get('type')
+        
+        schedule={}
+        schedule['type'] = self.request.get('type')
+        schedule['postalcode'] = self.request.get('postalcode')
+        schedule['description'] = self.request.get('description')
+        schedule['servicetype'] = self.request.get('servicetype')
+        schedule['email'] = self.user.email_address
+        date={}
+        date['day'] = int(self.request.get('day'))
+        date['month'] = int(self.request.get('month'))
+        date['year'] = int(self.request.get('year'))
+        schedule['date'] = date
+        hour={}
+        hour['start'] = int(self.request.get('start'))
+        hour['end'] = int(self.request.get('end'))
+        schedule['hour'] = hour
+        schedule['readonly'] = False
         
         for temp in booking_cache:
-            if((temp['email'] == data['email']) and temp['type'] == data['type']):
+            if((temp['date'] == schedule['date']) and temp['hour'] == schedule['hour']):
                 booking_cache.remove(temp)
                 break;
         
@@ -860,8 +858,7 @@ class inventoryManagementHandler(BaseHandler):
         if delete=='Yes':
             iKey = self.request.get('warehouseKey')
             currentKey = ndb.Key(urlsafe=iKey)
-            warehouse = currentKey.get()
-            warehouse.delete()
+            currentKey.delete()
         
         if processType=='Add_Warehouse':
             #self.response.write('WAREHOUSE ADDED')
@@ -935,7 +932,7 @@ class editItemHandler(BaseHandler):
             item.put()
 
             self.display_message('<h1>Edit Item</h1> <br />Item successfully updated\
-            <br /><a href="/inventoryManagement"><input type="button" value="Back" ></a>')
+            <br /><a href="/admin/inventory"><input type="button" value="Back" ></a>')
         
     
         iKey = self.request.get('itemKey')
@@ -964,6 +961,23 @@ class aboutHandler(BaseHandler):
 class servicesHandler(BaseHandler):
     def get(self):
         self.render_template('services.html')
+        
+class removeusercacheHandler(BaseHandler):
+    def post(self):
+        global booking_cache
+        booking_cache_remove=[]
+
+        for temp in booking_cache:
+            if(temp['email'] == self.user.email_address):
+                booking_cache_remove.append(temp)
+            elif(temp['type'] == 'administrator' and self.user.accounType == 'administrator'):
+                booking_cache_remove.append(temp)
+                
+        for temp in booking_cache_remove:
+            booking_cache.remove(temp)
+        
+        #self.response.out.write(json.JSONEncoder().encode(params))
+        
 
 config = {
   'webapp2_extras.auth': {
@@ -984,18 +998,15 @@ app = webapp2.WSGIApplication([
     webapp2.Route('/login', LoginHandler, name='login'),
     webapp2.Route('/logout', LogoutHandler, name='logout'),
     webapp2.Route('/forgot', ForgotPasswordHandler, name='forgot'),
-    webapp2.Route('/authenticated', AuthenticatedHandler, name='authenticated'),
-    webapp2.Route('/testdb', dbHandler, name='test'),
-    webapp2.Route('/sign', GuestBook),
     webapp2.Route('/verifyemail', VerifyHandler, name='verifyemail'),
     webapp2.Route('/setting', SettingHandler),
     webapp2.Route('/schedulebooking', QueryScheduleHandler),
     webapp2.Route('/jsonrecommend', recommendScheduleHandler),
-    webapp2.Route('/empschedule', AdminScheduleHandler),
+    webapp2.Route('/admin/schedule', AdminScheduleHandler),
     webapp2.Route('/scheduleconfirmation', ScheduleHandler),
     webapp2.Route('/jsonempweeklyschedule', weeklySchedulejsonHandler),
-    webapp2.Route('/empweeklyschedule',weeklyScheduleHandler),
-    webapp2.Route('/empsignup', AdminSignupHandler),
+    webapp2.Route('/admin/weeklyschedule',weeklyScheduleHandler),
+    webapp2.Route('/admin/signup', AdminSignupHandler),
     webapp2.Route('/json', jsonHandler),
     webapp2.Route('/cacheBooking', cacheHandler),
     webapp2.Route('/removeCacheBooking', cacheRemoveHandler),
@@ -1006,8 +1017,9 @@ app = webapp2.WSGIApplication([
     webapp2.Route('/quotation', quotationHandler),
     webapp2.Route('/bookinghistory', historyHandler),
     webapp2.Route('/jsonbookinghistory', historyjsonHandler),
-    webapp2.Route('/inventoryManagement', inventoryManagementHandler),
+    webapp2.Route('/admin/inventory', inventoryManagementHandler),
     webapp2.Route('/editItem', editItemHandler),
+    webapp2.Route('/removeusercache', removeusercacheHandler)
 ], debug=True, config=config)
 
 logging.getLogger().setLevel(logging.DEBUG)

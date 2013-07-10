@@ -2,7 +2,8 @@ $(document).ready(function() {
 	var created = false;
 	$('#bookingForm').submit(function(event){
 		//save booking to database
-		$.post("/json", booking);
+		clickSubmit=true;
+		$.post("/json", selectedBooking);
      //event.preventDefault();
 	});//KELVIN
 	
@@ -56,11 +57,17 @@ $(document).ready(function() {
 				displayendTime = calEvent.end.getHours() + ":00 am";
 			 }
 		 
-	         var startField = $dialogContent.find("input[name='start']").val(displaystartTime);
-	         var endField = $dialogContent.find("input[name='end']").val(displayendTime);
+			 if(user_var.accounType == 'administrator'){
+				 var startField = $dialogContent.find("select[name='start']").val(calEvent.start);
+		         var endField = $dialogContent.find("select[name='end']").val(calEvent.end);
+			 }else{
+				 var startField = $dialogContent.find("input[name='start']").val(displaystartTime);
+				 var endField = $dialogContent.find("input[name='end']").val(displayendTime);
+			 }
+	         
 	         var servicetypeField = $dialogContent.find("input[name='servicetype']").val(user_var.servicetype);
 	         var bodyField = $dialogContent.find("textarea[name='body']").val(user_var.description);
-	         var emailField = $dialogContent.find("input[name='email']").val(user_var.email);//KELVIN
+	         var emailField = $dialogContent.find("input[name='email']").val(user_var.email);
         	 var pcField = $dialogContent.find("input[name='postalcode']").val(user_var.postalcode);
         	 
 
@@ -75,25 +82,44 @@ $(document).ready(function() {
 	            buttons: {
 	               save : function() {
 	                  calEvent.id = id;
-	                  id++;
-	                  calEvent.start = new Date(calEvent.start);
-	                  calEvent.end = new Date(calEvent.end);
+	                  if(user_var.accounType == 'administrator'){ 
+	                	  id++;
+	                	  calEvent.start = new Date(startField.val());
+	                      calEvent.end = new Date(endField.val());
+	                      calEvent.postalcode = pcField.val();
+	                	  calEvent.email = emailField.val();
+	                  }else{
+	                	  calEvent.start = new Date(calEvent.start);
+	                	  calEvent.end = new Date(calEvent.end);
+	                	  calEvent.postalcode = user_var.postalcode;
+	                	  calEvent.email = user_var.email;
+	                  }
 	                  calEvent.servicetype = servicetypeField.val();
 	                  calEvent.description = bodyField.val();
-	                  calEvent.postalcode = pcField.val();
-                      calEvent.email = emailField.val();
+	                  calEvent.type = "appointment";
+	                  
 	
 	                  $calendar.weekCalendar("removeUnsavedEvents");
 	                  
-	                  
 	                  //KELVIN
 	                  if(created && (user_var.accounType != 'administrator')){
-	                	  $calendar.weekCalendar("removeEvent", calEvent.id -1);
-	                	  $.post("/removeCacheBooking",booking);
+	                	  //$calendar.weekCalendar("removeEvent", calEvent.id -1);
+	                	  //allEvent.pop(calEvent);
+	                	  for(var i=0; i<allEvent.length; i++){
+	                		  if((allEvent[i].type == "appointment" && allEvent[i].email == user_var.email) || (allEvent[i].type == "query" && (!allEvent[i].readOnly) && allEvent[i].email == user_var.email)){
+	                			  console.log(allEvent);
+	                			  console.log(allEvent[i].id);
+	                			  $calendar.weekCalendar("removeEvent", allEvent[i].id);
+	                			  allEvent.splice(i, 1);
+	                			  break;
+	                		  }
+	                	  }
+	                	  $.post("/removeCacheBooking",selectedBooking);
 	                	  //remove recommended slot
 	                  }
+	                  allEvent.push(calEvent);
 	                  
-	                  booking = {
+	                  selectedBooking = {
 	                			'id': calEvent.id,
 	                			'day': calEvent.start.getDate(),
 	                			'month': calEvent.start.getMonth()+1,
@@ -102,21 +128,25 @@ $(document).ready(function() {
 	                			'end': calEvent.end.getHours(),
 	                			'servicetype': calEvent.servicetype,
 	                			'email': calEvent.email,
-	                			'postalcode': user_var.postalcode,
+	                			'postalcode': calEvent.postalcode,
 	                			'description': calEvent.description,
 	                			'type': 'appointment'
 	                		}
-	                  console.log(booking);
-	                		$.post("/cacheBooking", booking,function(data){
+	                  
+	                  if(user_var.accounType == 'administrator') selectedBooking.type = 'administrator';
+	                  
+	                  console.log(selectedBooking);
+	                		$.post("/cacheBooking", selectedBooking,function(data){
 	                			alert(data.msg);
 	                			created=true;
 	                			booking_quota++;
 	                			if(data.exist){
-	                				getUpdates();
-	                				$calendar.weekCalendar("removeEvent", calEvent.id);
+	                				selectedBooking = {};
+	                				//$calendar.weekCalendar("removeEvent", calEvent.id);
 	                			}else $calendar.weekCalendar("updateEvent", calEvent);
 	                		}, "json");
-	                  
+	                  adminBooking.push(selectedBooking);
+	                  getUpdates();
 	                  $dialogContent.dialog("close");
 	               },
 	               cancel : function() {
@@ -126,9 +156,12 @@ $(document).ready(function() {
 	         }).show();
 	    	  
 	         $dialogContent.find(".date_holder").text($calendar.weekCalendar("formatDate", calEvent.start));
+	         setupStartAndEndTimeFields(startField, endField, calEvent, $calendar.weekCalendar("getTimeslotTimes", calEvent.start));
     	  }else{
     		  	$calendar.weekCalendar("removeUnsavedEvents");
     		  }
+    	 //$dialogContent.find(".date_holder").text($calendar.weekCalendar("formatDate", calEvent.start));
+    	 
       },
       eventDrop : function(calEvent, $event) {
       },
@@ -175,15 +208,15 @@ $(document).ready(function() {
                  },
                  buttons: {
                 	 save : function() {
-                		 calEvent.start = startField;
-                         calEvent.end = endField;
+                		 calEvent.start = new Date(startField.val());
+                         calEvent.end = new Date(endField.val());
                          calEvent.servicetype = servicetypeField.val();
                          calEvent.description = bodyField.val();
                          calEvent.postalcode = pcField.val();
                          calEvent.email = emailField.val();
                          
                          
-                         booking = {
+                         selectedBooking = {
  	                			'id': calEvent.id,
  	                			'day': calEvent.start.getDate(),
  	                			'month': calEvent.start.getMonth()+1,
@@ -201,7 +234,18 @@ $(document).ready(function() {
                          $dialogContent.dialog("close");
                 	 },
                     "delete" : function() {
-                       $calendar.weekCalendar("removeEvent", calEvent.id);
+                       for(var i=0; i<adminBooking.length; i++){
+	                		  if((adminBooking[i].year == calEvent.start.getFullYear()) &&
+	                				  (adminBooking[i].month == calEvent.start.getMonth()+1) &&
+	                				  		(adminBooking[i].day == calEvent.start.getDate()) &&
+	                				  			(adminBooking[i].start == calEvent.start.getHours())){
+	                			  $calendar.weekCalendar("removeEvent", calEvent.id);
+	                			  $.post("/removeCacheBooking",adminBooking[i]);
+	                			  adminBooking.splice(i, 1);
+	                			  break;
+	                		  }
+	                	  }
+                       getUpdates();
                        $dialogContent.dialog("close");
                     },
                     cancel : function() {
@@ -227,8 +271,10 @@ $(document).ready(function() {
          }
 
          
-
+         var startField = $dialogContent.find("select[name='start']").val(calEvent.start);
+         var endField = $dialogContent.find("select[name='end']").val(calEvent.end);
          $dialogContent.find(".date_holder").text($calendar.weekCalendar("formatDate", calEvent.start));
+         setupStartAndEndTimeFields(startField, endField, calEvent, $calendar.weekCalendar("getTimeslotTimes", calEvent.start));
          $(window).resize().resize(); //fixes a bug in modal overlay size ??
 
       },
@@ -247,6 +293,7 @@ $(document).ready(function() {
    function resetForm($dialogContent) {
       $dialogContent.find("input").val("");
       $dialogContent.find("textarea").val("");
+      $dialogContent.find("select option").remove();
    }
 
    function getEventData() {
@@ -298,7 +345,7 @@ $(document).ready(function() {
 	    	  if(now) break;
 	      }
       }
-      lol();
+      //lol();
       return {
          events : allEvent.concat(unavailableList)
       };

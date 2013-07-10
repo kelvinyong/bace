@@ -45,7 +45,7 @@ $(document).ready(function(){
 <h2><span><strong>Register customer</strong></span></h2>
 {% endif %}
 <div class="clr">
-	<img src="images/images_2.jpg" width="613" height="197" alt="Join us" />
+	<img src="/images/images_2.jpg" width="613" height="197" alt="Join us" />
 </div>
 <div class="clr"></div>
 
@@ -77,7 +77,7 @@ $(document).ready(function(){
             </li>
             <li>
               <label for="postalcode">PostalCode</label>
-              <input type="text" name="postalcode" class="text" id="number" required="required"/>
+              <input type="number" name="postalcode" class="text" id="number" required="required"/>
             </li>
             <li>
             {% if user.accounType == 'administrator' %}
