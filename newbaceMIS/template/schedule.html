@@ -26,9 +26,13 @@ window.onbeforeunload = function(e) {
 	}
 };
 
-function lol(){
-console.log(allEvent);
-}
+
+setTimeout(function(){
+		$.post("/removeusercache", user_var).done(function() {
+				alert("Please Book again\n Your Booking session has timed out");
+			});
+},300000);
+
 
 user_var = {
 	'accounType' : "{{ user.accounType }}",
@@ -80,7 +84,10 @@ $.getJSON('/json', function(data){
 			};
 				
 		if(!event['readOnly']){
-		booking_quota++;
+			booking_quota++;
+			if(booking_quota>1){
+				$('#csubmit').attr("disabled","disabled");
+			}
 		}
 		
 		allEvent.push(event);
@@ -161,7 +168,7 @@ $.getJSON('/json', function(data){
 	<form action="/scheduleconfirmation" id="bookingForm" method="POST">
 	<label for="confirmation">Select Preferred booking:</label>
 	<input type="radio" id="rBook" name="check" checked="checked">Recommended<input type="radio" name="check">My Preference
-	<input type="submit" value="Check Out" />
+	<input type="submit" id="csubmit" value="Check Out" />
 	</form>
 	<small>*Recommendation will be selected if preference is not created on the calendar*</small>
 	{% endif %}

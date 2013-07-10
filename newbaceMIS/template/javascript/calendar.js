@@ -345,7 +345,7 @@ $(document).ready(function() {
 	    	  if(now) break;
 	      }
       }
-      //lol();
+      
       return {
          events : allEvent.concat(unavailableList)
       };

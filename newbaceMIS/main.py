@@ -163,7 +163,7 @@ class SignupHandler(BaseHandler):
     self.render_template('signup.html')
 
   def post(self):
-    email = self.request.get('email')
+    email = (self.request.get('email')).lower()
     password = self.request.get('password')
     auth = self.auth
     
@@ -355,8 +355,19 @@ class LoginHandler(BaseHandler):
 
 class LogoutHandler(BaseHandler):
     def get(self):
-        #global booking_cache
+        global booking_cache
         global day
+        booking_cache_remove=[]
+
+        for temp in booking_cache:
+            if(temp['email'] == self.user.email_address):
+                booking_cache_remove.append(temp)
+            elif(temp['type'] == 'administrator' and self.user.accounType == 'administrator'):
+                booking_cache_remove.append(temp)
+                
+        for temp in booking_cache_remove:
+            booking_cache.remove(temp)
+        
 
         #booking_cache = []
         day=16
@@ -661,15 +672,17 @@ class quotationHandler(BaseHandler):
         quotation.put()
         
         message = mail.AdminEmailMessage()
-        message.sender = quotation.Email
+        message.sender = 'kelvinyong87@gmail.com'
         message.body = """
-            testing quotation
-            """
+            testing quotation sender is: %s
+            """ % quotation.Email
         message.Send()
         
         self.display_message('Your enquiry has been sent. We will reply within 48 hours')
         
 class AdminScheduleHandler(BaseHandler):
+    @user_required
+    @admin_required
     def get(self):
         self.render_template('schedule.html')
         
