@@ -30,6 +30,7 @@ window.onbeforeunload = function(e) {
 setTimeout(function(){
 		$.post("/removeusercache", user_var).done(function() {
 				alert("Please Book again\n Your Booking session has timed out");
+				window.location = "/admin/schedule";
 			});
 },300000);
 

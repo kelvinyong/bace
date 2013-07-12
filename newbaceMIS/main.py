@@ -21,7 +21,7 @@ from webapp2_extras.auth import InvalidPasswordError
 
 # A list storing the booking cache.
 booking_cache = []
-day = 16
+day = 19
 
 def user_required(handler):
     """
@@ -378,7 +378,7 @@ class LogoutHandler(BaseHandler):
             booking_cache.remove(temp)
         
 
-        booking_cache = []
+        #booking_cache = []
         day=19
         self.auth.unset_session()
         self.redirect(self.uri_for('home'))
