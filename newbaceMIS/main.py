@@ -77,6 +77,15 @@ def getKey(self):
     key = info.key()
     return key
 
+def getJobKey(self,datetime):
+    """
+        return key of schedule data being accessed
+    """
+    info = (db.GqlQuery("SELECT * FROM Job where StartDate = :startdate", startdate = datetime)).get()
+    
+    key = info.key()
+    return key
+
 
 class VerifiedError(Exception):
     """
@@ -369,8 +378,8 @@ class LogoutHandler(BaseHandler):
             booking_cache.remove(temp)
         
 
-        #booking_cache = []
-        day=16
+        booking_cache = []
+        day=19
         self.auth.unset_session()
         self.redirect(self.uri_for('home'))
         
@@ -504,11 +513,6 @@ class recommendScheduleHandler(BaseHandler):
         
 class ScheduleHandler(BaseHandler):
     def post(self):
-        #save info toconfirm booking
-        #params={}
-        #data = json.loads(data)
-        #params['info'] = self.request.get('id');
-        
         self.display_message('Saved Booking')
 
 
@@ -552,8 +556,6 @@ class jsonHandler(BaseHandler):
                 cache['email'] = None
                 params['schedule'].append(cache)
                 cache['email'] = temp
-        
-        #params['schedule'] += booking_cache#loop booking_cache than check email than set readonly to true so unauthorize ppl cannot click
         
         self.response.out.write(json.JSONEncoder().encode(params));
         
@@ -689,9 +691,10 @@ class AdminScheduleHandler(BaseHandler):
 class weeklySchedulejsonHandler(BaseHandler):
     def get(self):
         jobs = db.GqlQuery("SELECT * FROM Job WHERE StartDate >= :startdate AND StartDate <= :enddate")
+        customers= db.GqlQuery("SELECT * FROM Customer")
         params = {}
         params['report'] = []
-        #jobs = db.GqlQuery("SELECT * FROM Job WHERE StartDate >= :startdate", startdate = datetime.now())
+        
         start = datetime.combine(datetime(datetime.now().year,datetime.now().month,datetime.now().day),time(8))
         end = (start + timedelta(days=7))
         jobs.bind(startdate = start, enddate = end)
@@ -708,7 +711,6 @@ class weeklySchedulejsonHandler(BaseHandler):
         jobto['year'] = end.year
         params['jobto'] = jobto
         
-        
         for job in jobs:
             report={}
             report['description'] = job.Description
@@ -724,12 +726,20 @@ class weeklySchedulejsonHandler(BaseHandler):
             report['hour'] = hour
             report['servicetype'] = job.Service_Type
             report['postalcode'] = job.postalCode
+            for customer in customers:
+                if job.Email == customer.Email:
+                    customerInfo={}
+                    customerInfo['address'] = customer.Address
+                    customerInfo['contact'] = customer.Contact_No
+                    customerInfo['name'] = customer.First_Name + ' ' + customer.Last_Name
+                    report['customerInfo']= customerInfo
             params['report'].append(report)
         
         self.response.out.write(json.JSONEncoder().encode(params))
         
     def post(self):
         jobs = db.GqlQuery("SELECT * FROM Job WHERE StartDate >= :startdate AND StartDate <= :enddate")
+        customers= db.GqlQuery("SELECT * FROM Customer")
         params = {}
         params['report'] = []
         querydate={
@@ -776,6 +786,14 @@ class weeklySchedulejsonHandler(BaseHandler):
                     report['hour'] = hour
                     report['servicetype'] = job.Service_Type
                     report['postalcode'] = job.postalCode
+                    for customer in customers:
+                        if job.Email == customer.Email:
+                            customerInfo={}
+                            customerInfo['address'] = customer.Address
+                            customerInfo['contact'] = customer.Contact_No
+                            customerInfo['name'] = customer.First_Name + ' ' + customer.Last_Name
+                            report['customerInfo']= customerInfo
+                            break
                     params['report'].append(report)
                     
                 self.response.out.write(json.JSONEncoder().encode(params))
@@ -812,6 +830,14 @@ class weeklySchedulejsonHandler(BaseHandler):
                     report['hour'] = hour
                     report['servicetype'] = job.Service_Type
                     report['postalcode'] = job.postalCode
+                    for customer in customers:
+                        if job.Email == customer.Email:
+                            customerInfo={}
+                            customerInfo['address'] = customer.Address
+                            customerInfo['contact'] = customer.Contact_No
+                            customerInfo['name'] = customer.First_Name + ' ' + customer.Last_Name
+                            report['customerInfo']= customerInfo
+                            break
                     params['report'].append(report)
         
                 self.response.out.write(json.JSONEncoder().encode(params))
@@ -975,6 +1001,42 @@ class servicesHandler(BaseHandler):
     def get(self):
         self.render_template('services.html')
         
+class AdmineditBookingHandler(BaseHandler):
+    def post(self):
+        global booking_cache
+        clear_booking=[]
+
+        for temp in booking_cache:
+            if temp['type'] == 'administrator':
+                d = date(temp['date']['year'], temp['date']['month'], temp['date']['day'])
+                st = time(temp['hour']['start'])
+                et = time(temp['hour']['end'])
+                info = models.Job.get(getJobKey(self,datetime.combine(d, st)))
+                if info is None: 
+                    job = models.Job()
+                    job.Email = temp['email']
+                    job.Description = temp['description']
+                    job.StartDate = datetime.combine(d, st)
+                    job.EndDate = datetime.combine(d, et)
+                    job.Service_Type = temp['servicetype']
+                    job.postalCode = int(temp['postalcode'])
+                    job.put()
+                else:
+                    info.Email = temp['email']
+                    info.Description = temp['description']
+                    info.StartDate = datetime.combine(d, st)
+                    info.EndDate = datetime.combine(d, et)
+                    info.Service_Type = temp['servicetype']
+                    info.postalCode = int(temp['postalcode'])
+                    info.put()
+                    
+                clear_booking.append(temp)
+        
+        for temp in clear_booking:
+            booking_cache.remove(temp)
+
+
+        
 class removeusercacheHandler(BaseHandler):
     def post(self):
         global booking_cache
@@ -1031,6 +1093,7 @@ app = webapp2.WSGIApplication([
     webapp2.Route('/bookinghistory', historyHandler),
     webapp2.Route('/jsonbookinghistory', historyjsonHandler),
     webapp2.Route('/admin/inventory', inventoryManagementHandler),
+    webapp2.Route('/admin/jsonEditBooking', AdmineditBookingHandler),
     webapp2.Route('/editItem', editItemHandler),
     webapp2.Route('/removeusercache', removeusercacheHandler)
 ], debug=True, config=config)

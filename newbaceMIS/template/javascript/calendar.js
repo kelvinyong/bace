@@ -7,6 +7,12 @@ $(document).ready(function() {
      //event.preventDefault();
 	});//KELVIN
 	
+	$('#adminbookingForm').submit(function(event){
+		//save booking to database
+		clickSubmit=true;
+		$.post("/admin/jsonEditBooking");
+	});//KELVIN
+	
    var $calendar = $('#calendar');
    var id = allEvent.length+1;
 
@@ -18,7 +24,7 @@ $(document).ready(function() {
       businessHours :{start: 9, end: 18, limitDisplay: true },
       daysToShow : 6,
       height : function($calendar) {
-         return $(window).height() - $(".sidebar").outerHeight()/9 - 1;
+         return 560;
       },
       eventRender : function(calEvent, $event) {
     	  if ((calEvent.start < new Date()) || calEvent.readOnly) {//KELVIN timing issue?
@@ -28,7 +34,7 @@ $(document).ready(function() {
                "border" : "1px solid #888"
             });
          }else if(user_var.email == calEvent.email){//KELVIN!!!
-        	 $event.css("backgroundColor", "#FFFF00");
+        	 $event.css("backgroundColor", "#FF0000");
          }
          
       },
@@ -229,6 +235,12 @@ $(document).ready(function() {
  	                			'description': calEvent.description,
  	                			'type': 'appointment'
  	                		}
+                         
+                         selectedBooking.type = 'administrator';//since here only administrator
+                         
+                         $.post("/cacheBooking", selectedBooking,function(data){
+	                			alert('appointment will be modified upon save');
+	                		}, "json");
 
                          $calendar.weekCalendar("updateEvent", calEvent);
                          $dialogContent.dialog("close");

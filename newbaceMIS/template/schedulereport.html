@@ -18,7 +18,7 @@ $(document).ready(function(){
 			'eyear': end.getFullYear()
 		};
 		$.post("/jsonempweeklyschedule",info,function(data){
-			displayResult(data);
+			if(data!=null) displayResult(data);
 		},"json");
 	});
 	
@@ -33,7 +33,7 @@ $(document).ready(function(){
 			'eyear': end.getFullYear()
 		};
 		$.post("/jsonempweeklyschedule",info,function(data){
-			displayResult(data);
+		if(data!=null) displayResult(data);
 		},"json");
 	});
 });
@@ -53,15 +53,16 @@ function displayResult(data){
 	for(var i=0; i<data.report.length; i++){
 		html += '<ol>';
 		html += '<li>Email:'+data.report[i].email+'</li>';
+		html += '<li>Name:'+data.report[i].customerInfo.name+'</li>';
 		html += '<li>Description:'+data.report[i].description+'</li>';
-		
-		startdate = new Date(data.report[i].date.year,data.report[i].date.month-1,data.report[i].date.day, data.report[i].hour.start);
+		startdate = new Date(data.report[i].date.year,data.report[i].date.month-1,data.report[i].date.day, data.report[i].hour.start).toUTCString();
 		html += '<li>Start Date:'+ startdate +'</li>';
-		
-		enddate = new Date(data.report[i].date.year,data.report[i].date.month-1,data.report[i].date.day, data.report[i].hour.end);
+		enddate = new Date(data.report[i].date.year,data.report[i].date.month-1,data.report[i].date.day, data.report[i].hour.end).toUTCString();
 		html += '<li>End Date:'+ enddate +'</li>';
 		html += '<li>Service Type:'+data.report[i].servicetype+'</li>';
+		html += '<li>Address:'+data.report[i].customerInfo.address+'</li>';
 		html += '<li>Postal Code:'+data.report[i].postalcode+'</li>';
+		html += '<li>Contact Number:'+data.report[i].customerInfo.contact+'</li>';
 		html += '</ol><br />';
 	}
 	html += '</form>';
@@ -69,7 +70,7 @@ function displayResult(data){
 	startdisplay = start.getFullYear() + "-" + start.getMonth() + "-" + start.getDate();
 	enddisplay = end.getFullYear() + "-" + end.getMonth() + "-" + end.getDate();
 
-	document.getElementById("dateregion").innerHTML = "Between" + startdisplay + " and " + enddisplay;
+	document.getElementById("dateregion").innerHTML = "Between " + startdisplay + " and " + enddisplay;
 	document.getElementById("weeklySchedule").innerHTML = html;
 }
 

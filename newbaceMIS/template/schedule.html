@@ -161,7 +161,7 @@ $.getJSON('/json', function(data){
 	</div>
 	<div>
 	{% if user.accounType == 'administrator' %}
-	<form action="/empschedule" id="bookingForm" method="POST">
+	<form action="/scheduleconfirmation" id="adminbookingForm" method="POST">
 	<input type="submit" value="Add all schedule" />
 	</form>
 	{% else %}

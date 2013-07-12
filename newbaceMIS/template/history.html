@@ -14,13 +14,14 @@ $.getJSON("/jsonbookinghistory",function(data){
 function displayResult(data){
 	var startdate, enddate;
 	var html = '<form>';
+	if(data.history.length ==0) html += 'No History Found!';
 	for(var i=0; i<data.history.length; i++){
 		html += '<ol>';
 		html += '<li>Email:'+data.history[i].email+'</li>';
 		html += '<li>Description:'+data.history[i].description+'</li>';
-		startdate = new Date(data.history[i].date.year,data.history[i].date.month-1,data.history[i].date.day, data.history[i].hour.start);
+		startdate = new Date(data.history[i].date.year,data.history[i].date.month-1,data.history[i].date.day, data.history[i].hour.start).toUTCString();
 		html += '<li>Start Date:'+ startdate +'</li>';
-		enddate = new Date(data.history[i].date.year,data.history[i].date.month-1,data.history[i].date.day, data.history[i].hour.end);
+		enddate = new Date(data.history[i].date.year,data.history[i].date.month-1,data.history[i].date.day, data.history[i].hour.end).toUTCString();
 		html += '<li>End Date:'+ enddate +'</li>';
 		html += '<li>Service Type:'+data.history[i].servicetype+'</li>';
 		html += '<li>Postal Code:'+data.history[i].postalcode+'</li>';
@@ -30,13 +31,14 @@ function displayResult(data){
 	document.getElementById("bookinghistory").innerHTML = html;
 	
 	html = '<form>';
+	if(data.current.length ==0) html += 'No Appointment Found!';
 	for(var i=0; i<data.current.length; i++){
 		html += '<ol>';
 		html += '<li>Email:'+data.current[i].email+'</li>';
 		html += '<li>Description:'+data.current[i].description+'</li>';
-		startdate = new Date(data.current[i].date.year,data.current[i].date.month-1,data.current[i].date.day, data.current[i].hour.start);
+		startdate = new Date(data.current[i].date.year,data.current[i].date.month-1,data.current[i].date.day, data.current[i].hour.start).toUTCString();
 		html += '<li>Start Date:'+ startdate +'</li>';
-		enddate = new Date(data.current[i].date.year,data.current[i].date.month-1,data.current[i].date.day, data.current[i].hour.end);
+		enddate = new Date(data.current[i].date.year,data.current[i].date.month-1,data.current[i].date.day, data.current[i].hour.end).toUTCString();
 		html += '<li>End Date:'+ enddate +'</li>';
 		html += '<li>Service Type:'+data.current[i].servicetype+'</li>';
 		html += '<li>Postal Code:'+data.current[i].postalcode+'</li>';
