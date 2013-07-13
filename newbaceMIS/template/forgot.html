@@ -7,7 +7,7 @@
 <p>Forgot your password? Click the link below to receive a link to recover your password.</p>
 
 {% if not_found %}
-    <strong>Not found!</strong> We could not found any user with the given email.
+    <strong style="color:red;">Not found!</strong> We could not found any user with the given email.
 {% endif %} 
 
 <form class="form" action= "/forgot" method="POST">

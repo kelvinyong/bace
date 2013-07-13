@@ -3,14 +3,20 @@ $(document).ready(function() {
 	$('#bookingForm').submit(function(event){
 		//save booking to database
 		clickSubmit=true;
-		$.post("/json", selectedBooking);
-     //event.preventDefault();
+		event.preventDefault();
+		$.post("/json", selectedBooking).done(function(){
+			$('#bookingForm').unbind('submit').submit();
+		});
+     
 	});//KELVIN
 	
 	$('#adminbookingForm').submit(function(event){
 		//save booking to database
 		clickSubmit=true;
-		$.post("/admin/jsonEditBooking");
+		event.preventDefault();
+		$.post("/admin/jsonEditBooking").done(function(){
+			$('#adminbookingForm').unbind('submit').submit();
+		});
 	});//KELVIN
 	
    var $calendar = $('#calendar');
@@ -27,13 +33,13 @@ $(document).ready(function() {
          return 560;
       },
       eventRender : function(calEvent, $event) {
-    	  if ((calEvent.start < new Date()) || calEvent.readOnly) {//KELVIN timing issue?
+    	  if ((calEvent.start < new Date()) || calEvent.readOnly) {
             $event.css("backgroundColor", "#aaa");
             $event.find(".wc-time").css({
                "backgroundColor" : "#999",
                "border" : "1px solid #888"
             });
-         }else if(user_var.email == calEvent.email){//KELVIN!!!
+         }else if(user_var.email == calEvent.email){//personal booking
         	 $event.css("backgroundColor", "#FF0000");
          }
          
@@ -233,10 +239,11 @@ $(document).ready(function() {
  	                			'email': calEvent.email,
  	                			'postalcode': calEvent.postalcode,
  	                			'description': calEvent.description,
- 	                			'type': 'appointment'
+ 	                			'type': 'administrator',
+ 	                			'task': 'edit',
+ 	                			'key': calEvent.key
  	                		}
-                         
-                         selectedBooking.type = 'administrator';//since here only administrator
+                         //since here only administrator
                          
                          $.post("/cacheBooking", selectedBooking,function(data){
 	                			alert('appointment will be modified upon save');
@@ -257,6 +264,12 @@ $(document).ready(function() {
 	                			  break;
 	                		  }
 	                	  }
+                       
+                       $.post("/admin/jsonDeleteBooking", {key: calEvent.key},function(data){
+                    	   $calendar.weekCalendar("removeEvent", calEvent.id);
+                    	   allEvent.pop(calEvent);
+                    	   alert(data.msg);
+               			}, "json");
                        getUpdates();
                        $dialogContent.dialog("close");
                     },
@@ -287,7 +300,7 @@ $(document).ready(function() {
          var endField = $dialogContent.find("select[name='end']").val(calEvent.end);
          $dialogContent.find(".date_holder").text($calendar.weekCalendar("formatDate", calEvent.start));
          setupStartAndEndTimeFields(startField, endField, calEvent, $calendar.weekCalendar("getTimeslotTimes", calEvent.start));
-         $(window).resize().resize(); //fixes a bug in modal overlay size ??
+         $(window).resize().resize();
 
       },
       eventMouseover : function(calEvent, $event) {
@@ -328,7 +341,6 @@ $(document).ready(function() {
 	    				  now = true;
 		    			  break;
 		    		  }
-	    			  //console.log(d+':'+date+':'+m+':'+month+':'+hour);
 		    		  id += allEvent.length;
 		        	  unavailableEvent ={};
 		        	  unavailableEvent['id'] = id;

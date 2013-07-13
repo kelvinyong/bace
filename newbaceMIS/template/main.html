@@ -80,7 +80,7 @@
 				
 					<small><a href = "/signup">Register</a> | <a href="/forgot">Forgot password</a></small><br />
 					{% if failed %}
-        			<strong>Login failed!</strong> Check your Login ID/password and try again.
+        			<strong style="color:red;">Login failed!</strong> Check your Login ID/password and try again.
         			{% endif %}    
         		</ul>
         		{% else %}
@@ -95,7 +95,6 @@
         		{% endif %}
 				{% if user.accounType == 'administrator' %}
 					<li><a href="/admin/signup">New Employee</a></li>
-					<li><a href="/">Add a job</a></li>
 					<li><a href="/admin/schedule">Schedule</a></li>
 					<li><a href="/admin/weeklyschedule">Weekly Schedule</a></li>
 					<li><a href="/admin/inventory">Inventory</a></li>

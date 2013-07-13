@@ -59,6 +59,9 @@ function getUpdates(){
 				'email': data.schedule[i].email,
 				'type': data.schedule[i].type
 			};
+			
+			if(user_var.accounType == 'administrator') event['key'] = data.schedule[i].key;
+			
 			allEvent.push(event);
 		}
 	}).done(function(){
@@ -84,6 +87,8 @@ $.getJSON('/json', function(data){
 			'type': data.schedule[i].type
 			};
 				
+		if(user_var.accounType == 'administrator') event['key'] = data.schedule[i].key;
+			
 		if(!event['readOnly']){
 			booking_quota++;
 			if(booking_quota>1){
@@ -163,7 +168,8 @@ $.getJSON('/json', function(data){
 	<div>
 	{% if user.accounType == 'administrator' %}
 	<form action="/scheduleconfirmation" id="adminbookingForm" method="POST">
-	<input type="submit" value="Add all schedule" />
+	<input type="submit" value="Add all schedule" /><br />
+	*<small>deleting of existing booking will be processed immediately</small>*
 	</form>
 	{% else %}
 	<form action="/scheduleconfirmation" id="bookingForm" method="POST">

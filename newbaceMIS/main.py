@@ -77,15 +77,6 @@ def getKey(self):
     key = info.key()
     return key
 
-def getJobKey(self,datetime):
-    """
-        return key of schedule data being accessed
-    """
-    info = (db.GqlQuery("SELECT * FROM Job where StartDate = :startdate", startdate = datetime)).get()
-    
-    key = info.key()
-    return key
-
 
 class VerifiedError(Exception):
     """
@@ -189,7 +180,6 @@ class SignupHandler(BaseHandler):
     customer.Contact_No = int(self.request.get('contact'))
     customer.Address = self.request.get('address')
     customer.postalCode = int(self.request.get('postalcode'))
-    #customer.latest_location # use google map got coordinate?
 
     #unique_properties = ['email_address']
     acct_data = self.user_model.create_user(email, email_address=email, password_raw=password, first_name=customer.First_Name, accounType = accType, verified=False)
@@ -199,8 +189,8 @@ class SignupHandler(BaseHandler):
         return
     
     if not acct_data[0]: #acct_data is a tuple
-        self.display_message('Unable to create user for email %s because of \
-            duplicate keys %s' % (email, acct_data[1]))
+        self.display_message('Unable to create user for email %s because \
+            it already exist' % (email))
         return
     
     customer.put()
@@ -529,6 +519,8 @@ class jsonHandler(BaseHandler):
             schedule['type'] = 'query'
             if(self.user.email_address == job.Email or self.user.accounType == 'administrator'):
                 schedule['email'] = job.Email
+            if self.user.accounType == 'administrator':
+                schedule['key'] = str(job.key())
             schedule['description'] = job.Description
             schedule['postalcode'] = job.postalCode
             schedule['servicetype'] = job.Service_Type
@@ -600,6 +592,8 @@ class cacheHandler(BaseHandler):
         hour['end'] = int(self.request.get('end'))
         schedule['hour'] = hour
         schedule['readonly'] = False
+        schedule['task'] = self.request.get('task')
+        schedule['key'] = self.request.get('key')
         
         
         #check for existing same date and time in cache before appending
@@ -1011,8 +1005,16 @@ class AdmineditBookingHandler(BaseHandler):
                 d = date(temp['date']['year'], temp['date']['month'], temp['date']['day'])
                 st = time(temp['hour']['start'])
                 et = time(temp['hour']['end'])
-                info = models.Job.get(getJobKey(self,datetime.combine(d, st)))
-                if info is None: 
+                if(temp['task'] == 'edit'):
+                    info = models.Job.get(temp['key'])
+                    info.Email = temp['email']
+                    info.Description = temp['description']
+                    info.StartDate = datetime.combine(d, st)
+                    info.EndDate = datetime.combine(d, et)
+                    info.Service_Type = temp['servicetype']
+                    info.postalCode = int(temp['postalcode'])
+                    info.put()
+                else:
                     job = models.Job()
                     job.Email = temp['email']
                     job.Description = temp['description']
@@ -1021,21 +1023,20 @@ class AdmineditBookingHandler(BaseHandler):
                     job.Service_Type = temp['servicetype']
                     job.postalCode = int(temp['postalcode'])
                     job.put()
-                else:
-                    info.Email = temp['email']
-                    info.Description = temp['description']
-                    info.StartDate = datetime.combine(d, st)
-                    info.EndDate = datetime.combine(d, et)
-                    info.Service_Type = temp['servicetype']
-                    info.postalCode = int(temp['postalcode'])
-                    info.put()
                     
                 clear_booking.append(temp)
         
         for temp in clear_booking:
             booking_cache.remove(temp)
 
-
+class AdmindeleteBookingHandler(BaseHandler):
+    def post(self):
+        data={}
+        iKey = models.Job.get(self.request.get('key'))
+        iKey.delete()
+        data['msg'] = 'delete successful'
+            
+        self.response.out.write(json.JSONEncoder().encode(data))   
         
 class removeusercacheHandler(BaseHandler):
     def post(self):
@@ -1050,8 +1051,6 @@ class removeusercacheHandler(BaseHandler):
                 
         for temp in booking_cache_remove:
             booking_cache.remove(temp)
-        
-        #self.response.out.write(json.JSONEncoder().encode(params))
         
 
 config = {
@@ -1094,6 +1093,7 @@ app = webapp2.WSGIApplication([
     webapp2.Route('/jsonbookinghistory', historyjsonHandler),
     webapp2.Route('/admin/inventory', inventoryManagementHandler),
     webapp2.Route('/admin/jsonEditBooking', AdmineditBookingHandler),
+    webapp2.Route('/admin/jsonDeleteBooking', AdmindeleteBookingHandler),
     webapp2.Route('/editItem', editItemHandler),
     webapp2.Route('/removeusercache', removeusercacheHandler)
 ], debug=True, config=config)
