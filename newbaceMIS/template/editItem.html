@@ -2,6 +2,16 @@
 
 {% block title %}Edit Item{% endblock %}
 
+{% block script %}
+<script type="text/javascript">
+
+$(document).ready(function(){
+	$('option:contains("{{ item.Store }}")').prop({selected: true});
+});
+
+</script>
+{% endblock %}
+
 {% block maincontent %}
 
 <h1>Edit Item</h1>
@@ -16,7 +26,7 @@
         <tr><td>Item quantity:</td><td><input type="text" name="itemQty" value="{{ item.Quantity }}" required="required"/></td>
         <tr><td>Item storage:</td>
         <td>
-        	<select name="itemStorage">
+        	<select id="itemselect" name="itemStorage">
         	{% if warehouses %}
         		{% for warehouse in warehouses %}
         			<option value="{{ warehouse.Name }}">{{ warehouse.Name }}</option>
