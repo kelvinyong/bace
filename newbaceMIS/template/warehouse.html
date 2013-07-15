@@ -4,11 +4,6 @@
 
 {% block script %}
 <script type="text/javascript">
-
-//
-
-//console.log($('#formrange').val());
-
 $(document).ready(function(){
 	$('.number').keypress(function(e) {
     		var a = [];
@@ -21,26 +16,16 @@ $(document).ready(function(){
         	e.preventDefault();
 		});
 		
-		$('#formrange').val(document.getElementById("range").value);
-		
-		$("#range").change(function()
-            {
-                console.log('change');
-            });
-		
-		
 		var currency = document.getElementById('currency');
 		var pattern = /^\d+(?:\.\d{0,2})$/;
 
 		$('#currency').blur(function() {
-			$('#currency').formatCurrency();
 		    if (!pattern.test(currency.value)) 
 			{
 				alert('Please key in a valid amount');
 				currency.focus;
 				return false;
 			}
-			});
 
 
 })
@@ -56,15 +41,15 @@ $(document).ready(function(){
 <br />
 {% if items %}
 	<b id = "itemlist">List of Items</b>
-	<select id="range">
-		  <option value="1" selected>1</option>
+	<select name="type">
+		  <option value="1">1</option>
 		  <option value="5">5</option>
 		  <option value="10">10</option>
-	</select>
+		</select>
 	<br>
 	<table border="1" cellspacing="2" cellpadding="5">
 		<tr><td><strong>Type</strong></td><td><strong>Name</strong></td><td><strong>Description</strong></td><td><strong>Price</strong></td><td><strong>Quantity</strong></td><td><strong>Storage</strong></td><td><strong>Edit</strong></td></tr>
-			{% for mainItem in mainItemList|slice:range %}
+			{% for mainItem in mainItemList %}
 				<form action="/editItem" method="post">
 				<tr>
 				<td>{{ mainItem.0.Type }}</td>
@@ -76,7 +61,6 @@ $(document).ready(function(){
 				<td><input type="submit" value="Edit"></td>
 				</tr>
 				<input type="hidden" name="location" value="item">
-				<input id="formrange" type="hidden" name="range">
 				<input type="hidden" name="itemKey" value="{{ mainItem.1 }}">
 				</form>
 			{% endfor %}

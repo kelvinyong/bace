@@ -877,6 +877,12 @@ class historyjsonHandler(BaseHandler):
         
         self.response.out.write(json.JSONEncoder().encode(params))
         
+        
+class inventoryMaintHandler(BaseHandler):
+    def get(self):
+        self.render_template('inventorymain.html')
+        
+        
 class inventoryManagementHandler(BaseHandler):
     @user_required
     @admin_required
@@ -886,7 +892,9 @@ class inventoryManagementHandler(BaseHandler):
     def post(self):
     
         processType = self.request.get('process')
+        pageType = self.request.get('location')
         delete = self.request.get('delete')
+        range = self.request.get('formrange')
         
         if delete=='Yes':
             iKey = self.request.get('warehouseKey')
@@ -942,9 +950,14 @@ class inventoryManagementHandler(BaseHandler):
                   'mainItemList': mainItemList,
                   'warehouses': warehouses,
                   'warehousesKeys': warehousesKeys,
-                  'mainWarehousesList': mainWarehousesList
+                  'mainWarehousesList': mainWarehousesList,
+                  'range': range
                   }
-        self.render_template('inventory.html',params)
+        
+        if pageType == 'warehouse':
+            self.render_template('warehouse.html',params)
+        if pageType == 'item':
+            self.render_template('inventory.html',params)
 
 
 class editItemHandler(BaseHandler):
@@ -964,8 +977,11 @@ class editItemHandler(BaseHandler):
             item.Store = self.request.get('itemStorage')
             item.put()
 
-            self.display_message('<h1>Edit Item</h1> <br />Item successfully updated\
-            <br /><a href="/admin/inventory"><input type="button" value="Back" ></a>')
+            self.display_message('Item successfully updated\
+            <br /><form action="/admin/inventory" method="post">\
+                <input type="hidden" name="location" value="item">\
+                <input type="submit" value="Back">\
+            </form>')
         
     
         iKey = self.request.get('itemKey')
@@ -1095,6 +1111,7 @@ app = webapp2.WSGIApplication([
     webapp2.Route('/bookinghistory', historyHandler),
     webapp2.Route('/jsonbookinghistory', historyjsonHandler),
     webapp2.Route('/admin/inventory', inventoryManagementHandler),
+    webapp2.Route('/admin/inventoryall', inventoryMaintHandler),
     webapp2.Route('/admin/jsonEditBooking', AdmineditBookingHandler),
     webapp2.Route('/admin/jsonDeleteBooking', AdmindeleteBookingHandler),
     webapp2.Route('/editItem', editItemHandler),

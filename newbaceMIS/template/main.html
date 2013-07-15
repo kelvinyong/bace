@@ -97,21 +97,23 @@
 					<li><a href="/admin/signup">New Employee</a></li>
 					<li><a href="/admin/schedule">Schedule</a></li>
 					<li><a href="/admin/weeklyschedule">Weekly Schedule</a></li>
-					<li><a href="/admin/inventory">Inventory</a></li>
+					<li><a href="/admin/inventoryall">Inventory</a></li>
 					<li>{{ user.accounType }} Rights</li>
 				{% endif %}
 				</ul>
 				{% endif %}
       		</div>
       		<div class="gadget">
-        		<h2 class="star"><span>Sidebar</span> Menu</h2>
+        		<h2 class="star">Menu</h2>
         		<div class="clr"></div>
         		<ul class="sb_menu">
           			<li id="navsfirst"><a href="/">Home</a></li>
           			<li id="navssecond"><a href="/about">About Us</a></li>
          			<li id="navsthird"><a href="/gallery">Gallery</a></li>
          	 		<li id="navsfourth"><a href="/services">Services</a></li>
+         	 		{% if user.accounType != 'administrator' and user.accounType != 'employee' %}	
          			<li id="navsfifth"><a href="/schedulebooking">Booking</a></li>
+         			{% endif %}
           			<li id="navssixth"><a href="/contact">Contact Us</a></li>
         		</ul>
       		</div>
