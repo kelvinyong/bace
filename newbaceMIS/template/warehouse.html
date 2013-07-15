@@ -2,99 +2,42 @@
 
 {% block title %}Inventory Management{% endblock %}
 
-{% block script %}
-<script type="text/javascript">
-$(document).ready(function(){
-	$('.number').keypress(function(e) {
-    		var a = [];
-   			var k = e.which;
-    
-   			for (i = 48; i < 58; i++)
-        		a.push(i);
-    		a.push(8);
-    		if (!(a.indexOf(k)>=0))
-        	e.preventDefault();
-		});
-		
-		var currency = document.getElementById('currency');
-		var pattern = /^\d+(?:\.\d{0,2})$/;
-
-		$('#currency').blur(function() {
-		    if (!pattern.test(currency.value)) 
-			{
-				alert('Please key in a valid amount');
-				currency.focus;
-				return false;
-			}
-
-
-})
-</script>
-
-{% endblock %}
 
 {% block maincontent %}
 
-<h1>Item</h1>
+<h1>Warehouse</h1>
 <br />
-<div class="clr"><img src="/images/Pipes.jpg" width="613" height="193" alt="we offer very affordable and reliable professional service for both residential and industrial customers" /></div>
+<div class="clr"><img src="/images/inventory.jpg" width="613" height="193" alt="we offer very affordable and reliable professional service for both residential and industrial customers" /></div>
 <br />
-{% if items %}
-	<b id = "itemlist">List of Items</b>
-	<select name="type">
-		  <option value="1">1</option>
-		  <option value="5">5</option>
-		  <option value="10">10</option>
-		</select>
-	<br>
-	<table border="1" cellspacing="2" cellpadding="5">
-		<tr><td><strong>Type</strong></td><td><strong>Name</strong></td><td><strong>Description</strong></td><td><strong>Price</strong></td><td><strong>Quantity</strong></td><td><strong>Storage</strong></td><td><strong>Edit</strong></td></tr>
-			{% for mainItem in mainItemList %}
-				<form action="/editItem" method="post">
-				<tr>
-				<td>{{ mainItem.0.Type }}</td>
-				<td>{{ mainItem.0.Name }}</td>
-				<td>{{ mainItem.0.Description }}</td>
-				<td>{{ mainItem.0.Price }}</td>
-				<td>{{ mainItem.0.Quantity }}</td>
-				<td>{{ mainItem.0.Store }}</td>
-				<td><input type="submit" value="Edit"></td>
-				</tr>
-				<input type="hidden" name="location" value="item">
-				<input type="hidden" name="itemKey" value="{{ mainItem.1 }}">
-				</form>
-			{% endfor %}
-	</table>
-	<br />
-	<p><a href ="#">Back to Top</a></p>
+{% if warehouses %}
+<b>List of Warehouses</b>
+<br />
+<table border="1" cellspacing="2" cellpadding="5">
+<tr><td><strong>Name</strong></td><td><strong>Location</strong></td><td><strong>Delete</strong></td></tr>
+{% for warehouse in mainWarehousesList %}
+<form id="warehouse" method="post">
+<tr>
+<td>{{ warehouse.0.Name }}</td>
+<td>{{ warehouse.0.Location }}</td>
+<td><input type="submit" value="Delete"></td>
+</tr>
+<input type="hidden" name="warehouseKey" value="{{ warehouse.1 }}">
+<input type="hidden" name="delete" value="Yes">
+</form>
+{% endfor %}
+</table>
+<br />
 {% endif %}
-<br />
 
-<b>Add Item</b>
-<br />
-    <form id="addItem" method="post">
-    	<table>
-    	<tr><td>Item type:</td><td><input type="text" name="itemType" required="required"/></td>
-        <tr><td>Item name:</td><td><input type="text" name="itemName" required="required"/></td>
-        <tr><td>Item description:</td><td><input type="text" name="itemDesc" required="required"/></td>
-        <tr><td>Item price:</td><td><input id="currency" type="text" name="itemPrice" required="required"/></td>
-        <tr><td>Item quantity:</td><td><input type="number" class="number" name="itemQty" required="required"/></td>
-        <tr><td>Item storage:</td>
-        <td>
-        	<select name="itemStorage">
-        	{% if warehouses %}
-        		{% for warehouse in warehouses %}
-        			<option value="{{ warehouse.Name }}">{{ warehouse.Name }}</option>
-        		{% endfor %}
-        	{% endif %}
-        	</select>
-        </td>
+<br /><b>Add Warehouse</b><br />
+    <form id="addStorage" method="post">
+     <table>
+     <tr><td>Warehouse name:</td><td><input type="text" name="warehouseName" required="required"/></td>
+        <tr><td>Warehouse location:</td><td><input type="text" name="warehouseLocation" required="required"/></td>
         </table>
-        <br>
-        <input type="hidden" name="process" value="Add_Item">
-        <input type="hidden" name="location" value="item">
-        <input type="submit" value="Add Item">
+        <br />
+        <input type="hidden" name="process" value="Add_Warehouse">
+        <input type="submit" value="Add Warehouse">
     </form>
-    <br />
     <p><a href ="#">Back to Top</a></p>
 {% endblock %}

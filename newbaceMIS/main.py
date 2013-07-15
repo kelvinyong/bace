@@ -21,6 +21,7 @@ from webapp2_extras.auth import InvalidPasswordError
 
 # A list storing the booking cache.
 booking_cache = []
+location = ""
 day = 19
 
 def user_required(handler):
@@ -887,14 +888,15 @@ class inventoryManagementHandler(BaseHandler):
     @user_required
     @admin_required
     def get(self):
+        global location
+        location = self.request.get('location')
         self.post()
         
     def post(self):
-    
+        
         processType = self.request.get('process')
         pageType = self.request.get('location')
         delete = self.request.get('delete')
-        range = self.request.get('formrange')
         
         if delete=='Yes':
             iKey = self.request.get('warehouseKey')
@@ -951,12 +953,11 @@ class inventoryManagementHandler(BaseHandler):
                   'warehouses': warehouses,
                   'warehousesKeys': warehousesKeys,
                   'mainWarehousesList': mainWarehousesList,
-                  'range': range
                   }
         
         if pageType == 'warehouse':
             self.render_template('warehouse.html',params)
-        if pageType == 'item':
+        if pageType == 'item' or location == 'item':
             self.render_template('inventory.html',params)
 
 
