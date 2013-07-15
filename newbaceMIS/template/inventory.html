@@ -30,9 +30,84 @@ $(document).ready(function(){
 				return false;
 			}
 			});
+			
+		var show_per_page = 4; 
+	var number_of_items = document.getElementById("itemcontent").getElementsByTagName("FORM").length;
+	alert(number_of_items);
+	var number_of_pages = Math.ceil(number_of_items/show_per_page);
+	alert(number_of_pages);
+	
+	//set the value of our hidden input fields
+	$('#current_page').val(0);
+	$('#show_per_page').val(show_per_page);
+	
+
+	//create the navi buttons
+	var navigation_html = '<a class="previous_link" href="javascript:previous();">Prev</a> &nbsp;|&nbsp;';
+	var current_link = 0;
+	while(number_of_pages > current_link){
+		navigation_html += '<a class="page_link" href="javascript:go_to_page(' + current_link +')" longdesc="' + current_link +'">'+ (current_link + 1) +'</a> &nbsp;|&nbsp;';
+		current_link++;
+	}
+	navigation_html += '<a class="next_link" href="javascript:next();">Next</a>';
+	
+	$('#page_navigation').html(navigation_html);
+	
+	//add active_page class to the first page link
+	$('#page_navigation .page_link:first').addClass('active_page');
+	
+	//hide all the elements inside content div
+	$('#itemcontent').children().css('display', 'none');
+	
+	//and show the first n (show_per_page) elements
+	$('#itemcontent').children().slice(0, show_per_page).css('display', 'block');
 
 
-})
+});
+
+function previous(){
+	
+	new_page = parseInt($('#current_page').val()) - 1;
+	//if there is an item before the current active link run the function
+	if($('.active_page').prev('.page_link').length==true){
+		go_to_page(new_page);
+	}
+	
+}
+
+function next(){
+	new_page = parseInt($('#current_page').val()) + 1;
+	//if there is an item after the current active link run the function
+	if($('.active_page').next('.page_link').length==true){
+		go_to_page(new_page);
+	}
+	
+}
+
+function go_to_page(page_num){
+	//get the number of items shown per page
+	var show_per_page = parseInt($('#show_per_page').val());
+	
+	//get the element number where to start the slice from
+	start_from = page_num * show_per_page;
+	
+	//get the element number where to end the slice
+	end_on = start_from + show_per_page;
+	
+	//hide all children elements of content div, get specific items and show them
+	$('#itemcontent').children().css('display', 'none').slice(start_from, end_on).css('display', 'block');
+	
+	/*get the page link that has longdesc attribute of the current page and add active_page class to it
+	and remove that class from previously active page link*/
+	$('.page_link[longdesc=' + page_num +']').addClass('active_page').siblings('.active_page').removeClass('active_page');
+	
+	//update the current page input field
+	$('#current_page').val(page_num);
+}
+
+
+
+
 </script>
 
 {% endblock %}
@@ -44,26 +119,29 @@ $(document).ready(function(){
 <div class="clr"><img src="/images/Pipes.jpg" width="613" height="193" alt="we offer very affordable and reliable professional service for both residential and industrial customers" /></div>
 <br />
 {% if items %}
-	<b id = "itemlist">List of Items</b>
-	<br>
-	<table border="1" cellspacing="2" cellpadding="5">
-		<tr><td><strong>Type</strong></td><td><strong>Name</strong></td><td><strong>Description</strong></td><td><strong>Price</strong></td><td><strong>Quantity</strong></td><td><strong>Storage</strong></td><td><strong>Edit</strong></td></tr>
-			{% for mainItem in mainItemList %}						
-				<form action="/editItem" method="post">
-				<tr>
-				<td>{{ mainItem.0.Type }}</td>
-				<td>{{ mainItem.0.Name }}</td>
-				<td>{{ mainItem.0.Description }}</td>
-				<td>{{ mainItem.0.Price }}</td>
-				<td>{{ mainItem.0.Quantity }}</td>
-				<td>{{ mainItem.0.Store }}</td>
-				<td><input type="submit" value="Edit"></td>
-				</tr>
-				<input type="hidden" name="location" value="item">
+	<h2 id = "itemlist">List of Items</h2>
+    <!-- the input fields that will hold the variables we will use -->
+  	<input type="hidden" id="current_page">
+  	<input type="hidden" id="show_per_page">
+	<ul id="itemcontent">
+			{% for mainItem in mainItemList %}
+				<form class="report" action="/editItem" method="post">
+				
+				<ul>{{ mainItem.0.Name }}:</ul>
+                	<li>{{ mainItem.0.Type }}</li>
+					<li>{{ mainItem.0.Description }}</li>
+					<li>{{ mainItem.0.Price }}</li>
+					<li>{{ mainItem.0.Quantity }}</li>
+					<li>{{ mainItem.0.Store }}</li>
+                
+				<ul><input type="submit" value="Edit"></ul>
+				
 				<input type="hidden" name="itemKey" value="{{ mainItem.1 }}">
 				</form>
 			{% endfor %}
-	</table>
+	</ul>
+    <br />
+        <div id="page_navigation"></div>
 	<br />
 	<p><a href ="#">Back to Top</a></p>
 {% endif %}
@@ -73,11 +151,11 @@ $(document).ready(function(){
 <br />
     <form id="addItem" method="post">
     	<table>
-    	<tr><td>Item type:</td><td><input type="text" name="itemType" required="required"/></td>
-        <tr><td>Item name:</td><td><input type="text" name="itemName" required="required"/></td>
-        <tr><td>Item description:</td><td><input type="text" name="itemDesc" required="required"/></td>
-        <tr><td>Item price:</td><td><input id="currency" type="text" name="itemPrice" required="required"/></td>
-        <tr><td>Item quantity:</td><td><input type="number" class="number" name="itemQty" required="required"/></td>
+    	<tr><td>Item type:</td><td><input type="text" name="itemType" required/></td>
+        <tr><td>Item name:</td><td><input type="text" name="itemName" required/></td>
+        <tr><td>Item description:</td><td><input type="text" name="itemDesc" required/></td>
+        <tr><td>Item price:</td><td><input type="text" name="itemPrice" required/></td>
+        <tr><td>Item quantity:</td><td><input type="number" name="itemQty" min="0" max="1000"required/></td>
         <tr><td>Item storage:</td>
         <td>
         	<select name="itemStorage">
@@ -91,7 +169,6 @@ $(document).ready(function(){
         </table>
         <br>
         <input type="hidden" name="process" value="Add_Item">
-        <input type="hidden" name="location" value="item">
         <input type="submit" value="Add Item">
     </form>
     <br />
