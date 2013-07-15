@@ -6,7 +6,7 @@ $(document).ready(function(){
 		$("#navsixth").addClass("active");
 		$("#navssixth").addClass("active");
 		
-		$('#number').keypress(function(e) {
+		$('.number').keypress(function(e) {
     		var a = [];
    			var k = e.which;
     
@@ -52,25 +52,25 @@ $(document).ready(function(){
               <label for="type">Service Type</label>
               <select name="type">
 		  <option value="repair">Repair</option>
-		  <option value="installation" selected>Installation</option>
+		  <option value="installation">Installation</option>
 		  <option value="genralenquiries">Genral Enquiries</option>
 		</select>
             </li>
             <li>
               <label for="name">Name (required)</label>
-              <input id="name" name="name" class="text" required="required"/>
+              <input type="text" id="name" name="name" class="text" required="required"/>
             </li>
             <li>
               <label for="email">Email Address (required)</label>
-              <input id="email" name="email" class="text" required="required"/>
+              <input type="email" id="email" name="email" class="text" required="required"/>
             </li>
             <li>
               <label for="contact">Contact Number (required)</label>
-              <input id="number" name="contact" class="text" required="required"/>
+              <input type="number" name="contact" class="text number" required="required"/>
             </li>
             <li>
               <label for="request">Request</label>
-              <textarea id="request" name="request" required="required" rows="8" cols="50"></textarea>
+              <textarea type="text" id="request" name="request" required="required" rows="8" cols="50"></textarea>
             </li>
             <li>
               <input type="image" name="imageField" id="imageField" src="/images/submit.gif" class="send" />
