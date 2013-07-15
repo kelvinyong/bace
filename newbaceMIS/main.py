@@ -1032,9 +1032,12 @@ class AdmineditBookingHandler(BaseHandler):
 class AdmindeleteBookingHandler(BaseHandler):
     def post(self):
         data={}
-        iKey = models.Job.get(self.request.get('key'))
-        iKey.delete()
-        data['msg'] = 'delete successful'
+        if self.request.get('key') == '':
+            data['msg'] = 'deleted from cache'
+        else:
+            iKey = models.Job.get(self.request.get('key'))
+            iKey.delete()
+            data['msg'] = 'delete successful'
             
         self.response.out.write(json.JSONEncoder().encode(data))   
         
