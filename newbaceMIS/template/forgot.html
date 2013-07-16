@@ -2,17 +2,31 @@
 
 {% block maincontent %}
 
+{% if changepwd %}
+<h1>Change password</h1>
+<p>A verification link for a change of email will be mailed.</p>
+{% else %}
 <h1>Recover password</h1>
-
 <p>Forgot your password? Click the link below to receive a link to recover your password.</p>
+{% endif %}
 
 {% if not_found %}
+{% if changepwd %}
+	<strong style="color:red;">Not found!</strong> Incorrect email.
+{% else %}
     <strong style="color:red;">Not found!</strong> We could not found any user with the given email.
-{% endif %} 
+{% endif %}
+{% endif %}
 
-<form class="form" action= "/forgot" method="POST">
+<form class="form" action= "/changepwd" method="POST">
+<ol>
+    <li>
 	<input type="text" value="{{ email }}" name="email"/>
+	</li>
+    <li>
 	<input type="submit" value="Send password reset link"/>
+	</li>
+</ol>
 </form>
 
 {% endblock %}

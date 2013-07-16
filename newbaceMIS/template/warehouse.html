@@ -6,15 +6,13 @@
 <script type="text/javascript">
 
 $(document).ready(function(){
-	console.log('as');
-		/*$('.warehouse').submit(function(event){
-		console.log('asd');
-			event.preventDefault();
+		$('.warehouse').submit(function(event){
 			if (confirm('Are you sure?')){
 			console.log('asdsd');
-			$('.warehouse').unbind('submit').submit();
-    		}			
-		});*/
+    		}else{
+    			event.preventDefault();
+    		}		
+		});
 });
 
 </script>

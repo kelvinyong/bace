@@ -87,10 +87,13 @@
         		<h2 class="star"><span>Welcome</span></h2>
         		<div class="clr"></div>
         		<ul class="ex_menu">
-        			<li>Logged in as <span style="background-color: OldLace">{{ user.first_name }}</span></li>
-        			<li><a href="/logout">Logout</a></li>
-        			<li><a href="/forgot">Change Password</a></li>
-        			<li><a href="/setting">Change Personal Details</a></li>
+                {% if user.accounType == 'administrator' %}
+                	<li><strong>{{ user.accounType }} Rights</strong></li>
+				{% endif %}
+        			<li><strong>Logged in as <span style="background-color: OldLace">{{ user.first_name }}</span></strong></li>
+        			<li><button onClick="window.location.href='/logout'">Logout</button></li>
+        			<li><a href="/changepwd">Change Password</a></li>
+         			<li><a href="/setting">Change Personal Details</a></li>
         		{% if user.accounType == 'customer' %}	
         			<li><a href="/bookinghistory">Booking History</a></li>
         		{% endif %}
@@ -99,7 +102,6 @@
 					<li><a href="/admin/schedule">Schedule</a></li>
 					<li><a href="/admin/weeklyschedule">Weekly Schedule</a></li>
 					<li><a href="/admin/inventoryall">Inventory</a></li>
-					<li>{{ user.accounType }} Rights</li>
 				{% endif %}
 				</ul>
 				{% endif %}

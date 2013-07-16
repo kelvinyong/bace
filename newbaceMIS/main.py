@@ -409,7 +409,47 @@ class SettingHandler(BaseHandler):
         
 class ChangepwdHandler(BaseHandler):
     def get(self):
-        self.render_template('changepassword.html')
+        self._serve_page()
+    
+    def post(self):
+        email = self.request.get('email')
+
+        #useremail = self.user_model.get_by_auth_id(email)
+        useremail = self.user.email_address
+        
+        if email != useremail:
+            logging.info('Could not find any user entry for email %s', email)
+            self._serve_page(not_found=True)
+            return
+        user = self.user_model.get_by_auth_id(email)
+        user_id = user.get_id()
+        token = self.user_model.create_signup_token(user_id)
+
+        verification_url = self.uri_for('verification', type='p', user_id=user_id,
+                                        signup_token=token, _full=True)
+
+        msg = 'Send an email to user in order to reset their password. \
+              They will be able to do so by visiting <a href="{url}">{url}</a>'
+          
+        message = mail.EmailMessage()
+        message.sender = 'postmaster@billyacemis.appspotmail.com'
+        message.to = email
+        message.body = """
+            testing email
+            %s
+            """ % msg.format(url=verification_url)
+        message.Send()
+
+        self.display_message(msg.format(url=verification_url))
+  
+    def _serve_page(self, not_found=False):
+        email = self.request.get('email')
+        params = {
+                  'email': email,
+                  'not_found': not_found,
+                  'changepwd': True 
+                  }
+        self.render_template('forgot.html', params)
 
 
 class AdminSignupHandler(BaseHandler):
