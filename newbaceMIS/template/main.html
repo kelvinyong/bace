@@ -80,7 +80,7 @@
 				
 					<small><a href = "/signup">Register</a> | <a href="/forgot">Forgot password</a></small><br />
 					{% if failed %}
-        			<strong style="color:red;">Login failed!</strong> <br />Check your Login ID/password and try again.
+        			<strong style="color:red;">Login failed!</strong> <br />Invalid User or Bad Password.
         			{% endif %}    
         		</ul>
         		{% else %}
@@ -89,7 +89,8 @@
         		<ul class="ex_menu">
         			<li>Logged in as <span style="background-color: OldLace">{{ user.first_name }}</span></li>
         			<li><a href="/logout">Logout</a></li>
-        			<li><a href="/setting">Settings</a></li>
+        			<li><a href="/changepwd">Change Password</a></li>
+        			<li><a href="/setting">Change Personal Details</a></li>
         		{% if user.accounType == 'customer' %}	
         			<li><a href="/bookinghistory">Booking History</a></li>
         		{% endif %}

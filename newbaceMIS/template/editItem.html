@@ -6,6 +6,27 @@
 <script type="text/javascript">
 
 $(document).ready(function(){
+	
+	$('#submit').submit(function(event){
+		event.preventDefault();
+		var currency = document.getElementById('currency');
+		var qty = document.getElementById('qty');
+		var pattern = /^\d+(?:\.\d{0,2})$/;
+
+	    if (!pattern.test(currency.value)) 
+		{
+			alert('Please key in a valid amount');
+			currency.focus;
+			return false;
+		}else if(qty.value>1000 || qty.value<0){
+			alert('Please key in a valid quantity\n between 0 to 1000');
+			qty.focus;
+			return false;
+		}else {
+			$('#submit').unbind('submit').submit();
+		}
+	});
+
 	$('option:contains("{{ item.Store }}")').prop({selected: true});
 });
 
@@ -17,13 +38,13 @@ $(document).ready(function(){
 <h1>Edit Item</h1>
 
 <br>
-    <form id="editItem" method="post">
+    <form id="submit" method="post">
     	<table>
     	<tr><td>Item type:</td><td><input type="text" name="itemType" value="{{ item.Type }}" required="required"/></td>
         <tr><td>Item name:</td><td><input type="text" name="itemName" value="{{ item.Name }}" required="required"/></td>
         <tr><td>Item description:</td><td><input type="text" name="itemDesc" value="{{ item.Description }}" required="required"/></td>
-        <tr><td>Item price:</td><td><input type="text" name="itemPrice" value="{{ item.Price }}" required="required"/></td>
-        <tr><td>Item quantity:</td><td><input type="text" name="itemQty" value="{{ item.Quantity }}" required="required"/></td>
+        <tr><td>Item price(eg. 1.00):</td><td><input id="currency" type="text" name="itemPrice" value="{{ item.Price }}" required="required"/></td>
+        <tr><td>Item quantity:</td><td><input id="qty" class="number" type="number" name="itemQty" value="{{ item.Quantity }}" min="0" max="1000" required="required"/></td>
         <tr><td>Item storage:</td>
         <td>
         	<select id="itemselect" name="itemStorage">

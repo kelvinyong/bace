@@ -17,21 +17,27 @@ $(document).ready(function(){
         	e.preventDefault();
 		});
 		
-		
-		var currency = document.getElementById('currency');
-		var pattern = /^\d+(?:\.\d{0,2})$/;
+		$('#submit').submit(function(event){
+			event.preventDefault();
+			var currency = document.getElementById('currency');
+			var qty = document.getElementById('qty');
+			var pattern = /^\d+(?:\.\d{0,2})$/;
 
-		$('#currency').blur(function() {
-			$('#currency').formatCurrency();
 		    if (!pattern.test(currency.value)) 
 			{
 				alert('Please key in a valid amount');
 				currency.focus;
 				return false;
+			}else if(qty.value>1000 || qty.value<0){
+				alert('Please key in a valid quantity\n between 0 to 1000');
+				qty.focus;
+				return false;
+			}else {
+				$('#submit').unbind('submit').submit();
 			}
-			});
+		});
 			
-		var show_per_page = 4; 
+	var show_per_page = 4; 
 	var number_of_items = document.getElementById("itemcontent").getElementsByTagName("FORM").length;
 	var number_of_pages = Math.ceil(number_of_items/show_per_page);
 
@@ -147,13 +153,13 @@ function go_to_page(page_num){
 
 <b>Add Item</b>
 <br />
-    <form id="addItem" method="post">
+    <form id="submit" method="post">
     	<table>
-    	<tr><td>Item type:</td><td><input type="text" name="itemType" required/></td>
-        <tr><td>Item name:</td><td><input type="text" name="itemName" required/></td>
-        <tr><td>Item description:</td><td><input type="text" name="itemDesc" required/></td>
-        <tr><td>Item price:</td><td><input type="text" name="itemPrice" required/></td>
-        <tr><td>Item quantity:</td><td><input type="number" name="itemQty" min="0" max="1000"required/></td>
+    	<tr><td>Item type:</td><td><input type="text" name="itemType" required="required"/></td>
+        <tr><td>Item name:</td><td><input type="text" name="itemName" required="required"/></td>
+        <tr><td>Item description:</td><td><input type="text" name="itemDesc" required="required"/></td>
+        <tr><td>Item price(eg. 1.00):</td><td><input id="currency" type="text" name="itemPrice" required="required"/></td>
+        <tr><td>Item quantity:</td><td><input id="qty" class="number" type="number" name="itemQty" min="0" max="1000"required="required"/></td>
         <tr><td>Item storage:</td>
         <td>
         	<select name="itemStorage">
@@ -167,6 +173,7 @@ function go_to_page(page_num){
         </table>
         <br>
         <input type="hidden" name="process" value="Add_Item">
+        <input type="hidden" name="location" value="item">
         <input type="submit" value="Add Item">
     </form>
     <br />

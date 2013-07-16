@@ -398,14 +398,22 @@ class SettingHandler(BaseHandler):
         else:
             info = models.Customer.get(getKey(self))
             
-        info.Email = self.request.get('email')
         info.First_Name = self.request.get('firstname')
         info.Last_Name = self.request.get('lastname')
         info.Contact_No = int(self.request.get('contact'))
         info.Address = self.request.get('address')
         info.postalCode = int(self.request.get('postalcode'))
         info.put()
-        self.display_message('Settings updated')
+        self.display_message('Information has been changed successfully')
+        
+        
+class ChangepwdHandler(BaseHandler):
+    def get(self):
+        self.render_template('changepassword.html')
+        
+    def post(self):
+        password = self.request.get('password')
+
 
 class AdminSignupHandler(BaseHandler):
     @user_required
@@ -1094,6 +1102,7 @@ app = webapp2.WSGIApplication([
     webapp2.Route('/forgot', ForgotPasswordHandler, name='forgot'),
     webapp2.Route('/verifyemail', VerifyHandler, name='verifyemail'),
     webapp2.Route('/setting', SettingHandler),
+    webapp2.Route('/changepwd', ChangepwdHandler),
     webapp2.Route('/schedulebooking', QueryScheduleHandler),
     webapp2.Route('/jsonrecommend', recommendScheduleHandler),
     webapp2.Route('/admin/schedule', AdminScheduleHandler),

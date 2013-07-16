@@ -77,7 +77,7 @@ $(document).ready(function() {
 				 var endField = $dialogContent.find("input[name='end']").val(displayendTime);
 			 }
 	         
-	         var servicetypeField = $dialogContent.find("input[name='servicetype']").val(user_var.servicetype);
+	         var servicetypeField = $dialogContent.find("textarea[name='servicetype']").val(user_var.servicetype);
 	         var bodyField = $dialogContent.find("textarea[name='body']").val(user_var.description);
 	         var emailField = $dialogContent.find("input[name='email']").val(user_var.email);
         	 var pcField = $dialogContent.find("input[name='postalcode']").val(user_var.postalcode);
@@ -204,7 +204,7 @@ $(document).ready(function() {
 		 
          var startField = $dialogContent.find("input[name='start']").val(displaystartTime);
          var endField = $dialogContent.find("input[name='end']").val(displayendTime);
-         var servicetypeField = $dialogContent.find("input[name='servicetype']").val(calEvent.servicetype);
+         var servicetypeField = $dialogContent.find("textarea[name='servicetype']").val(calEvent.servicetype);
          var bodyField = $dialogContent.find("textarea[name='body']").val(calEvent.description);
          
          if(user_var.accounType == 'administrator'){

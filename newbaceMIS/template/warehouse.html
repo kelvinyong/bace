@@ -22,6 +22,7 @@
 <td><input type="submit" value="Delete"></td>
 </tr>
 <input type="hidden" name="warehouseKey" value="{{ warehouse.1 }}">
+<input type="hidden" name="location" value="warehouse">
 <input type="hidden" name="delete" value="Yes">
 </form>
 {% endfor %}
@@ -37,6 +38,7 @@
         </table>
         <br />
         <input type="hidden" name="process" value="Add_Warehouse">
+        <input type="hidden" name="location" value="warehouse">
         <input type="submit" value="Add Warehouse">
     </form>
     <p><a href ="#">Back to Top</a></p>

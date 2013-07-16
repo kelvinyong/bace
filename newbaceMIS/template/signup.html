@@ -16,19 +16,21 @@ $(document).ready(function(){
         	e.preventDefault();
 		});
 		
-		var email = document.getElementById('email');
-		var pattern = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+		$('#submit').submit(function(event){
+			event.preventDefault();
+			var email = document.getElementById('email');
+			var pattern = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
 
-		$('#email').blur(function() {
-		    if (!pattern.test(email.value)) 
-			{
-				
-				alert('Please provide a valid email address');
-				email.focus;
-				return false;
-			}
+		    	if (!pattern.test(email.value)) 
+				{
+					alert('Please provide a valid email address');
+					email.focus;
+					return false;
+				}else {
+					$('#submit').unbind('submit').submit();
+				}
+		});
 });
-})
 
 </script>
 
@@ -49,7 +51,7 @@ $(document).ready(function(){
 </div>
 <div class="clr"></div>
 
-<form action="/signup" method="POST" >
+<form id="submit" action="/signup" method="POST" >
 	<ol>
           	<li>
               <label for="email">Email Address</label>
@@ -57,7 +59,7 @@ $(document).ready(function(){
             </li>
             <li>
               <label for="password">Password</label>
-              <input type="text" name="password" class="text"/>
+              <input type="text" name="password" class="text" maxlength="10"/>
             </li>
             <li>
               <label for="firstname">First Name</label>
@@ -140,7 +142,7 @@ $(document).ready(function(){
             </li>
             <li> 
             	I  agree to the Web Site Terms and Conditions
-            	<input name="agreecheckbox" type="checkbox" autofocus required />
+            	<input name="agreecheckbox" type="checkbox" required="requireds" />
             </li>
             
             <li>
