@@ -3,13 +3,16 @@
 {% block maincontent %}
 
 
-<h1>Select</h1>
+<h1 style= "text-align:center;">Inventory Managment</h1>
+<br />
 <div class="article" >
 			<form action="/admin/inventory" style= "text-align:center;" method="post">
             	<img src="/images/warehouse_icon.png" width="92" height="80" alt="store" /><br />
             	<input type="hidden" name="location" value="warehouse">
             	<input type="submit" value="Store">
             </form>
+            <br />
+            <br />
             <form action="/admin/inventory" style= "text-align:center;" method="post">
             	<img src="/images/item_icon.png" width="92" height="80" alt="item" /><br />
             	<input type="hidden" name="location" value="item">
