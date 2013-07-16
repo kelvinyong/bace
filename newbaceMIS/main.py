@@ -410,9 +410,6 @@ class SettingHandler(BaseHandler):
 class ChangepwdHandler(BaseHandler):
     def get(self):
         self.render_template('changepassword.html')
-        
-    def post(self):
-        password = self.request.get('password')
 
 
 class AdminSignupHandler(BaseHandler):
