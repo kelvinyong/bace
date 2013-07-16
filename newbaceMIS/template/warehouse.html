@@ -2,40 +2,31 @@
 
 {% block title %}Inventory Management{% endblock %}
 
+{% block script %}
+<script type="text/javascript">
+
+$(document).ready(function(){
+	console.log('as');
+		/*$('.warehouse').submit(function(event){
+		console.log('asd');
+			event.preventDefault();
+			if (confirm('Are you sure?')){
+			console.log('asdsd');
+			$('.warehouse').unbind('submit').submit();
+    		}			
+		});*/
+});
+
+</script>
+{% endblock %}
 
 {% block maincontent %}
-<script type="text/javascript">
-function confirmDelete()
-{
-    if (confirm('Are you sure?'))
-    {
-       alert('OK');
-    }
-}
-</script>
 <h1>Store Managment</h1>
 <p id="storepagenav"><a href="#warehouse">Store List</a>&nbsp;|&nbsp;<a href="#addStorage">Add Store</a></p>
 <br />
 <div class="clr"><img src="/images/inventory.jpg" width="613" height="193" alt="we offer very affordable and reliable professional service for both residential and industrial customers" /></div>
 <br />
 {% if warehouses %}
-
-<b>List of Warehouses</b>
-<br />
-<table border="1" cellspacing="2" cellpadding="5">
-<tr><td><strong>Name</strong></td><td><strong>Location</strong></td><td><strong>Delete</strong></td></tr>
-{% for warehouse in mainWarehousesList %}
-<form id="warehouse" method="post">
-<tr>
-<td>{{ warehouse.0.Name }}</td>
-<td>{{ warehouse.0.Location }}</td>
-<td><input type="submit" value="Delete"></td>
-</tr>
-<input type="hidden" name="warehouseKey" value="{{ warehouse.1 }}">
-<input type="hidden" name="location" value="warehouse">
-<input type="hidden" name="delete" value="Yes">
-</form>
-{% endfor %}
 
 <h2><strong>List of Stores</strong></h2>
 <table width=100% border="1" cellspacing="2" cellpadding="5">
@@ -45,13 +36,14 @@ function confirmDelete()
         <td width=10%><strong>Delete</strong></td>
     </tr>
     {% for warehouse in mainWarehousesList %}
-    <form id="warehouse" method="post">
+    <form class="warehouse" method="post">
     <tr>
         <td>{{ warehouse.0.Name }}</td>
         <td>{{ warehouse.0.Location }}</td>
-        <td><input type="submit" value="Delete" onclick="confirmDelete()"></td>
+        <td><input type="submit" value="Delete"></td>
     </tr>
         <input type="hidden" name="warehouseKey" value="{{ warehouse.1 }}">
+        <input type="hidden" name="location" value="warehouse">
         <input type="hidden" name="delete" value="Yes">
     </form>
     {% endfor %}
@@ -62,34 +54,23 @@ function confirmDelete()
 {% endif %}
 
 
-<br /><b>Add Warehouse</b><br />
-    <form id="addStorage" method="post">
-     <table>
-     <tr><td>Warehouse name:</td><td><input type="text" name="warehouseName" required="required"/></td>
-        <tr><td>Warehouse location:</td><td><input type="text" name="warehouseLocation" required="required"/></td>
-        </table>
-        <br />
-        <input type="hidden" name="process" value="Add_Warehouse">
-        <input type="hidden" name="location" value="warehouse">
-        <input type="submit" value="Add Warehouse">
-
-<br />
-<br />
 <h2><strong>Add Store</strong></h2>
-<form id="addStorage" method="post">
+<form method="post">
      <table width=80%>
      <tr>
          <td width=40%><strong>Store Name:</strong></td>
-       <td width=60%><input type="text" name="warehouseName" required/></td>
+       <td width=60%><input type="text" name="warehouseName" required="required"/></td>
      </tr>
      <tr>
          <td><strong>Store Location:</strong></td>
-         <td><input type="text" name="warehouseLocation" required/></td>
+         <td><input type="text" name="warehouseLocation" required="required"/></td>
      </tr>
   </table>
      <br />
      <input type="hidden" name="process" value="Add_Warehouse">
-  <input type="submit" value="Add Warehouse">
+     <input type="hidden" name="location" value="warehouse">
+     <input type="submit" value="Add Warehouse">
     </form>
     <p><a href ="#storepagenav">Back to Top</a></p>
+    
 {% endblock %}

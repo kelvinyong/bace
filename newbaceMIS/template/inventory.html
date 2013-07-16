@@ -138,7 +138,7 @@ function go_to_page(page_num){
 	<br />
 	<ul id="itemcontent">
 			{% for mainItem in mainItemList %}
-				<form class="report" action="/editItem" method="post">
+				<form method="post">
 				<table width=100% border="1" cellspacing="2" cellpadding="5">
 				<tr>
                     <td width=40%><strong>Item Type:</strong></td>
@@ -167,9 +167,11 @@ function go_to_page(page_num){
                 
 				<tr>
                 	<td></td>
-                  <td style= "text-align:center;"><input type="submit" value="Edit"></td>
+                  <td style= "text-align:center;"><input formaction="/editItem" type="submit" value="Edit"><input type="submit" value="Delete"></td>
                 </tr>
 				<input type="hidden" name="itemKey" value="{{ mainItem.1 }}">
+				<input type="hidden" name="location" value="item">
+				<input type="hidden" name="deleteitem" value="Yes">
                 </table>
                 <br />
 				</form>
@@ -180,26 +182,8 @@ function go_to_page(page_num){
 <br />
 <br />
 
-    <form id="submit" method="post">
-    	<table>
-    	<tr><td>Item type:</td><td><input type="text" name="itemType" required="required"/></td>
-        <tr><td>Item name:</td><td><input type="text" name="itemName" required="required"/></td>
-        <tr><td>Item description:</td><td><input type="text" name="itemDesc" required="required"/></td>
-        <tr><td>Item price(eg. 1.00):</td><td><input id="currency" type="text" name="itemPrice" required="required"/></td>
-        <tr><td>Item quantity:</td><td><input id="qty" class="number" type="number" name="itemQty" min="0" max="1000"required="required"/></td>
-        <tr><td>Item storage:</td>
-        <td>
-        	<select name="itemStorage">
-        	{% if warehouses %}
-        		{% for warehouse in warehouses %}
-        			<option value="{{ warehouse.Name }}">{{ warehouse.Name }}</option>
-        		{% endfor %}
-        	{% endif %}
-        	</select>
-        </td>
-
 <h2><strong>Add Item</strong></h2>
-    <form id="addItem" method="post">
+    <form id="submit" method="post">
     	<table width=80%>
     	<tr>
             <td width=40%><strong>Item Type:</strong></td>
@@ -214,12 +198,12 @@ function go_to_page(page_num){
             <td><input type="text" name="itemDesc" required/></td>
         </tr>
         <tr>
-        <td><strong>Item Price:</strong></td>
-        <td><input type="text" name="itemPrice" required/></td>
+        <td><strong>Item Price(eg. 1.00):</strong></td>
+        <td><input id="currency" type="text" name="itemPrice" required="required"/></td>
         </tr>
         <tr>
         <td><strong>Item Quantity:</strong></td>
-        <td><input type="number" name="itemQty" min="0" max="1000"required/></td>
+        <td><input id="qty" class="number" type="number" name="itemQty" min="0" max="1000"required="required"//></td>
         </tr>
         <tr>
         <td><strong>Item Location:</strong></td>

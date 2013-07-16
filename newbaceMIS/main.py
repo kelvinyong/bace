@@ -902,6 +902,12 @@ class inventoryManagementHandler(BaseHandler):
         processType = self.request.get('process')
         pageType = self.request.get('location')
         delete = self.request.get('delete')
+        deleteitem = self.request.get('deleteitem')
+        
+        if deleteitem=='Yes':
+            iKey = self.request.get('itemKey')
+            currentKey = ndb.Key(urlsafe=iKey)
+            currentKey.delete()
         
         if delete=='Yes':
             iKey = self.request.get('warehouseKey')
