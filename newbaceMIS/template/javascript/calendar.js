@@ -4,13 +4,17 @@ $(document).ready(function() {
 		//save booking to database
 		clickSubmit=true;
 		var selected;
+		var remove;
 		event.preventDefault();
 		if(document.getElementById("rBook").checked){
-			selected=selectedRecommend;
+			selected = selectedRecommend;
+			remove = selectedBooking
 		}else{
-			selected=selectedBooking;
+			selected = selectedBooking;
+			remove = selectedRecommend
 		}
 		$.post("/json", selected).done(function(){
+			$.post("/removeCacheBooking",remove);
 			$('#bookingForm').unbind('submit').submit();
 		});
      
@@ -61,9 +65,13 @@ $(document).ready(function() {
     		 var $dialogContent = $("#event_edit_container");
 	         resetForm($dialogContent);
 	         var difference = user_var.rDuration - user_var.rHour;
-
 	         calEvent.end.setHours(calEvent.start.getHours()+difference);
-	         console.log(calEvent.end.getHours());
+	         
+	         if(calEvent.end.getHours()>18){ 
+	        	 $('#calendar').weekCalendar("removeUnsavedEvents");
+	        	 return false;
+	         }
+	         
 	         var displaystartTime;
 			 var displayendTime;
 		 

@@ -22,8 +22,7 @@ from webapp2_extras.auth import InvalidPasswordError
 # A list storing the booking cache.
 booking_cache = []
 location = ""
-recommend = {}
-day = 19
+
 
 def user_required(handler):
     """
@@ -528,7 +527,6 @@ class QueryScheduleHandler(BaseHandler):
 class recommendScheduleHandler(BaseHandler):
     def post(self):
         global booking_cache
-        #global day
         #.. send information to database first to calculate recommendation
         #create one cache for recommendation
         schedule={}
@@ -550,7 +548,6 @@ class recommendScheduleHandler(BaseHandler):
         
         #recommend 
         booking_cache.append(schedule)
-        #day +=1
         
         
         

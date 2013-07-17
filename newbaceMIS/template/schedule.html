@@ -93,7 +93,21 @@ $.getJSON('/json', function(data){
 			'type': data.schedule[i].type
 			};
 			
-		if(data.schedule[i].type == 'recommendation' && data.schedule[i].email == user_var.email) selectedRecommend=event;
+		if(data.schedule[i].type == 'recommendation' && data.schedule[i].email == user_var.email){ 
+			selectedRecommend = {
+	                			'id': event.id,
+	                			'day': event.start.getDate(),
+	                			'month': event.start.getMonth()+1,
+	                			'year': event.start.getFullYear(),
+	                			'start': event.start.getHours(),
+	                			'end': event.end.getHours(),
+	                			'servicetype': event.servicetype,
+	                			'email': event.email,
+	                			'postalcode': event.postalcode,
+	                			'description': event.description,
+	                			'type': 'recommendation'
+	                		}
+		}
 				
 		if(user_var.accounType == 'administrator') event['key'] = data.schedule[i].key;
 			
