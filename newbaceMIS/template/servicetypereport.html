@@ -1,0 +1,53 @@
+{% extends "main.html" %}
+
+{% block title %}Schedule Booking{% endblock %}
+
+{% block script %}
+<script type="text/javascript">
+var count1=0;
+var count2=0;
+var count3=0;
+var count4=0;
+
+
+$.getJSON('/json', function(data){
+	for(var i=0; i<data.schedule.length; i++){
+		if(data.schedule[i].type=="query"){
+			var servicetype = data.schedule[i].servicetype;
+			if(servicetype.indexOf("Basic Servicing")>=0){
+				count1++;
+			}
+			if(servicetype.indexOf("Chemical Washing")>=0){
+				count2++;
+			}
+			if(servicetype.indexOf("Gas")>=0){
+				count3++;
+			}
+			if(servicetype.indexOf("Checking")>=0){
+				count4++;
+			}
+		}
+
+	}
+	var html = '<form>';
+	html += '<ol>';
+	html += '<li>Basic Servicing:'+count1+'</li>';
+	html += '<li>Chemical Washing:'+count2+'</li>';
+	html += '<li>Gas:'+count3+'</li>';
+	html += '<li>Checking:'+count4+'</li>';
+	html += '</ol><br />';
+	html += '</form>';
+	
+	document.getElementById("popservices").innerHTML = html;
+	
+});
+
+</script>
+{% endblock %}
+
+
+{% block maincontent %}
+<h1> Popular Services </h1>
+<div id="popservices">
+</div>
+{% endblock %}
