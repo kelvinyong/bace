@@ -17,7 +17,8 @@
 
 user_var = {
 	'email' : "{{ email }}",
-	'postalcode': "{{ postalcode }}"
+	'postalcode': "{{ postalcode }}",
+	'address': "{{ address }}"
 };
 
 $(document).ready(function(){
@@ -43,17 +44,6 @@ $(document).ready(function(){
 		allEvent.push(event);
 	}
 	});
-	
-		$('#number').keypress(function(e) {
-    		var a = [];
-   			var k = e.which;
-    
-   			for (i = 48; i < 58; i++)
-        		a.push(i);
-    		a.push(8);
-    		if (!(a.indexOf(k)>=0))
-        	e.preventDefault();
-		});
 
 		$("#navfifth").addClass("active");
 		$("#navsfifth").addClass("active");
@@ -241,11 +231,11 @@ function showAddress(address, id) {
      </li>
      <li>
         <label for="address">Address:</label>
-        <input type="text" name="address" class="text" value = "{{ address }}" readonly/>
+        <input type="text" name="address" class="text" value = "{{ address }}" disabled="disabled"/>
      </li>
      <li>
         <label for="address">Postal Code:</label>
-        <input type="text" name="postalcode" id="number" value = "{{ postalcode }}" readonly/>
+        <input type="text" name="postalcode" value = "{{ postalcode }}" disabled="disabled"/>
     </li>
     <li>
 		<label for="description">Request</label>

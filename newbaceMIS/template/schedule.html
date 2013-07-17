@@ -129,11 +129,11 @@ $.getJSON('/json', function(data){
     if(user_var.accounType == 'administrator'){
 		x = document.getElementsByTagName("input");
 		for(i=0;i<x.length;i++){
-			x[i].removeAttribute("readonly");
+			x[i].removeAttribute("disabled");
 			}
 		x = document.getElementsByTagName("textarea");
 		for(i=0;i<x.length;i++){
-			x[i].removeAttribute("readonly");
+			x[i].removeAttribute("disabled");
 			}
 	}
 });
@@ -159,7 +159,7 @@ $.getJSON('/json', function(data){
 					{% if user.accounType == 'administrator' %}
 					<select name="start"><option value="">Select Start Time</option></select>
 					{% else %}
-					<input type="text" name="start" readonly/>
+					<input type="text" name="start" disabled="disabled"/>
 					{% endif %}
 				</li>
 				<li>
@@ -167,7 +167,7 @@ $.getJSON('/json', function(data){
 					{% if user.accounType == 'administrator' %}
 					<select name="end"><option value="">Select End Time</option></select>
 					{% else %}
-					<input type="text" name="end" readonly/>
+					<input type="text" name="end" disabled="disabled"/>
 					{% endif %}
 				</li>
 				{% if user.accounType == 'administrator' %}
@@ -179,10 +179,10 @@ $.getJSON('/json', function(data){
 				</li>
 				{% endif %}
 				<li>
-					<label for="servicetype">Service(s) Type: </label><textarea name="servicetype" style="width:250px;" readonly/></textarea>
+					<label for="servicetype">Service(s) Type: </label><textarea name="servicetype" style="width:250px;" disabled="disabled"/></textarea>
 				</li>
 				<li>
-					<label for="body">Request: </label><textarea name="body" style="width:250px;" readonly></textarea>
+					<label for="body">Request: </label><textarea name="body" style="width:250px;" disabled="disabled"></textarea>
 				</li>
 			</ol>
 		</form>

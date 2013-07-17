@@ -893,6 +893,12 @@ class weeklyScheduleHandler(BaseHandler):
     def get(self):
         self.render_template('schedulereport.html')
         
+class servicetypereportHandler(BaseHandler):
+    @user_required
+    @admin_required
+    def get(self):
+        self.render_template('servicetypereport.html')
+        
 class historyHandler(BaseHandler):
     @user_required
     def get(self):
@@ -1156,6 +1162,7 @@ app = webapp2.WSGIApplication([
     webapp2.Route('/scheduleconfirmation', ScheduleHandler),
     webapp2.Route('/jsonempweeklyschedule', weeklySchedulejsonHandler),
     webapp2.Route('/admin/weeklyschedule',weeklyScheduleHandler),
+    webapp2.Route('/admin/servicetypereport',servicetypereportHandler),
     webapp2.Route('/admin/signup', AdminSignupHandler),
     webapp2.Route('/json', jsonHandler),
     webapp2.Route('/cacheBooking', cacheHandler),
