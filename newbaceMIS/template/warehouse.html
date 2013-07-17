@@ -37,7 +37,9 @@ $(document).ready(function(){
     <tr>
         <td>{{ warehouse.0.Name }}</td>
         <td>{{ warehouse.0.Location }}</td>
+        {% if not warehouse.2 %}
         <td><input type="submit" value="Delete"></td>
+        {% endif %}
     </tr>
         <input type="hidden" name="warehouseKey" value="{{ warehouse.1 }}">
         <input type="hidden" name="location" value="warehouse">

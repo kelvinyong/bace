@@ -1003,8 +1003,18 @@ class inventoryManagementHandler(BaseHandler):
         for i in warehousesKeys:
             warehousesList.append(i.urlsafe())
         
-        mainWarehousesList = zip(warehouses, warehousesList)
-        
+        warehouseitemexist = []
+        for i in warehouses:
+            exist = False
+            for j in items:
+                if i.Name == j.Store:
+                    exist = True
+                    warehouseitemexist.append(True)
+                    break
+            if not exist:
+                warehouseitemexist.append(False)
+                    
+        mainWarehousesList = zip(warehouses, warehousesList, warehouseitemexist)            
         
         params = {
                   'process': self.request.get('process'),
