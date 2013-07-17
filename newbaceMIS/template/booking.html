@@ -6,8 +6,6 @@
 <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=AIzaSyAatrvBOixHV_b6B1ee13soUYBb-7UoFB0" type="text/javascript"></script>
 <script type="text/javascript">
 
-//assumption: recommendation is done to maximise the current schedule. As such, 1st booking of the day would not be recommended
-//advance booking, ie +5days. Have not been considered
     var allEvent=[];
     var geocoder = null;
 	var newBookingdetails = {BasicServicing:0,ChemicalWash:0,TopUpGas:"N",CheckAndTroubleshooting:"N",postalCode:null,point:null};
@@ -27,7 +25,6 @@ $(document).ready(function(){
 			geocoder = new GClientGeocoder();
 		  }
 		  showAddress(newBookingdetails.postalCode + ", SG", 0);
-		  //console.log(newBookingdetails);
 	$.getJSON('/json', function(data){
 	for(var i=0; i<data.schedule.length; i++){
 		event={
@@ -50,13 +47,21 @@ $(document).ready(function(){
 		
 		
 		$('#recommend').submit(function(event){
-		var servicetype = '';
-		slotsRequired = (document.getElementById("basicservicingquantity").value * 15) + (document.getElementById("chemicalwashquantity").value * 30)
+		var advancedays = new Date();
+		for(var i=0;allEvent.length>i;i++){
+			if(allEvent[i].email == user_var.email && allEvent[i].start.getTime() > advancedays.getTime()){
+			alert("Dear Customer, you already have an existing booking with us.");
+			return false;
+			}
+		}
 		
-		bs = document.getElementById("basicservicingquantity").value;
-		if(bs>1)servicetype += 'Basic Servicing; ';
-		cw = document.getElementById("chemicalwashquantity").value;
-		if(cw>1)servicetype += 'Chemical Washing; ';
+		var servicetype = '';
+		var basic_serv = document.getElementById("basicservicingquantity").value;
+		var chem_wash = document.getElementById("chemicalwashquantity").value;
+		slotsRequired = (basic_serv * 15) + (chem_wash * 30);
+		
+		if(basic_serv>1)servicetype += 'Basic Servicing; ';
+		if(chem_wash>1)servicetype += 'Chemical Washing; ';
 		
 		if(document.getElementById("topupgas").checked){
 		slotsRequired += 45;
@@ -72,23 +77,20 @@ $(document).ready(function(){
 			alert("Please enter the amount of services required.");
 			return false;
 		}
-		
 		for(var i=0;allEvent.length>i;i++){
 			showAddress(allEvent[i].postalcode + ", SG", allEvent[i].id);
 		}
 		
 		
-		var advancedays = new Date();
+		
 		advancedays.setDate(advancedays.getDate() + 5);
 		Loop1:
 		for(var i=0;distances.length>i;i++){
-		console.log(distances[i]);
 			if(distances[i].len > 20){
 			allEvent[distances[i].id-1].end.setHours(allEvent[distances[i].id-1].end.getHours()+1);
 			}
 			console.log((allEvent[distances[i].id-1].end.getHours() + slotsRequired)+":hour");
 			if((allEvent[distances[i].id-1].end.getHours() + slotsRequired) >= 18){
-				console.log('>18');
 				continue;
 			}
 			else{
@@ -101,7 +103,7 @@ $(document).ready(function(){
 				}
 				chosenRecommendedSlot = allEvent[distances[i].id-1].end;
 				chosenRecommendedSlot.setHours(chosenRecommendedSlot.getHours()+1);
-				if(chosenRecommendedSlot.getDate() < advancedays.getDate()){
+				if(chosenRecommendedSlot.getTime() < advancedays.getTime()){
 				chosenRecommendedSlot = null;
 				continue;
 				}
@@ -112,28 +114,30 @@ $(document).ready(function(){
 				
 		}
 		console.log(chosenRecommendedSlot);
-			
-			
-			event.preventDefault();
-			if(chosenRecommendedSlot != null){
+		event.preventDefault();
+		if(chosenRecommendedSlot == null && distances.length != 0){
+			while(chosenRecommendedSlot == null){
+				chosenRecommendedSlot = advancedays;
+				chosenRecommendedSlot.setHours(8);
+				for(var i=0;allEvent.length>i;i++){
+					if(allEvent[i].start.toDateString() == chosenRecommendedSlot.toDateString()){
+						chosenRecommendedSlot == null;
+					}
+				}
+				advancedays.setDate(advancedays.getDate() + 1);
+			}
+		}		
+		else if(chosenRecommendedSlot != null && distances.length != 0){
 			user_var['description'] = document.getElementById("request").value;
 			user_var['servicetype'] = servicetype;
-			document.getElementById('service').value = servicetype;
 			user_var['rDay'] = chosenRecommendedSlot.getDate();
-			document.getElementById('day').value = chosenRecommendedSlot.getDate();;
 			user_var['rMth'] = chosenRecommendedSlot.getMonth() + 1;
-			document.getElementById('mth').value = chosenRecommendedSlot.getMonth() + 1;
 			user_var['rYear'] = chosenRecommendedSlot.getFullYear();
-			document.getElementById('year').value = chosenRecommendedSlot.getFullYear();
 			user_var['rHour'] = chosenRecommendedSlot.getHours();
-			document.getElementById('hour').value = chosenRecommendedSlot.getHours();
 			user_var['rDuration'] = chosenRecommendedSlot.getHours() + slotsRequired;
-			document.getElementById('duration').value = chosenRecommendedSlot.getHours() + slotsRequired;
 			$.post("/jsonrecommend", user_var).done(function() {
 				$('#recommend').unbind('submit').submit();
 			});
-			}else if(chosenRecommendedSlot == null && distances.length != 0){
-				$('#recommend').unbind('submit').submit();
 			}
 			//else{
 			//arguments.callee();
@@ -142,24 +146,24 @@ $(document).ready(function(){
 	});
 
 })
-
 function showAddress(address, id) {
 	if (geocoder) {
 		geocoder.getLatLng(
 		address,
 		function(point) {
-			if (point) {
+			if (point){
 				if(newBookingdetails.point == null){
 					newBookingdetails.point = point;
-				}else{
+				}
+				else{
 					var distance = CalculateDistance(point,newBookingdetails.point) / 1000;
 					//need to push primary key of event also
 					distances.push({id:id,len:distance});
 					//Sort numerically and ascending
 					distances.sort(function(a,b){return a.len - b.len})
 					//console.log(point.y + " " + point.x);
-					}
 				}
+			}
 			}
 		);
 	}
@@ -231,21 +235,16 @@ function showAddress(address, id) {
      </li>
      <li>
         <label for="address">Address:</label>
-        <input type="text" name="address" class="text" value = "{{ address }}" disabled="disabled"/>
+        <input type="text" name="address" value = "{{ address }}" disabled="disabled" size="65"/>
      </li>
      <li>
         <label for="address">Postal Code:</label>
-        <input type="text" name="postalcode" value = "{{ postalcode }}" disabled="disabled"/>
+        <input type="text" name="postalcode" value = "{{ postalcode }}" disabled="disabled" size="6"/>
     </li>
     <li>
 		<label for="description">Request</label>
         <textarea id="request" name="description" rows="8" cols="50"></textarea>
         <input type="hidden" name="servicetype" id="service" />
-        <input type="hidden" name="rDay" id="day" />
-        <input type="hidden" name="rMth" id="mth" />
-        <input type="hidden" name="rYear" id="year" />
-        <input type="hidden" name="rHour" id="hour" />
-        <input type="hidden" name="rDuration" id="duration" />
     </li>
     <li>
         <input type="submit" value="Proceed" />
