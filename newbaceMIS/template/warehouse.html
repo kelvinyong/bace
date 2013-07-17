@@ -8,7 +8,6 @@
 $(document).ready(function(){
 		$('.warehouse').submit(function(event){
 			if (confirm('Are you sure?')){
-			console.log('asdsd');
     		}else{
     			event.preventDefault();
     		}		
@@ -53,7 +52,7 @@ $(document).ready(function(){
 
 
 <h2><strong>Add Store</strong></h2>
-<form method="post">
+<form id="addStorage" method="post">
      <table width=80%>
      <tr>
          <td width=40%><strong>Store Name:</strong></td>

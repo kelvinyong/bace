@@ -19,9 +19,9 @@ function displayResult(data){
 		html += '<ol>';
 		html += '<li>Email:'+data.history[i].email+'</li>';
 		html += '<li>Description:'+data.history[i].description+'</li>';
-		startdate = new Date(data.history[i].date.year,data.history[i].date.month-1,data.history[i].date.day, data.history[i].hour.start).toUTCString();
+		startdate = new Date(data.history[i].date.year,data.history[i].date.month-1,data.history[i].date.day, data.history[i].hour.start).toLocaleString();
 		html += '<li>Start Date:'+ startdate +'</li>';
-		enddate = new Date(data.history[i].date.year,data.history[i].date.month-1,data.history[i].date.day, data.history[i].hour.end).toUTCString();
+		enddate = new Date(data.history[i].date.year,data.history[i].date.month-1,data.history[i].date.day, data.history[i].hour.end).toLocaleString();
 		html += '<li>End Date:'+ enddate +'</li>';
 		html += '<li>Service Type:'+data.history[i].servicetype+'</li>';
 		html += '<li>Postal Code:'+data.history[i].postalcode+'</li>';
@@ -36,9 +36,9 @@ function displayResult(data){
 		html += '<ol>';
 		html += '<li>Email:'+data.current[i].email+'</li>';
 		html += '<li>Description:'+data.current[i].description+'</li>';
-		startdate = new Date(data.current[i].date.year,data.current[i].date.month-1,data.current[i].date.day, data.current[i].hour.start).toUTCString();
+		startdate = new Date(data.current[i].date.year,data.current[i].date.month-1,data.current[i].date.day, data.current[i].hour.start).toLocaleString();
 		html += '<li>Start Date:'+ startdate +'</li>';
-		enddate = new Date(data.current[i].date.year,data.current[i].date.month-1,data.current[i].date.day, data.current[i].hour.end).toUTCString();
+		enddate = new Date(data.current[i].date.year,data.current[i].date.month-1,data.current[i].date.day, data.current[i].hour.end).toLocaleString();
 		html += '<li>End Date:'+ enddate +'</li>';
 		html += '<li>Service Type:'+data.current[i].servicetype+'</li>';
 		html += '<li>Postal Code:'+data.current[i].postalcode+'</li>';
@@ -58,7 +58,7 @@ function displayResult(data){
 <div id="bookinghistory"></div>
 <h1> Current Booking </h1>
 <div class="clr"></div>
-<small>*Please contact us if you wish to change the appointment*<small>
+<small>*Please contact us if you wish to change the appointment*</small>
 <div id="bookingcurrent"></div>
 
 {% endblock %}

@@ -22,6 +22,7 @@ from webapp2_extras.auth import InvalidPasswordError
 # A list storing the booking cache.
 booking_cache = []
 location = ""
+recommend = {}
 day = 19
 
 def user_required(handler):
@@ -515,14 +516,19 @@ class QueryScheduleHandler(BaseHandler):
         params = {
                   'postalcode': self.request.get('postalcode'),
                   'description': self.request.get('description'),
-                  'servicetype': self.request.get('servicetype')
+                  'servicetype': self.request.get('servicetype'),
+                  'rDay': int(self.request.get('rDay')),
+                  'rMth': int(self.request.get('rMth')),
+                  'rYear': int(self.request.get('rYear')),
+                  'rHour': int(self.request.get('rHour')),
+                  'rDuration': int(self.request.get('rDuration'))
                   }
         self.render_template('schedule.html',params)
         
 class recommendScheduleHandler(BaseHandler):
     def post(self):
         global booking_cache
-        global day
+        #global day
         #.. send information to database first to calculate recommendation
         #create one cache for recommendation
         schedule={}
@@ -532,18 +538,19 @@ class recommendScheduleHandler(BaseHandler):
         schedule['postalcode'] = self.request.get('postalcode')
         schedule['email'] = self.user.email_address
         date={}
-        date['day'] = day
-        date['month'] = 7
-        date['year'] = 2013
+        date['day'] = int(self.request.get('rDay'))
+        date['month'] = int(self.request.get('rMth'))
+        date['year'] = int(self.request.get('rYear'))
         schedule['date'] = date
         hour={}
-        hour['start'] = 14
-        hour['end'] = 16
+        hour['start'] = int(self.request.get('rHour'))
+        hour['end'] = int(self.request.get('rDuration'))
         schedule['hour'] = hour
         schedule['readonly'] = False
         
+        #recommend 
         booking_cache.append(schedule)
-        day +=1
+        #day +=1
         
         
         
@@ -720,7 +727,7 @@ class quotationHandler(BaseHandler):
             """ % quotation.Email
         message.Send()
         
-        self.display_message('Your enquiry has been sent. We will reply within 48 hours')
+        self.display_message('Your enquiry has been sent. We will get back to you within 3 working days')
         
 class AdminScheduleHandler(BaseHandler):
     @user_required

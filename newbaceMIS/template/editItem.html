@@ -23,7 +23,11 @@ $(document).ready(function(){
 			qty.focus;
 			return false;
 		}else {
-			$('#submit').unbind('submit').submit();
+			if (confirm('Are you sure?')){
+				$('#submit').unbind('submit').submit();
+    		}else{
+    			event.preventDefault();
+    		}
 		}
 	});
 

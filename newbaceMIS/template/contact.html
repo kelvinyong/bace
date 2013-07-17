@@ -68,8 +68,8 @@ $(document).ready(function(){
               <input type="email" id="email" name="email" class="text" required="required"/>
             </li>
             <li>
-              <label for="contact">Contact Number (required)</label>
-              <input type="number" name="contact" class="text number" required="required"/>
+              <label for="contact">Contact Number (e.g. 98765432)</label>
+              <input type="text" name="contact" class="text number" required="required" pattern=.{8,8}/>
             </li>
             <li>
               <label for="request">Request</label>

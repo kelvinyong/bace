@@ -3,8 +3,14 @@ $(document).ready(function() {
 	$('#bookingForm').submit(function(event){
 		//save booking to database
 		clickSubmit=true;
+		var selected;
 		event.preventDefault();
-		$.post("/json", selectedBooking).done(function(){
+		if(document.getElementById("rBook").checked){
+			selected=selectedRecommend;
+		}else{
+			selected=selectedBooking;
+		}
+		$.post("/json", selected).done(function(){
 			$('#bookingForm').unbind('submit').submit();
 		});
      
@@ -54,6 +60,10 @@ $(document).ready(function() {
     	 if((booking_quota < 2 || created)|| user_var.accounType == 'administrator'){
     		 var $dialogContent = $("#event_edit_container");
 	         resetForm($dialogContent);
+	         var difference = user_var.rDuration - user_var.rHour;
+
+	         calEvent.end.setHours(calEvent.start.getHours()+difference);
+	         console.log(calEvent.end.getHours());
 	         var displaystartTime;
 			 var displayendTime;
 		 
@@ -76,7 +86,7 @@ $(document).ready(function() {
 				 var startField = $dialogContent.find("input[name='start']").val(displaystartTime);
 				 var endField = $dialogContent.find("input[name='end']").val(displayendTime);
 			 }
-	         
+
 	         var servicetypeField = $dialogContent.find("textarea[name='servicetype']").val(user_var.servicetype);
 	         var bodyField = $dialogContent.find("textarea[name='body']").val(user_var.description);
 	         var emailField = $dialogContent.find("input[name='email']").val(user_var.email);
@@ -346,7 +356,7 @@ $(document).ready(function() {
 		        	  unavailableEvent['id'] = id;
 		        	  unavailableEvent['start'] = new Date(year,m,d,t);
 		        	  unavailableEvent['end'] = new Date(year,m,d,t+1);
-		        	  unavailableEvent['servicetype'] = 'unavailable'
+		        	  unavailableEvent['servicetype'] = '&nbsp'
 		        	  unavailableEvent['readOnly'] = true
 		        	  unavailableEvent['type'] = 'unavailable';
 		        	  

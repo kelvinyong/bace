@@ -17,7 +17,7 @@ $(document).ready(function(){
         	e.preventDefault();
 		});
 		
-		$('#submit').submit(function(event){
+		$('#addItem').submit(function(event){
 			event.preventDefault();
 			var currency = document.getElementById('currency');
 			var qty = document.getElementById('qty');
@@ -33,7 +33,7 @@ $(document).ready(function(){
 				qty.focus;
 				return false;
 			}else {
-				$('#submit').unbind('submit').submit();
+				$('#addItem').unbind('submit').submit();
 			}
 		});
 			
@@ -183,7 +183,7 @@ function go_to_page(page_num){
 <br />
 
 <h2><strong>Add Item</strong></h2>
-    <form id="submit" method="post">
+    <form id="addItem" method="post">
     	<table width=80%>
     	<tr>
             <td width=40%><strong>Item Type:</strong></td>

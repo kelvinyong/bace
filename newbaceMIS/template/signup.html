@@ -58,8 +58,8 @@ $(document).ready(function(){
               <input type="email" id="email" name="email" class="text" required="required"/>
             </li>
             <li>
-              <label for="password">Password</label>
-              <input type="text" name="password" class="text" maxlength="10"/>
+              <label for="password">Password(6-10 character)</label>
+              <input type="text" name="password" class="text" pattern=.{6,10}/>
             </li>
             <li>
               <label for="firstname">First Name</label>
@@ -70,16 +70,16 @@ $(document).ready(function(){
               <input type="text" name="lastname" class="text" required="required"/>
             </li>
             <li>
-              <label for="contact">Contact Number</label>
-              <input type="number" name="contact" class="text number" required="required"/>
+              <label for="contact">Contact Number(e.g. 98765432)</label>
+              <input type="text" name="contact" class="text number" required="required" pattern=.{8,8}/>
             </li>
             <li>
               <label for="address">Address</label>
               <input type="text" name="address" class="text" required="required"/>
             </li>
             <li>
-              <label for="postalcode">PostalCode</label>
-              <input type="number" name="postalcode" class="text number" min="000000" max="999999" required="required"/>
+              <label for="postalcode">PostalCode(e.g. 123456)</label>
+              <input type="text" name="postalcode" class="text number" pattern=.{6,6} required="required"/>
             </li>
             <li>
             {% if user.accounType == 'administrator' %}
@@ -91,7 +91,7 @@ $(document).ready(function(){
 			{% endif %}
             </li>
             <li>
-            <textarea rows="10" cols="70">    
+            <textarea rows="10" cols="70" disabled="disabled">    
 		Web Site Terms and Conditions of Use
 	
 		1. Terms

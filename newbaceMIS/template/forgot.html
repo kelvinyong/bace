@@ -4,7 +4,7 @@
 
 {% if changepwd %}
 <h1>Change password</h1>
-<p>A verification link for a change of email will be mailed.</p>
+<p>A verification link will be sent to your email.</p>
 {% else %}
 <h1>Recover password</h1>
 <p>Forgot your password? Click the link below to receive a link to recover your password.</p>
@@ -21,6 +21,7 @@
 <form class="form" action= "/changepwd" method="POST">
 <ol>
     <li>
+    <label>Email:</label>
 	<input type="text" value="{{ email }}" name="email"/>
 	</li>
     <li>

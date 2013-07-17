@@ -52,12 +52,11 @@ function displayResult(data){
 	var html = '<form class="report">';
 	for(var i=0; i<data.report.length; i++){
 		html += '<ol>';
-		html += '<li>Email:'+data.report[i].email+'</li>';
 		html += '<li>Name:'+data.report[i].customerInfo.name+'</li>';
 		html += '<li>Description:'+data.report[i].description+'</li>';
-		startdate = new Date(data.report[i].date.year,data.report[i].date.month-1,data.report[i].date.day, data.report[i].hour.start).toUTCString();
+		startdate = new Date(data.report[i].date.year,data.report[i].date.month-1,data.report[i].date.day, data.report[i].hour.start).toLocaleString();
 		html += '<li>Start Date:'+ startdate +'</li>';
-		enddate = new Date(data.report[i].date.year,data.report[i].date.month-1,data.report[i].date.day, data.report[i].hour.end).toUTCString();
+		enddate = new Date(data.report[i].date.year,data.report[i].date.month-1,data.report[i].date.day, data.report[i].hour.end).toLocaleString();
 		html += '<li>End Date:'+ enddate +'</li>';
 		html += '<li>Service Type:'+data.report[i].servicetype+'</li>';
 		html += '<li>Address:'+data.report[i].customerInfo.address+'</li>';

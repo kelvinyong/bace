@@ -31,24 +31,24 @@ $(document).ready(function(){
     <input type="text" name="email" class="text" value = "{{ email }}" disabled="disabled" />
     </li>
     <li>
-    <label for="firstname">First Name:</label>
+    <label for="firstname">First Name</label>
     <input type="text" name="firstname" value = "{{ firstname }}" class="text" required="required"/>
     </li>
     <li>
-    <label for="lastname">Last Name:</label>
+    <label for="lastname">Last Name</label>
     <input type="text" name="lastname" value = "{{ lastname }}" class="text" required="required"/>
     </li>
     <li>
-    <label for="contact">Contact Number:</label>
-    <input type="text" name="contact" value = "{{ contact }}" class="text number" required="required"/>
-    </li>
+    <label for="contact">Contact Number(e.g. 98765432)</label>
+    <input type="text" name="contact" value = "{{ contact }}" class="text number" pattern=.{8,8} required="required"/>
+    </li> 
     <li>
-    <label for="address">Address:</label>
+    <label for="address">Address</label>
     <input type="text" name="address" value = "{{ address }}" class="text" required="required"/>
     </li>
     <li>
-    <label for="postalcode">Postcode:</label>
-    <input type="text" name="postalcode" value = "{{ postalcode }}" class="text number" required="required"/>
+    <label for="postalcode">Postcode(e.g. 123456)</label>
+    <input type="text" name="postalcode" value = "{{ postalcode }}" class="text number" pattern=.{6,6} required="required"/>
     </li>
     <li>
     <input type="submit" value="Submit Changes"/>

@@ -15,6 +15,7 @@ var allEvent=[];
 var clickSubmit = false;
 var adminBooking=[];
 var selectedBooking;
+var selectedRecommend;
 var booking_quota = 0;
 
 window.onbeforeunload = function(e) {
@@ -40,7 +41,12 @@ user_var = {
 	'email' : "{{ user.email_address }}",
 	'postalcode' : "{{ postalcode }}",
 	'description': "{{ description }}",
-	'servicetype': "{{ servicetype }}"
+	'servicetype': "{{ servicetype }}",
+	'rDay': "{{ rDay }}",
+	'rMth': "{{ rMth }}",
+	'rYear': "{{ rYear }}",
+	'rHour': "{{ rHour }}",
+	'rDuration': "{{ rDuration }}"
 };
 
 function getUpdates(){
@@ -86,6 +92,8 @@ $.getJSON('/json', function(data){
 			'email': data.schedule[i].email,
 			'type': data.schedule[i].type
 			};
+			
+		if(data.schedule[i].type == 'recommendation' && data.schedule[i].email == user_var.email) selectedRecommend=event;
 				
 		if(user_var.accounType == 'administrator') event['key'] = data.schedule[i].key;
 			

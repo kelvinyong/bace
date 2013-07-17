@@ -3,7 +3,17 @@
 {% block title %}Schedule Booking{% endblock %}
 
 {% block script %}
+<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=AIzaSyAatrvBOixHV_b6B1ee13soUYBb-7UoFB0" type="text/javascript"></script>
 <script type="text/javascript">
+
+//assumption: recommendation is done to maximise the current schedule. As such, 1st booking of the day would not be recommended
+//advance booking, ie +5days. Have not been considered
+    var allEvent=[];
+    var geocoder = null;
+	var newBookingdetails = {BasicServicing:0,ChemicalWash:0,TopUpGas:"N",CheckAndTroubleshooting:"N",postalCode:null,point:null};
+	var distances = [];
+	var slotsRequired;
+	var chosenRecommendedSlot;
 
 user_var = {
 	'email' : "{{ email }}",
@@ -11,6 +21,29 @@ user_var = {
 };
 
 $(document).ready(function(){
+	newBookingdetails.postalCode = user_var.postalcode;
+	if (GBrowserIsCompatible()) {
+			geocoder = new GClientGeocoder();
+		  }
+		  showAddress(newBookingdetails.postalCode + ", SG", 0);
+		  //console.log(newBookingdetails);
+	$.getJSON('/json', function(data){
+	for(var i=0; i<data.schedule.length; i++){
+		event={
+			'id': i+1,
+			'start': new Date(data.schedule[i].date.year,data.schedule[i].date.month-1,data.schedule[i].date.day, data.schedule[i].hour.start),
+			'end': new Date(data.schedule[i].date.year,data.schedule[i].date.month-1,data.schedule[i].date.day, data.schedule[i].hour.end),
+			'servicetype': data.schedule[i].servicetype,
+			'description': data.schedule[i].description,
+			'postalcode': data.schedule[i].postalcode,
+			'readOnly': data.schedule[i].readonly,
+			'email': data.schedule[i].email,
+			'type': data.schedule[i].type
+			};
+		allEvent.push(event);
+	}
+	});
+	
 		$('#number').keypress(function(e) {
     		var a = [];
    			var k = e.which;
@@ -27,26 +60,134 @@ $(document).ready(function(){
 		
 		
 		$('#recommend').submit(function(event){
-			var servicetype = '';
-			bs = document.getElementById("basicservicingquantity").value;
-			if(bs>1)servicetype += 'Basic Servicing; ';
-			cw = document.getElementById("chemicalwashquantity").value;
-			if(cw>1)servicetype += 'Chemical Washing; ';
-			if(document.getElementById("topupgas").checked) servicetype += 'Gas; ';
-			if(document.getElementById("checktroubleshoot").checked) servicetype += 'Checking. ';
+		var servicetype = '';
+		slotsRequired = (document.getElementById("basicservicingquantity").value * 15) + (document.getElementById("chemicalwashquantity").value * 30)
+		
+		bs = document.getElementById("basicservicingquantity").value;
+		if(bs>1)servicetype += 'Basic Servicing; ';
+		cw = document.getElementById("chemicalwashquantity").value;
+		if(cw>1)servicetype += 'Chemical Washing; ';
+		
+		if(document.getElementById("topupgas").checked){
+		slotsRequired += 45;
+		servicetype += 'Gas; ';
+		}
+		if(document.getElementById("checktroubleshoot").checked){
+		slotsRequired += 10;
+		servicetype += 'Checking. ';
+		}
+		slotsRequired = Math.ceil(slotsRequired/60);
+		console.log(slotsRequired);
+		if(slotsRequired == 0){
+			alert("Please enter the amount of services required.");
+			return false;
+		}
+		
+		for(var i=0;allEvent.length>i;i++){
+			showAddress(allEvent[i].postalcode + ", SG", allEvent[i].id);
+		}
+		
+		
+		var advancedays = new Date();
+		advancedays.setDate(advancedays.getDate() + 5);
+		Loop1:
+		for(var i=0;distances.length>i;i++){
+		console.log(distances[i]);
+			if(distances[i].len > 20){
+			allEvent[distances[i].id-1].end.setHours(allEvent[distances[i].id-1].end.getHours()+1);
+			}
+			console.log((allEvent[distances[i].id-1].end.getHours() + slotsRequired)+":hour");
+			if((allEvent[distances[i].id-1].end.getHours() + slotsRequired) >= 18){
+				console.log('>18');
+				continue;
+			}
+			else{
+				for(var i2=0;allEvent.length>i2;i2++){
+					if(allEvent[i2].id != distances[i].id && allEvent[distances[i].id-1].start.getHours() < allEvent[i2].start.getHours()){
+						if(allEvent[i2].end.toDateString() == allEvent[distances[i].id-1].start.toDateString() && (allEvent[distances[i].id-1].end.getHours() + slotsRequired) > allEvent[i2].start.getHours()){
+							continue Loop1; 
+						}
+					}
+				}
+				chosenRecommendedSlot = allEvent[distances[i].id-1].end;
+				chosenRecommendedSlot.setHours(chosenRecommendedSlot.getHours()+1);
+				if(chosenRecommendedSlot.getDate() < advancedays.getDate()){
+				chosenRecommendedSlot = null;
+				continue;
+				}
+				else{
+				break;
+				}
+			}
+				
+		}
+		console.log(chosenRecommendedSlot);
 			
-			document.getElementById('service').value = servicetype;
-			user_var['servicetype'] = servicetype;
-			user_var['description'] = document.getElementById("request").value;
+			
 			event.preventDefault();
+			if(chosenRecommendedSlot != null){
+			user_var['description'] = document.getElementById("request").value;
+			user_var['servicetype'] = servicetype;
+			document.getElementById('service').value = servicetype;
+			user_var['rDay'] = chosenRecommendedSlot.getDate();
+			document.getElementById('day').value = chosenRecommendedSlot.getDate();;
+			user_var['rMth'] = chosenRecommendedSlot.getMonth() + 1;
+			document.getElementById('mth').value = chosenRecommendedSlot.getMonth() + 1;
+			user_var['rYear'] = chosenRecommendedSlot.getFullYear();
+			document.getElementById('year').value = chosenRecommendedSlot.getFullYear();
+			user_var['rHour'] = chosenRecommendedSlot.getHours();
+			document.getElementById('hour').value = chosenRecommendedSlot.getHours();
+			user_var['rDuration'] = chosenRecommendedSlot.getHours() + slotsRequired;
+			document.getElementById('duration').value = chosenRecommendedSlot.getHours() + slotsRequired;
 			$.post("/jsonrecommend", user_var).done(function() {
 				$('#recommend').unbind('submit').submit();
 			});
-
+			}else if(chosenRecommendedSlot == null && distances.length != 0){
+				$('#recommend').unbind('submit').submit();
+			}
+			//else{
+			//arguments.callee();
+			//}
+			
 	});
 
 })
 
+function showAddress(address, id) {
+	if (geocoder) {
+		geocoder.getLatLng(
+		address,
+		function(point) {
+			if (point) {
+				if(newBookingdetails.point == null){
+					newBookingdetails.point = point;
+				}else{
+					var distance = CalculateDistance(point,newBookingdetails.point) / 1000;
+					//need to push primary key of event also
+					distances.push({id:id,len:distance});
+					//Sort numerically and ascending
+					distances.sort(function(a,b){return a.len - b.len})
+					//console.log(point.y + " " + point.x);
+					}
+				}
+			}
+		);
+	}
+}
+		
+		function CalculateDistance(latlng1, latlng2) {
+		  var lat = [latlng1.y, latlng2.y]
+		  var lng = [latlng1.x, latlng2.x]
+		  var R = 6378137;
+		  var dLat = (lat[1]-lat[0]) * Math.PI / 180;
+		  var dLng = (lng[1]-lng[0]) * Math.PI / 180;
+		  var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+		  Math.cos(lat[0] * Math.PI / 180 ) * Math.cos(lat[1] * Math.PI / 180 ) *
+		  Math.sin(dLng/2) * Math.sin(dLng/2);
+		  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+		  var d = R * c;
+		  return Math.round(d);
+		}
 </script>
 
 {% endblock %}
@@ -70,7 +211,6 @@ $(document).ready(function(){
           <option value="6">6</option>
           <option value="7">7</option>
           <option value="8">8</option>
-          <option value="8+">8&lt;</option>
         </select>
      </li>
     <li>
@@ -85,7 +225,6 @@ $(document).ready(function(){
           <option value="6">6</option>
           <option value="7">7</option>
           <option value="8">8</option>
-          <option value="8+">8&lt;</option>
        </select>
      </li>
      <li>
@@ -112,6 +251,11 @@ $(document).ready(function(){
 		<label for="description">Request</label>
         <textarea id="request" name="description" rows="8" cols="50"></textarea>
         <input type="hidden" name="servicetype" id="service" />
+        <input type="hidden" name="rDay" id="day" />
+        <input type="hidden" name="rMth" id="mth" />
+        <input type="hidden" name="rYear" id="year" />
+        <input type="hidden" name="rHour" id="hour" />
+        <input type="hidden" name="rDuration" id="duration" />
     </li>
     <li>
         <input type="submit" value="Proceed" />
