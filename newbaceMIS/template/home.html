@@ -28,7 +28,9 @@ $(document).ready(function(){
         	<strong>OPERATING HOURS</strong><br />
         	MONDAY to SATURDAY & PUBLIC HOLIDAYS<br />
         	9 A.M - 6 P.M
+        {% if user.accounType != 'administrator' and user.accounType != 'employee' %}	
         <p><a href ="/schedulebooking">Book NOW!</a></p>
+        {% endif %}
         </p>
         <p>      
       		<strong>EXCLUDING</strong><br />

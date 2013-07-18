@@ -513,14 +513,14 @@ class QueryScheduleHandler(BaseHandler):
         
     def post(self):
         params = {
-                  'postalcode': self.request.get('postalcode'),
+                  'postalcode': int(self.request.get('postalcode')),
                   'description': self.request.get('description'),
                   'servicetype': self.request.get('servicetype'),
-                  'rDay': self.request.get('rDay'),
-                  'rMth': self.request.get('rMth'),
-                  'rYear': self.request.get('rYear'),
-                  'rHour': self.request.get('rHour'),
-                  'rDuration': self.request.get('rDuration')
+                  'rDay': int(self.request.get('rDay')),
+                  'rMth': int(self.request.get('rMth')),
+                  'rYear': int(self.request.get('rYear')),
+                  'rHour': int(self.request.get('rHour')),
+                  'rDuration': int(self.request.get('rDuration'))
                   }
         self.render_template('schedule.html',params)
         
@@ -533,16 +533,16 @@ class recommendScheduleHandler(BaseHandler):
         schedule['type'] = 'recommendation'
         schedule['servicetype'] = 'R>'+self.request.get('servicetype')
         schedule['description'] = self.request.get('description')
-        schedule['postalcode'] = self.request.get('postalcode')
+        schedule['postalcode'] = int(self.request.get('postalcode'))
         schedule['email'] = self.user.email_address
         date={}
-        date['day'] = self.request.get('rDay')
-        date['month'] = self.request.get('rMth')
-        date['year'] = self.request.get('rYear')
+        date['day'] = int(self.request.get('rDay'))
+        date['month'] = int(self.request.get('rMth'))
+        date['year'] = int(self.request.get('rYear'))
         schedule['date'] = date
         hour={}
-        hour['start'] = self.request.get('rHour')
-        hour['end'] = self.request.get('rDuration')
+        hour['start'] = int(self.request.get('rHour'))
+        hour['end'] = int(self.request.get('rDuration'))
         schedule['hour'] = hour
         schedule['readonly'] = False
         

@@ -89,7 +89,6 @@ $(document).ready(function(){
 			if(distances[i].len > 20){
 			allEvent[distances[i].id-1].end.setHours(allEvent[distances[i].id-1].end.getHours()+1);
 			}
-			console.log((allEvent[distances[i].id-1].end.getHours() + slotsRequired)+":hour");
 			if((allEvent[distances[i].id-1].end.getHours() + slotsRequired) >= 18){
 				continue;
 			}
@@ -130,11 +129,17 @@ $(document).ready(function(){
 		else if(chosenRecommendedSlot != null && distances.length != 0){
 			user_var['description'] = document.getElementById("request").value;
 			user_var['servicetype'] = servicetype;
+			document.getElementById('service').value = servicetype; 
 			user_var['rDay'] = chosenRecommendedSlot.getDate();
+			document.getElementById('day').value = chosenRecommendedSlot.getDate();
 			user_var['rMth'] = chosenRecommendedSlot.getMonth() + 1;
+			document.getElementById('mth').value = chosenRecommendedSlot.getMonth() + 1; 
 			user_var['rYear'] = chosenRecommendedSlot.getFullYear();
+			document.getElementById('year').value = chosenRecommendedSlot.getFullYear(); 
 			user_var['rHour'] = chosenRecommendedSlot.getHours();
+			document.getElementById('hour').value = chosenRecommendedSlot.getHours(); 
 			user_var['rDuration'] = chosenRecommendedSlot.getHours() + slotsRequired;
+			document.getElementById('duration').value = chosenRecommendedSlot.getHours() + slotsRequired; 
 			$.post("/jsonrecommend", user_var).done(function() {
 				$('#recommend').unbind('submit').submit();
 			});
@@ -239,12 +244,18 @@ function showAddress(address, id) {
      </li>
      <li>
         <label for="address">Postal Code:</label>
-        <input type="text" name="postalcode" value = "{{ postalcode }}" disabled="disabled" size="6"/>
+        <input type="text" name="ppostalcode" value = "{{ postalcode }}" disabled="disabled" size="6"/>
+        <input type="hidden" name="postalcode" value = "{{ postalcode }}"/>
     </li>
     <li>
 		<label for="description">Request</label>
         <textarea id="request" name="description" rows="8" cols="50"></textarea>
         <input type="hidden" name="servicetype" id="service" />
+        <input type="hidden" name="rDay" id="day" /> 
+        <input type="hidden" name="rMth" id="mth" /> 
+        <input type="hidden" name="rYear" id="year" /> 
+        <input type="hidden" name="rHour" id="hour" /> 
+        <input type="hidden" name="rDuration" id="duration" /> 
     </li>
     <li>
         <input type="submit" value="Proceed" />
