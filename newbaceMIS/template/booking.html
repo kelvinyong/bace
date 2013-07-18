@@ -118,7 +118,7 @@ $(document).ready(function(){
 		if(chosenRecommendedSlot == null && distances.length != 0){
 			while(chosenRecommendedSlot == null){
 				chosenRecommendedSlot = advancedays;
-				chosenRecommendedSlot.setHours(8);
+				chosenRecommendedSlot.setHours(9);
 				for(var i=0;allEvent.length>i;i++){
 					if(allEvent[i].start.toDateString() == chosenRecommendedSlot.toDateString()){
 						chosenRecommendedSlot == null;
