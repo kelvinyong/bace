@@ -126,7 +126,7 @@ $(document).ready(function(){
 				advancedays.setDate(advancedays.getDate() + 1);
 			}
 		}		
-		else if(chosenRecommendedSlot != null && distances.length != 0){
+		if(chosenRecommendedSlot != null && distances.length != 0){
 			user_var['description'] = document.getElementById("request").value;
 			user_var['servicetype'] = servicetype;
 			document.getElementById('service').value = servicetype; 
