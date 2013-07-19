@@ -40,7 +40,7 @@ def user_required(handler):
   
 
 def admin_required(handler):
-    """ 
+    """  
         Decorator that checks if there's a admin associated with the current session.
         Will redirect to home page if fail
     """
