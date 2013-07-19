@@ -179,7 +179,7 @@ $.getJSON('/json', function(data){
 				</li>
 				{% endif %}
 				<li>
-					<label for="servicetype">Service(s) Type: </label><textarea name="servicetype" style="width:250px;" disabled="disabled"/></textarea>
+					<label for="servicetype">Service(s) Type: </label><textarea name="servicetype" style="width:250px;" disabled="disabled"></textarea>
 				</li>
 				<li>
 					<label for="body">Request: </label><textarea name="body" style="width:250px;" disabled="disabled"></textarea>
@@ -191,12 +191,12 @@ $.getJSON('/json', function(data){
 	{% if user.accounType == 'administrator' %}
 	<form action="/scheduleconfirmation" id="adminbookingForm" method="POST">
 	<input type="submit" value="Add all schedule" /><br />
-	*<small>deleting of existing booking will be processed immediately</small>*
+	<small>*deleting of existing booking will be processed immediately*</small>
 	</form>
 	{% else %}
 	<form action="/scheduleconfirmation" id="bookingForm" method="POST">
 	<label for="confirmation">Select Preferred booking:</label>
-	<input type="radio" id="rBook" name="check" checked="checked">Recommended<input type="radio" name="check">My Preference
+	<input type="radio" id="rBook" name="check" checked="checked"><label>Recommended</label><input type="radio" name="check"><label>My Preference</label>
 	<input type="submit" id="csubmit" value="Check Out" />
 	</form>
 	<small>*Recommendation will be selected if preference is not created on the calendar*</small>

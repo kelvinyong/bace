@@ -307,7 +307,6 @@ ol li input.text {
 	margin:2px 0;
 	padding:5px 2px;
 	height:16px;
-	background:#fff;
 }
 ol li textarea {
         resize: none;
@@ -315,36 +314,9 @@ ol li textarea {
 	border:1px solid #c0c0c0;
 	margin:2px 0;
 	padding:2px;
-	
 }
 ol li .send {
 	margin:16px 0 0 0;
-}
-.search span {
-	width:250px;
-	display:block;
-	background:#FFF;
-	height:29px;
-	margin:0;
-	padding:0;
-	border:1px solid #e7e7e7;
-}
-.search input#s {
-	float:left;
-	width:200px;
-	padding:7px 0 7px 10px;
-	margin:0;
-	border:0;
-	background:none;
-	color:#afaeae;
-	font:normal 12px/15px Arial, Helvetica, sans-serif;
-}
-.search .btn {
-	float:left;
-	padding:0;
-	margin:0;
-	border:0;
-	width:auto;
 }
 .pagenavi {
 	clear:both;
