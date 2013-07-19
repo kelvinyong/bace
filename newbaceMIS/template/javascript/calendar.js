@@ -172,6 +172,7 @@ $(document).ready(function() {
 	                			booking_quota++;
 	                			if(data.exist){
 	                				selectedBooking = {};
+	                				$.extend(selectedBooking,selectedRecommend);
 	                				//$calendar.weekCalendar("removeEvent", calEvent.id);
 	                			}else $calendar.weekCalendar("updateEvent", calEvent);
 	                		}, "json");

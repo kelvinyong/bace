@@ -18,7 +18,11 @@
 {% endif %}
 {% endif %}
 
+{% if user %}
 <form class="form" action= "/changepwd" method="POST">
+{% else %}
+<form class="form" action= "/forgot" method="POST">
+{% endif %}
 <ol>
     <li>
     <label>Email:</label>

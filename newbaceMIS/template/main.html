@@ -132,7 +132,11 @@
   		<p class="lf">
       	Sitemap <br />
       	<a href="/">Home</a>&nbsp;|&nbsp;<a href="/about">About Us</a>&nbsp;|&nbsp;<a href="/gallery">Gallery</a>
-		&nbsp;|&nbsp;<a href="/services">Services</a>&nbsp;|&nbsp;<a href="/schedulebooking">Booking</a>&nbsp;|&nbsp;<a href="/contact">Contact Us</a>
+		&nbsp;|&nbsp;<a href="/services">Services</a>&nbsp;|&nbsp;
+		{% if user.accounType != 'administrator' and user.accounType != 'employee' %}	
+		<a href="/schedulebooking">Booking</a>&nbsp;|&nbsp;
+		{% endif %}
+		<a href="/contact">Contact Us</a>
       	</p>
       	<div class="clr"></div>
     </div>

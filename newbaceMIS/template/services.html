@@ -31,7 +31,9 @@ $(document).ready(function(){
 		<strong>EXCLUDING</strong><br />
 		SUNDAY
 	</p>
+	{% if user.accounType != 'administrator' and user.accounType != 'employee' %}
 	<p><a href ="/schedulebooking">Book NOW!</a></p> 
+	{% endif %}
 </div>
 <div class="article" id = "servicing" >
 	<h2><strong>Basic Air-Conditioning Servicing</strong></h2>

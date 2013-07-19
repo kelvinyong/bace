@@ -40,7 +40,7 @@ def user_required(handler):
   
 
 def admin_required(handler):
-    """  
+    """
         Decorator that checks if there's a admin associated with the current session.
         Will redirect to home page if fail
     """
@@ -51,6 +51,21 @@ def admin_required(handler):
             self.redirect(self.uri_for('home'), abort=True)
             
     return check_login
+
+
+def notCust_required(handler):
+    """
+        Decorator that checks if there's a employee associated with the current session.
+        Will redirect to home page if fail
+    """
+    def check_login(self,*args, **kwargs):
+        if self.user.accounType == 'employee' or self.user.accounType == 'administrator':
+            return handler(self, *args, **kwargs)
+        else:
+            self.redirect(self.uri_for('home'), abort=True)
+            
+    return check_login
+
     
 def loggedin(handler):
     """
@@ -603,7 +618,7 @@ class jsonHandler(BaseHandler):
         
     def post(self):
         #save booking into database
-        d = date(int(self.request.get('year')), int(self.request.get('month')), int(self.request.get('day')))
+        d = datetime(int(self.request.get('year')), int(self.request.get('month')), int(self.request.get('day')))
         st = time(int(self.request.get('start')))
         et = time(int(self.request.get('end')))
         #datetime.combine(d, st)
@@ -616,6 +631,23 @@ class jsonHandler(BaseHandler):
         job.Service_Type = self.request.get('servicetype')
         job.postalCode = int(self.request.get('postalcode'))
         job.put()
+        
+        
+        schedule={}
+        date={}
+        date['day'] = d.day
+        date['month'] = d.month
+        date['year'] = d.year
+        schedule['date'] = date
+        hour={}
+        hour['start'] = st.hour
+        hour['end'] = et.hour
+        schedule['hour'] = hour
+        
+        for temp in booking_cache:
+            if((temp['date'] == schedule['date']) and temp['hour'] == schedule['hour']):
+                booking_cache.remove(temp)
+                break;
         
         
 class cacheHandler(BaseHandler):
@@ -889,7 +921,7 @@ class weeklySchedulejsonHandler(BaseHandler):
         
 class weeklyScheduleHandler(BaseHandler):
     @user_required
-    @admin_required
+    @notCust_required
     def get(self):
         self.render_template('schedulereport.html')
         

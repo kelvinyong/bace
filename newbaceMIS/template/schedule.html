@@ -14,7 +14,7 @@
 var allEvent=[];
 var clickSubmit = false;
 var adminBooking=[];
-var selectedBooking;
+var selectedBooking={};
 var selectedRecommend;
 var booking_quota = 0;
 
@@ -107,6 +107,8 @@ $.getJSON('/json', function(data){
 	                			'description': event.description,
 	                			'type': 'recommendation'
 	                		}
+	        $.extend(selectedBooking,selectedRecommend);
+
 		}
 				
 		if(user_var.accounType == 'administrator') event['key'] = data.schedule[i].key;
@@ -196,7 +198,7 @@ $.getJSON('/json', function(data){
 	{% else %}
 	<form action="/scheduleconfirmation" id="bookingForm" method="POST">
 	<label for="confirmation">Select Preferred booking:</label>
-	<input type="radio" id="rBook" name="check" checked="checked"><label>Recommended</label><input type="radio" name="check"><label>My Preference</label>
+	<input type="radio" id="rBook" name="check" checked="checked">Recommended<input type="radio" name="check">My Preference
 	<input type="submit" id="csubmit" value="Check Out" />
 	</form>
 	<small>*Recommendation will be selected if preference is not created on the calendar*</small>
