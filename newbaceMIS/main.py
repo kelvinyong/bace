@@ -371,7 +371,7 @@ class LoginHandler(BaseHandler):
 class LogoutHandler(BaseHandler):
     def get(self):
         global booking_cache
-        global day
+
         booking_cache_remove=[]
 
         for temp in booking_cache:
@@ -384,8 +384,6 @@ class LogoutHandler(BaseHandler):
             booking_cache.remove(temp)
         
 
-        #booking_cache = []
-        day=19
         self.auth.unset_session()
         self.redirect(self.uri_for('home'))
         

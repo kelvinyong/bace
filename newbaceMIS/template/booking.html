@@ -83,7 +83,8 @@ $(document).ready(function(){
 		
 		
 		
-		advancedays.setDate(advancedays.getDate() + 5);
+		advancedays.setDate(advancedays.getDate() + 6);
+		if(advancedays.getDay() == 0)advancedays.setDate(advancedays.getDate() + 1);
 		Loop1:
 		for(var i=0;distances.length>i;i++){
 			if(distances[i].len > 20){
@@ -119,11 +120,16 @@ $(document).ready(function(){
 				chosenRecommendedSlot = advancedays;
 				chosenRecommendedSlot.setHours(9);
 				for(var i=0;allEvent.length>i;i++){
-					if(allEvent[i].start.toDateString() == chosenRecommendedSlot.toDateString()){
-						chosenRecommendedSlot == null;
+					if(allEvent[i].start.getDate() == chosenRecommendedSlot.getDate() &&
+						allEvent[i].start.getMonth() == chosenRecommendedSlot.getMonth()){
+						chosenRecommendedSlot = null;
+						advancedays.setDate(advancedays.getDate() + 1);
+						if(advancedays.getDay() == 0)advancedays.setDate(advancedays.getDate() + 1);
+						break;
 					}
+					
 				}
-				advancedays.setDate(advancedays.getDate() + 1);
+
 			}
 		}		
 		if(chosenRecommendedSlot != null && distances.length != 0){

@@ -64,8 +64,11 @@ $(document).ready(function() {
     	 if((booking_quota < 2 || created)|| user_var.accounType == 'administrator'){
     		 var $dialogContent = $("#event_edit_container");
 	         resetForm($dialogContent);
-	         var difference = user_var.rDuration - user_var.rHour;
-	         calEvent.end.setHours(calEvent.start.getHours()+difference);
+	         if(user_var.accounType == 'customer'){
+	        	 var difference = user_var.rDuration - user_var.rHour;
+	        	 calEvent.end.setHours(calEvent.start.getHours()+difference);
+	         }
+	         
 	         
 	         if(calEvent.end.getHours()>18){ 
 	        	 $('#calendar').weekCalendar("removeUnsavedEvents");
