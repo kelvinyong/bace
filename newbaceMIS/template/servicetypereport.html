@@ -30,12 +30,13 @@ $.getJSON('/json', function(data){
 
 	}
 	var html = '<form>';
-	html += '<ol>';
-	html += '<li>Basic Servicing:'+count1+'</li>';
-	html += '<li>Chemical Washing:'+count2+'</li>';
-	html += '<li>Gas:'+count3+'</li>';
-	html += '<li>Checking:'+count4+'</li>';
-	html += '</ol><br />';
+	html += '<table width=80% border="1" cellspacing="2" cellpadding="5">';
+	html += '<tr><td><strong>Type of Services</strong></td><td><strong>Numbers</strong></td></tr>';
+	html += '<tr><td width=50%>Basic Servicing</td><td width=50%>'+count1+'</td></tr>';
+	html += '<tr><td>Chemical Washing</td><td>'+count2+'</td></tr>';
+	html += '<tr><td>Gas</td><td>'+count3+'</td></tr>';
+	html += '<tr><td>Checking</td><td>'+count4+'</td></tr>';
+	html += '</table><br />';
 	html += '</form>';
 	
 	document.getElementById("popservices").innerHTML = html;
@@ -48,6 +49,7 @@ $.getJSON('/json', function(data){
 
 {% block maincontent %}
 <h1> Popular Services </h1>
+<br />
 <div id="popservices">
 </div>
 {% endblock %}

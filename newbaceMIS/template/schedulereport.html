@@ -51,18 +51,18 @@ function displayResult(data){
 	var startdate, enddate;
 	var html = '<form class="report">';
 	for(var i=0; i<data.report.length; i++){
-		html += '<ol>';
-		html += '<li>Name:'+data.report[i].customerInfo.name+'</li>';
-		html += '<li>Description:'+data.report[i].description+'</li>';
+		html += '<table width=80% border="1" cellspacing="2" cellpadding="5">';
+		html += '<tr><td width=40%><strong>Customer Name</strong></td><td width=60%>'+data.report[i].customerInfo.name+'</td></tr>';
+		html += '<tr><td><strong>Description</strong></td><td>'+data.report[i].description+'</td></tr>';
 		startdate = new Date(data.report[i].date.year,data.report[i].date.month-1,data.report[i].date.day, data.report[i].hour.start).toLocaleString();
-		html += '<li>Start Date:'+ startdate +'</li>';
+		html += '<tr><td><strong>Start Date</strong></td><td>'+ startdate +'</td></tr>';
 		enddate = new Date(data.report[i].date.year,data.report[i].date.month-1,data.report[i].date.day, data.report[i].hour.end).toLocaleString();
-		html += '<li>End Date:'+ enddate +'</li>';
-		html += '<li>Service Type:'+data.report[i].servicetype+'</li>';
-		html += '<li>Address:'+data.report[i].customerInfo.address+'</li>';
-		html += '<li>Postal Code:'+data.report[i].postalcode+'</li>';
-		html += '<li>Contact Number:'+data.report[i].customerInfo.contact+'</li>';
-		html += '</ol><br />';
+		html += '<tr><td><strong>End Date</strong></td><td>'+ enddate +'</td></tr>';
+		html += '<tr><td><strong>Service Type</strong></td><td>'+data.report[i].servicetype+'</td></tr>';
+		html += '<tr><td><strong>Address</strong></td><td>'+data.report[i].customerInfo.address+'</td></tr>';
+		html += '<tr><td><strong>Postal Code</strong></td><td>'+data.report[i].postalcode+'</td></tr>';
+		html += '<tr><td><strong>Contact Number</strong></td><td>'+data.report[i].customerInfo.contact+'</td></tr>';
+		html += '</table><br />';
 	}
 	html += '</form>';
 	
@@ -80,9 +80,12 @@ function displayResult(data){
 
 {% block maincontent %}
 <h1> Upcoming Appointments </h1>
+<br />
 <div class="clr"></div>
 <input type="button" id="prev" value="&nbsp;&lt;&nbsp;previous"></input><input type="button" id="next" value="&nbsp;&gt;&nbsp;next"></input>
+<br />
 <h2 id="dateregion"></h2>
+<br />
 <div class="clr"></div>
 <div id="weeklySchedule">
 	<form>

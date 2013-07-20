@@ -100,12 +100,14 @@
 				{% if user.accounType == 'administrator' %}
 					<li><a href="/admin/signup">New Employee</a></li>
 					<li><a href="/admin/inventoryall">Inventory</a></li>
-					<li><a href="/admin/servicetypereport">Service Type Report</a></li>
 					<li><a href="/admin/schedule">Schedule</a></li>
 				{% endif %}
 				{% if user.accounType == 'administrator' or user.accounType == 'employee' %}	
 					<li><a href="/admin/weeklyschedule">Weekly Schedule</a></li>
 				{% endif %}
+				{% if user.accounType == 'administrator' %}
+                	<li><a href="/admin/servicetypereport">Service Type Report</a></li>
+                {% endif %}
 				</ul>
 				{% endif %}
       		</div>

@@ -14,18 +14,18 @@ $.getJSON("/jsonbookinghistory",function(data){
 function displayResult(data){
 	var startdate, enddate;
 	var html = '<form>';
-	if(data.history.length ==0) html += 'No History Found!';
+	if(data.history.length ==0) html += '<p><strong>No History Found!</strong></p>';
 	for(var i=0; i<data.history.length; i++){
-		html += '<ol>';
-		html += '<li>Email:'+data.history[i].email+'</li>';
-		html += '<li>Description:'+data.history[i].description+'</li>';
+		html += '<table width=80% border="1" cellspacing="2" cellpadding="5">';
+		html += '<tr><td width=40%><strong>Email</strong></td><td width=60%>'+data.history[i].email+'</td></tr>';
+		html += '<tr><td><strong>Description</strong></td><td>'+data.history[i].description+'</td></tr>';
 		startdate = new Date(data.history[i].date.year,data.history[i].date.month-1,data.history[i].date.day, data.history[i].hour.start).toLocaleString();
-		html += '<li>Start Date:'+ startdate +'</li>';
+		html += '<tr><td><strong>Start Date</strong></td><td>'+ startdate +'</td></tr>';
 		enddate = new Date(data.history[i].date.year,data.history[i].date.month-1,data.history[i].date.day, data.history[i].hour.end).toLocaleString();
-		html += '<li>End Date:'+ enddate +'</li>';
-		html += '<li>Service Type:'+data.history[i].servicetype+'</li>';
-		html += '<li>Postal Code:'+data.history[i].postalcode+'</li>';
-		html += '</ol><br />';
+		html += '<tr><td><strong>End Date</strong></td><td>'+ enddate +'</td></tr>';
+		html += '<tr><td><strong>Service Type</strong></td><td>'+data.history[i].servicetype+'</td></tr>';
+		html += '<tr><td><strong>Postal Code</strong></td><td>'+data.history[i].postalcode+'</td></tr>';
+		html += '</table><br />';
 	}
 	html += '</form>';
 	document.getElementById("bookinghistory").innerHTML = html;
@@ -33,16 +33,16 @@ function displayResult(data){
 	html = '<form>';
 	if(data.current.length ==0) html += 'No Appointment Found!';
 	for(var i=0; i<data.current.length; i++){
-		html += '<ol>';
-		html += '<li>Email:'+data.current[i].email+'</li>';
-		html += '<li>Description:'+data.current[i].description+'</li>';
+		html += '<table width=80% border="1" cellspacing="2" cellpadding="5">';
+		html += '<tr><td width=40%><strong>Email</strong></td><td width=60%>'+data.current[i].email+'</td></tr>';
+		html += '<tr><td><strong>Description</strong></td><td>'+data.current[i].description+'</td></tr>';
 		startdate = new Date(data.current[i].date.year,data.current[i].date.month-1,data.current[i].date.day, data.current[i].hour.start).toLocaleString();
-		html += '<li>Start Date:'+ startdate +'</li>';
+		html += '<tr><td><strong>Start Date</strong></td><td>'+ startdate +'</td></tr>';
 		enddate = new Date(data.current[i].date.year,data.current[i].date.month-1,data.current[i].date.day, data.current[i].hour.end).toLocaleString();
-		html += '<li>End Date:'+ enddate +'</li>';
-		html += '<li>Service Type:'+data.current[i].servicetype+'</li>';
-		html += '<li>Postal Code:'+data.current[i].postalcode+'</li>';
-		html += '</ol><br />';
+		html += '<tr><td><strong>End Date</strong></td><td>'+ enddate +'</td></tr>';
+		html += '<tr><td><strong>Service Type</strong></td><td>'+data.current[i].servicetype+'</td></tr>';
+		html += '<tr><td><strong>Postal Code</strong></td><td>'+data.current[i].postalcode+'</td></tr>';
+		html += '</table><br />';
 	}
 	html += '</form>';
 	document.getElementById("bookingcurrent").innerHTML = html;
@@ -54,11 +54,13 @@ function displayResult(data){
 
 {% block maincontent %}
 <h1> Booking History </h1>
+<br />
 <div class="clr"></div>
 <div id="bookinghistory"></div>
 <h1> Current Booking </h1>
+<br />
 <div class="clr"></div>
-<small>*Please contact us if you wish to change the appointment*</small>
+<small style="color:#FF0000">*Please contact us if you wish to change the appointment*</small>
 <div id="bookingcurrent"></div>
 
 {% endblock %}
