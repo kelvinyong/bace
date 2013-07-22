@@ -6,6 +6,7 @@
 <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=AIzaSyAatrvBOixHV_b6B1ee13soUYBb-7UoFB0" type="text/javascript"></script>
 <script type="text/javascript">
 
+
     var allEvent=[];
     var geocoder = null;
 	var newBookingdetails = {BasicServicing:0,ChemicalWash:0,TopUpGas:"N",CheckAndTroubleshooting:"N",postalCode:null,point:null};
@@ -113,7 +114,7 @@ $(document).ready(function(){
 			}
 				
 		}
-		console.log(chosenRecommendedSlot);
+
 		event.preventDefault();
 		if(chosenRecommendedSlot == null && distances.length != 0){
 			while(chosenRecommendedSlot == null){

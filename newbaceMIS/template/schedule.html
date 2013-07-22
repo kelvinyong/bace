@@ -22,8 +22,9 @@ window.onbeforeunload = function(e) {
 	if(!clickSubmit){
 		e.preventDefault();
 		$.post("/removeusercache", user_var).done(function() {
-				return 'Leaving this page will clear all unsaved information';
+				
 			});
+		return 'Please Book again\n All cache is deleted';
 	}
 };
 
@@ -33,7 +34,7 @@ setTimeout(function(){
 				alert("Please Book again\n Your Booking session has timed out");
 				window.location = "/admin/schedule";
 			});
-},300000);
+},60000);
 
 
 user_var = {

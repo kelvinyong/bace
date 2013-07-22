@@ -230,7 +230,8 @@ class SignupHandler(BaseHandler):
         """ % msg.format(url=verification_url)
     message.Send()
 
-    self.display_message(msg.format(url=verification_url))
+    #self.display_message(msg.format(url=verification_url))
+    self.display_message('A verification email has been sent to the respective email!')
 
 class ForgotPasswordHandler(BaseHandler):
   def get(self):
@@ -263,7 +264,8 @@ class ForgotPasswordHandler(BaseHandler):
         """ % msg.format(url=verification_url)
     message.Send()
 
-    self.display_message(msg.format(url=verification_url))
+    #self.display_message(msg.format(url=verification_url))
+    self.display_message('A verification email has been sent to the respective email!')
   
   def _serve_page(self, not_found=False):
     email = self.request.get('email')
@@ -453,7 +455,8 @@ class ChangepwdHandler(BaseHandler):
             """ % msg.format(url=verification_url)
         message.Send()
 
-        self.display_message(msg.format(url=verification_url))
+        #self.display_message(msg.format(url=verification_url))
+        self.display_message('A verification email has been sent to the respective email!')
   
     def _serve_page(self, not_found=False):
         email = self.request.get('email')
