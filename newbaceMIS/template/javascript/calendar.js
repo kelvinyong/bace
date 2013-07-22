@@ -14,8 +14,9 @@ $(document).ready(function() {
 			remove = selectedRecommend
 		}
 		$.post("/json", selected).done(function(){
-			$.post("/removeCacheBooking",remove);
-			$('#bookingForm').unbind('submit').submit();
+			$.post("/removeCacheBooking",remove).done(function(){
+				$('#bookingForm').unbind('submit').submit();
+			});
 		});
      
 	});//KELVIN
