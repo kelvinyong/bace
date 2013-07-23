@@ -444,7 +444,7 @@
          //KELVIN
          var today = new Date();
          date = dateWithinWeek || options.date;
-         if((date.getDate() == today.getDate())&& (date.getMonth() == today.getMonth())) date.setTime(date.getTime() + MILLIS_IN_WEEK + (MILLIS_IN_WEEK / 7));
+         if(typeof(dateWithinWeek) == "undefined") date.setTime(date.getTime() + MILLIS_IN_WEEK + (MILLIS_IN_WEEK / 7));
          weekStartDate = self._dateFirstDayOfWeek(date);
          weekEndDate = self._dateLastMilliOfWeek(date);
 
