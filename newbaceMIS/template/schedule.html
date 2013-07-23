@@ -34,7 +34,7 @@ setTimeout(function(){
 				alert("Please Book again\n Your Booking session has timed out");
 				window.location = "/admin/schedule";
 			});
-},60000);
+},600000);
 
 
 user_var = {
@@ -175,17 +175,17 @@ $.getJSON('/json', function(data){
 				</li>
 				{% if user.accounType == 'administrator' %}
 				<li>
-					<label for="postalcode">Postal Code: </label><input type="text" name="postalcode"/>
+					<label for="postalcode">Postal Code: </label><input type="text" name="postalcode" required="required" />
 				</li>
 				<li>
-					<label for="email">Email Address: </label><input type="text" name="email"/>
+					<label for="email">Email Address: </label><input type="text" name="email" required="required" />
 				</li>
 				{% endif %}
 				<li>
-					<label for="servicetype">Service(s) Type: </label><textarea name="servicetype" style="width:250px;" disabled="disabled"></textarea>
+					<label for="servicetype">Service(s) Type: </label><textarea name="servicetype" style="width:250px;" disabled="disabled" required="required"></textarea>
 				</li>
 				<li>
-					<label for="body">Request: </label><textarea name="body" style="width:250px;" disabled="disabled"></textarea>
+					<label for="body">Request: </label><textarea name="body" style="width:250px;" disabled="disabled" required="required"></textarea>
 				</li>
 			</ol>
 		</form>

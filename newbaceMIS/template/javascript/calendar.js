@@ -346,7 +346,7 @@ $(document).ready(function() {
 
    function getEventData() {
 	  var date = new Date();
-      date.setDate(date.getDate()+6);
+	  if(user_var.accounType != 'administrator') date.setDate(date.getDate()+6);
       var year = date.getFullYear();
       var month = date.getMonth();
       
@@ -354,8 +354,8 @@ $(document).ready(function() {
       var unavailableList = []
       var id=1;
       var now = false;
-      //KELVIN
-      if(user_var.accounType != 'administrator'){
+      
+      //if(user_var.accounType != 'administrator'){
 	      for(var m=4;m <= month; m++){
 	    	  var days = new Date(year,m+1,0).getDate();
 	    	  for(var d=1;d <= days; d++){
@@ -391,7 +391,7 @@ $(document).ready(function() {
 	          }
 	    	  if(now) break;
 	      }
-      }
+      //}
       
       return {
          events : allEvent.concat(unavailableList)

@@ -605,7 +605,7 @@ class jsonHandler(BaseHandler):
             hour['end'] = job.EndDate.hour
             schedule['hour'] = hour
             schedule['readonly'] = False
-            if((job.StartDate < datetime.now() or self.user.email_address != job.Email) and self.user.accounType != 'administrator'):
+            if(job.StartDate < datetime.now() or (self.user.email_address != job.Email and self.user.accounType != 'administrator')):
                 schedule['readonly'] = True
             params['schedule'].append(schedule)
             
