@@ -132,7 +132,8 @@ $(document).ready(function(){
 				}
 
 			}
-		}		
+		}
+		console.log(chosenRecommendedSlot);
 		if(chosenRecommendedSlot != null && distances.length != 0){
 			user_var['description'] = document.getElementById("request").value;
 			user_var['servicetype'] = servicetype;
@@ -150,7 +151,7 @@ $(document).ready(function(){
 			$.post("/jsonrecommend", user_var).done(function() {
 				$('#recommend').unbind('submit').submit();
 			});
-			}
+		}
 			//else{
 			//arguments.callee();
 			//}
