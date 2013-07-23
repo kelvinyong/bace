@@ -5,6 +5,21 @@
 {% block script %}
 <script type="text/javascript">
 
+var allitem=[];
+var item={};
+
+{% for mainItem in mainItemList %}
+item={
+	'Type': "{{ mainItem.0.Type }}",
+	'Name': "{{ mainItem.0.Name }}",
+	'Description': '{{ mainItem.0.Description|safe }}',
+	'Price': "{{ mainItem.0.Price }}",
+	'Quantity': "{{ mainItem.0.Quantity }}",
+	'Store': "{{ mainItem.0.Store }}"
+};
+allitem.push(item);
+{% endfor %}
+
 $(document).ready(function(){
 	$('.number').keypress(function(e) {
     		var a = [];
@@ -17,11 +32,42 @@ $(document).ready(function(){
         	e.preventDefault();
 		});
 		
+		$('.item').submit(function(event){
+			if (confirm('Are you sure?')){
+    		}else{
+    			event.preventDefault();
+    		}		
+		});
+		
 		$('#addItem').submit(function(event){
 			event.preventDefault();
 			var currency = document.getElementById('currency');
 			var qty = document.getElementById('qty');
+			var type = document.getElementById('itype');
+			var name = document.getElementById('iname');
+			var desc = document.getElementById('idesc');
+			var loc = document.getElementById('iloc');
 			var pattern = /^\d+(?:\.\d{0,2})$/;
+			var saveitem = {};
+			var exist=false;
+			
+			saveitem={
+				'Type': type.value,
+				'Name': name.value,
+				'Description': desc.value,
+				'Price': currency.value,
+				'Quantity': qty.value,
+				'Store': loc.value
+			};
+			
+			for(i=0;i<allitem.length;i++){
+			
+				if((allitem[i].Type == saveitem.Type) && (allitem[i].Name == saveitem.Name) && 
+					(allitem[i].Description == saveitem.Description) && (allitem[i].Price == saveitem.Price) && 
+						(allitem[i].Store == saveitem.Store)){
+						 	exist = true;
+						 }
+			}
 
 		    if (!pattern.test(currency.value)) 
 			{
@@ -32,6 +78,8 @@ $(document).ready(function(){
 				alert('Please key in a valid quantity\n between 0 to 1000');
 				qty.focus;
 				return false;
+			}else if(exist){
+				alert('Item exist\n Please key in another item');
 			}else {
 				$('#addItem').unbind('submit').submit();
 			}
@@ -138,7 +186,7 @@ function go_to_page(page_num){
 	<br />
 	<ul id="itemcontent">
 			{% for mainItem in mainItemList %}
-				<form method="post">
+				<form class="item" method="post">
 				<table width=100% border="1" cellspacing="2" cellpadding="5">
 				<tr>
                     <td width=40%><strong>Item Type:</strong></td>
@@ -187,15 +235,15 @@ function go_to_page(page_num){
     	<table width=80%>
     	<tr>
             <td width=40%><strong>Item Type:</strong></td>
-            <td width=60%><input type="text" name="itemType" required/></td>
+            <td width=60%><input id="itype"type="text" name="itemType" required/></td>
         </tr>
         <tr>
             <td><strong>Item Name:</strong></td>
-            <td><input type="text" name="itemName" required/></td>
+            <td><input id="iname" type="text" name="itemName" required/></td>
         </tr>
         <tr>
             <td><strong>Item Description:</strong></td>
-            <td><input type="text" name="itemDesc" required/></td>
+            <td><input id="idesc" type="text" name="itemDesc" required/></td>
         </tr>
         <tr>
         <td><strong>Item Price(eg. 1.00):</strong></td>
@@ -208,7 +256,7 @@ function go_to_page(page_num){
         <tr>
         <td><strong>Item Location:</strong></td>
             <td>
-                <select name="itemStorage">
+                <select id="iloc" name="itemStorage">
                 {% if warehouses %}
                     {% for warehouse in warehouses %}
                         <option value="{{ warehouse.Name }}">{{ warehouse.Name }}</option>

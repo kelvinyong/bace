@@ -418,7 +418,12 @@ class SettingHandler(BaseHandler):
         info.Contact_No = int(self.request.get('contact'))
         info.Address = self.request.get('address')
         info.postalCode = int(self.request.get('postalcode'))
+        
+        user = self.user
+        user.first_name = info.First_Name
+        user.put()
         info.put()
+        
         self.display_message('Information has been changed successfully')
         
         
